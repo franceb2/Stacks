@@ -77,6 +77,9 @@ struct SeriesDetailView: View {
         }
         .task { await load() }
         .refreshable { await load() }
+        .onReceive(NotificationCenter.default.publisher(for: .tourOpenReader)) { _ in
+            if let chapter = continueChapter { reader = ReaderLaunch(chapterId: chapter.id) }
+        }
         .fullScreenCover(item: $reader, onDismiss: {
             Task { await load() }
             NotificationCenter.default.post(name: .readingProgressChanged, object: nil)

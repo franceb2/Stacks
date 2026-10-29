@@ -60,6 +60,7 @@ struct ReaderView: View {
             }
         }
         .task(id: chapterId) { await load() }
+        .onReceive(NotificationCenter.default.publisher(for: .tourCloseReader)) { _ in dismiss() }
     }
 
     private var actions: ReaderActions {

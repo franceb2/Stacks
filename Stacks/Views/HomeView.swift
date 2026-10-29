@@ -13,9 +13,11 @@ struct HomeView: View {
     @State private var onDeck: [Series] = []
     @State private var error: String?
     @State private var loaded = false
+    @State private var path = NavigationPath()
+    @State private var tourStarted = false
 
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $path) {
             List {
                 if !onDeck.isEmpty {
                     Section("Continue reading") {
@@ -65,11 +67,73 @@ struct HomeView: View {
                 }
             }
             .refreshable { await load() }
-            .task { if !loaded { await load() } }
+            .task {
+                if !loaded { await load() }
+                if DemoTour.enabled && !tourStarted {
+                    tourStarted = true
+                    await runTour()
+                }
+            }
             .onReceive(NotificationCenter.default.publisher(for: .readingProgressChanged)) { _ in
                 Task { await load() }
             }
         }
+    }
+
+    /// Preview-build only: steps through the main screens, saving a screenshot of each.
+    private func runTour() async {
+        await DemoTour.pause(4)
+        DemoTour.snap("1-home")
+
+        if let comics = libraries.first(where: { $0.type == 1 || $0.type == 5 }) ?? libraries.first {
+            path.append(comics)
+            await DemoTour.pause(4)
+            DemoTour.snap("2-library")
+
+            if let series = try? await client.series(libraryId: comics.id, search: nil, page: 1).first {
+                path.append(series)
+                await DemoTour.pause(4)
+                DemoTour.snap("3-series")
+
+                NotificationCenter.default.post(name: .tourOpenReader, object: nil)
+                await DemoTour.pause(5)
+                DemoTour.snap("4-comic-reader")
+                NotificationCenter.default.post(name: .tourCloseReader, object: nil)
+                await DemoTour.pause(2)
+            }
+        }
+
+        if let manga = libraries.first(where: { $0.type == 0 }),
+           let series = try? await client.series(libraryId: manga.id, search: nil, page: 1).first {
+            path = NavigationPath()
+            await DemoTour.pause(1)
+            path.append(manga)
+            await DemoTour.pause(1.5)
+            path.append(series)
+            await DemoTour.pause(4)
+            DemoTour.snap("5-manga-volumes")
+        }
+
+        if let books = libraries.first(where: { $0.type == 2 || $0.type == 4 }),
+           let list = try? await client.series(libraryId: books.id, search: nil, page: 1),
+           let novel = list.first(where: { $0.format == MangaFormat.epub.rawValue }) ?? list.first {
+            path = NavigationPath()
+            await DemoTour.pause(1)
+            path.append(books)
+            await DemoTour.pause(3)
+            DemoTour.snap("6-books")
+            path.append(novel)
+            await DemoTour.pause(3)
+            NotificationCenter.default.post(name: .tourOpenReader, object: nil)
+            await DemoTour.pause(5)
+            DemoTour.snap("7-book-reader")
+            NotificationCenter.default.post(name: .tourCloseReader, object: nil)
+            await DemoTour.pause(2)
+        }
+
+        path = NavigationPath()
+        await DemoTour.pause(2)
+        DemoTour.finish()
     }
 
     private func load() async {

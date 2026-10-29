@@ -11,6 +11,13 @@ final class AppSession: ObservableObject {
     private let keychainAccount = "kavita-auth-key"
 
     init() {
+        // Preview builds launch the simulator with -demoServer/-demoApiKey; normal use never sets these.
+        if let demoServer = UserDefaults.standard.string(forKey: "demoServer"),
+           let demoKey = UserDefaults.standard.string(forKey: "demoApiKey"),
+           let url = URL(string: demoServer) {
+            client = KavitaClient(baseURL: url, apiKey: demoKey)
+            return
+        }
         if let raw = UserDefaults.standard.string(forKey: serverKey),
            let url = URL(string: raw),
            let key = Keychain.read(account: keychainAccount) {
