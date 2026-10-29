@@ -1,0 +1,46 @@
+name: Build iPhone app
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate Xcode project
+        run: xcodegen generate
+
+      - name: Build (unsigned)
+        run: |
+          set -o pipefail
+          xcodebuild -project Stacks.xcodeproj -target Stacks -configuration Release \
+            -sdk iphoneos SYMROOT="$PWD/build" \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
+            build | tee build.log | grep -E "error:|warning: .*Stacks/|BUILD (SUCCEEDED|FAILED)" || true
+          test -d build/Release-iphoneos/Stacks.app || { echo "::error::Build failed, see build.log artifact"; exit 1; }
+
+      - name: Package .ipa
+        run: |
+          mkdir -p Payload
+          cp -R build/Release-iphoneos/Stacks.app Payload/
+          zip -qry Stacks.ipa Payload
+
+      - name: Upload .ipa
+        uses: actions/upload-artifact@v4
+        with:
+          name: Stacks-ipa
+          path: Stacks.ipa
+
+      - name: Upload build log (if it failed)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-log
+          path: build.log
