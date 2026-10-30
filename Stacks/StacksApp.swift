@@ -161,12 +161,18 @@ struct RootView: View {
                  + "\n\nDownload it, then install it with Signulous like before.")
         }
         .onReceive(NotificationCenter.default.publisher(for: .networkReturned)) { _ in
-            Task { await downloads.flush(client: client) }
+            Task {
+                await downloads.flush(client: client)
+                downloads.resumeIncomplete(client: client)
+                await OfflineLibrary.shared.refresh(client: client)
+            }
         }
         .task {
             downloads.removeOldFinished()
             await downloads.flush(client: client)
+            if !ConnectionStatus.shared.offline { downloads.resumeIncomplete(client: client) }
             await updates.check()
+            await OfflineLibrary.shared.refresh(client: client)
             if DemoTour.enabled && !tourStarted {
                 tourStarted = true
                 await runTour()
@@ -177,7 +183,9 @@ struct RootView: View {
                 downloads.removeOldFinished()
                 Task {
                     await downloads.flush(client: client)
+                    if !ConnectionStatus.shared.offline { downloads.resumeIncomplete(client: client) }
                     await updates.check()
+                    await OfflineLibrary.shared.refresh(client: client)
                 }
             }
         }

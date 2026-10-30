@@ -90,6 +90,18 @@ final class ImageCache: @unchecked Sendable {
         return await refresh(url, key: k, file: file)
     }
 
+    /// Saves a cover to disk if it isn't there yet (no decoding, used for background saving).
+    func warm(_ url: URL?) async {
+        guard let url else { return }
+        let file = dir.appendingPathComponent(key(url))
+        if FileManager.default.fileExists(atPath: file.path) { return }
+        var req = URLRequest(url: url)
+        req.setValue(KavitaClient.clientHeader, forHTTPHeaderField: "X-Kavita-Client")
+        guard let (data, response) = try? await URLSession.shared.data(for: req),
+              (response as? HTTPURLResponse)?.statusCode == 200, data.count > 64 else { return }
+        try? data.write(to: file, options: .atomic)
+    }
+
     @discardableResult
     private func refresh(_ url: URL, key k: String, file: URL) async -> UIImage? {
         var req = URLRequest(url: url)

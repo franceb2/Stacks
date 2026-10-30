@@ -67,6 +67,16 @@ struct DownloadedChapter: Codable, Identifiable {
     var lastPage: Int?
     /// When the whole thing was read; used to clean up finished downloads.
     var finishedAt: Date?
+    /// Pages you asked for. Any not yet in `pages` get finished automatically.
+    var requested: [Int]?
+
+    var missing: [Int] {
+        let have = Set(pages)
+        if let requested { return requested.filter { !have.contains($0) } }
+        // Older downloads didn't record what was asked for: treat gaps in the middle as missing.
+        guard let first = pages.min(), let last = pages.max(), last > first else { return [] }
+        return (first...last).filter { !have.contains($0) }
+    }
 
     var id: Int { chapterId }
     var totalPages: Int { info.pages }
@@ -89,6 +99,7 @@ struct DownloadedChapter: Codable, Identifiable {
 enum DownloadRange {
     case all
     case pages(ClosedRange<Int>) // 0-based, inclusive
+    case list([Int])             // specific pages, used to finish incomplete downloads
 }
 
 /// Downloads chapters page by page through Kavita's reader API (works for CBZ, CBR, PDF and EPUB),
@@ -252,11 +263,24 @@ final class Downloads: ObservableObject {
         let dir = folder(chapterId)
         try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
 
+        // Ask iOS for extra time so leaving the app doesn't cut the download off.
+        var backgroundTask = UIBackgroundTaskIdentifier.invalid
+        backgroundTask = UIApplication.shared.beginBackgroundTask(withName: "Stacks download") {
+            UIApplication.shared.endBackgroundTask(backgroundTask)
+            backgroundTask = .invalid
+        }
+        defer {
+            if backgroundTask != .invalid { UIApplication.shared.endBackgroundTask(backgroundTask) }
+        }
+
         let info: ChapterInfo
         do {
             info = try await client.chapterInfo(chapterId: chapterId)
         } catch {
-            lastError = "Couldn't start the download: \(error.localizedDescription)"
+            // Offline: stay quiet; it's finished automatically when the connection comes back.
+            if !KavitaClient.isOffline(error) {
+                lastError = "Couldn't start the download: \(error.localizedDescription)"
+            }
             return
         }
 
@@ -271,10 +295,12 @@ final class Downloads: ObservableObject {
         switch range {
         case .all: wanted = Array(all)
         case .pages(let r): wanted = Array(all.clamped(to: r.lowerBound..<(r.upperBound + 1)))
+        case .list(let pages): wanted = pages.filter { all.contains($0) }
         }
         var entry = items[chapterId] ?? DownloadedChapter(chapterId: chapterId, seriesId: seriesId,
                                                           seriesName: seriesName, title: title, info: info,
                                                           pages: [], bytes: 0, date: Date(), lastPage: nil)
+        entry.requested = Array(Set(entry.requested ?? []).union(wanted)).sorted()
         let have = Set(entry.pages)
         wanted.removeAll { have.contains($0) }
         jobs[chapterId]?.total = wanted.count
@@ -291,7 +317,8 @@ final class Downloads: ObservableObject {
 
         let isBook = info.seriesFormat == MangaFormat.epub.rawValue
         var index = 0
-        let parallel = 4
+        let parallel = 3
+        var failedPages: [Int] = []
         while index < wanted.count {
             if Task.isCancelled { break }
             let batch = Array(wanted[index..<min(index + parallel, wanted.count)])
@@ -301,11 +328,13 @@ final class Downloads: ObservableObject {
                     group.addTask {
                         let bytes: Int64?
                         if isBook {
-                            bytes = try? await Self.saveSection(client: client, chapterId: chapterId,
-                                                                section: page, dir: dir)
+                            bytes = try? await Self.withRetries {
+                                try await Self.saveSection(client: client, chapterId: chapterId, section: page, dir: dir)
+                            }
                         } else {
-                            bytes = try? await Self.savePage(client: client, chapterId: chapterId,
-                                                             page: page, dir: dir)
+                            bytes = try? await Self.withRetries {
+                                try await Self.savePage(client: client, chapterId: chapterId, page: page, dir: dir)
+                            }
                         }
                         return (page, bytes)
                     }
@@ -323,23 +352,73 @@ final class Downloads: ObservableObject {
                     entry.bytes += bytes
                 } else {
                     job.failed += 1
+                    failedPages.append(page)
                 }
             }
             entry.pages = Array(Set(entry.pages)).sorted()
             entry.date = Date()
             items[chapterId] = entry
             jobs[chapterId] = job
-            if job.failed > 0 && job.failed == job.done {
+            if job.failed > 0 && job.failed == job.done && job.done >= 6 {
                 lastError = "Downloads are failing. Check that your server is reachable."
                 break
             }
         }
+
+        // Second pass: try anything that failed again, one at a time.
+        if !Task.isCancelled && !failedPages.isEmpty {
+            for page in failedPages {
+                if Task.isCancelled { break }
+                let bytes: Int64?
+                if isBook {
+                    bytes = try? await Self.withRetries {
+                        try await Self.saveSection(client: client, chapterId: chapterId, section: page, dir: dir)
+                    }
+                } else {
+                    bytes = try? await Self.withRetries {
+                        try await Self.savePage(client: client, chapterId: chapterId, page: page, dir: dir)
+                    }
+                }
+                if let bytes {
+                    entry.pages.append(page)
+                    entry.bytes += bytes
+                    jobs[chapterId]?.failed -= 1
+                }
+            }
+            entry.pages = Array(Set(entry.pages)).sorted()
+            items[chapterId] = entry
+        }
         save()
+    }
+
+    /// Tries an operation up to 3 times, waiting a little longer each time.
+    nonisolated private static func withRetries<T>(_ op: () async throws -> T) async throws -> T {
+        var lastError: Error?
+        for attempt in 0..<3 {
+            do { return try await op() } catch {
+                lastError = error
+                if Task.isCancelled { break }
+                try? await Task.sleep(nanoseconds: UInt64(attempt + 1) * 1_000_000_000)
+            }
+        }
+        throw lastError ?? URLError(.unknown)
+    }
+
+    /// Finishes any download that has pages missing (for example after the app was closed mid-download).
+    func resumeIncomplete(client: KavitaClient) {
+        for item in items.values where jobs[item.chapterId] == nil {
+            let missing = item.missing
+            guard !missing.isEmpty else { continue }
+            start(client: client, chapterId: item.chapterId, seriesId: item.seriesId, seriesName: item.seriesName,
+                  title: item.title, range: .list(missing))
+        }
     }
 
     nonisolated private static func savePage(client: KavitaClient, chapterId: Int, page: Int,
                                              dir: URL) async throws -> Int64 {
         let data = try await client.pageImageData(chapterId: chapterId, page: page)
+        // Only keep real pictures (not an error page from the server or Cloudflare).
+        guard data.count > 64, UIImage(data: data) != nil else { throw URLError(.cannotDecodeContentData) }
         try data.write(to: dir.appendingPathComponent("p\(page).img"), options: .atomic)
         return Int64(data.count)
     }

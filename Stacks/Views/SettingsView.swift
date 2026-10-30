@@ -17,6 +17,7 @@ struct SettingsView: View {
     @State private var autoDeleteDays = AutoDelete.days
     @AppStorage("appTheme") private var themeRaw = AppTheme.kavita.rawValue
     @StateObject private var updates = UpdateChecker.shared
+    @StateObject private var offlineLibrary = OfflineLibrary.shared
     @Environment(\.openURL) private var openURL
 
     var body: some View {
@@ -144,6 +145,27 @@ struct SettingsView: View {
                 Text("Auto-download")
             } footer: {
                 Text("When you finish an issue or chapter, the next ones download quietly so they're ready offline. Follows your reading list when you're reading from one.")
+            }
+            .listRowBackground(Theme.card)
+
+            Section {
+                if offlineLibrary.running {
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text("Saving your library…")
+                        ProgressView(value: offlineLibrary.progress).tint(Theme.primary)
+                    }
+                } else {
+                    LabeledContent("Saved", value: offlineLibrary.lastSaved.map {
+                        "\(offlineLibrary.savedCount) series · \($0.formatted(.relative(presentation: .named)))"
+                    } ?? "Not yet")
+                    Button("Save library now") {
+                        Task { await offlineLibrary.refresh(client: client, force: true) }
+                    }
+                }
+            } header: {
+                Text("Offline library")
+            } footer: {
+                Text("Your libraries, series pages, lists and covers are saved in the background so you can browse with no connection. Series pages and covers save on Wi-Fi. Only downloaded issues open offline.")
             }
             .listRowBackground(Theme.card)
 

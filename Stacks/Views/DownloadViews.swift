@@ -330,6 +330,21 @@ struct DownloadsView: View {
                         Text("Read to \(item.isBook ? "section" : "page") \(last + 1)")
                             .font(.caption).foregroundStyle(Theme.primary)
                     }
+                    if downloads.jobs[item.chapterId] == nil, !item.missing.isEmpty {
+                        HStack(spacing: 8) {
+                            Label("\(item.missing.count) \(item.isBook ? "section" : "page")\(item.missing.count == 1 ? "" : "s") missing",
+                                  systemImage: "exclamationmark.triangle.fill")
+                                .font(.caption)
+                                .foregroundStyle(.orange)
+                            Button("Finish") {
+                                downloads.start(client: client, chapterId: item.chapterId, seriesId: item.seriesId,
+                                                seriesName: item.seriesName, title: item.title,
+                                                range: .list(item.missing))
+                            }
+                            .font(.caption.weight(.semibold))
+                            .buttonStyle(.borderless)
+                        }
+                    }
                     if let job = downloads.jobs[item.chapterId] {
                         HStack {
                             ProgressView(value: job.fraction).tint(Theme.primary)
