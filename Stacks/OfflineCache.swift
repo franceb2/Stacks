@@ -64,7 +64,8 @@ final class ImageCache: @unchecked Sendable {
     /// Same picture regardless of which Auth Key is in the address.
     private func key(_ url: URL) -> String {
         var comps = URLComponents(url: url, resolvingAgainstBaseURL: false)
-        comps?.queryItems = comps?.queryItems?.filter { $0.name != "apiKey" }.sorted { $0.name < $1.name }
+        let items = comps?.queryItems?.filter { $0.name != "apiKey" }.sorted { $0.name < $1.name }
+        comps?.queryItems = items
         let text = comps?.string ?? url.absoluteString
         return SHA256.hash(data: Data(text.utf8)).map { String(format: "%02x", $0) }.joined()
     }
