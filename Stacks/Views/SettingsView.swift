@@ -12,9 +12,71 @@ struct SettingsView: View {
     @State private var resetDone = false
     @State private var autoCount = AutoDownload.count
     @State private var autoWifiOnly = AutoDownload.wifiOnly
+    @State private var mangaRTL = ReaderPrefsStore.mangaRightToLeft
+    @AppStorage("appTheme") private var themeRaw = AppTheme.kavita.rawValue
+    @StateObject private var updates = UpdateChecker.shared
+    @Environment(\.openURL) private var openURL
 
     var body: some View {
         Form {
+            Section("Theme") {
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 62), spacing: 12)], spacing: 14) {
+                    ForEach(AppTheme.allCases) { theme in
+                        Button {
+                            AppTheme.select(theme)
+                        } label: {
+                            VStack(spacing: 6) {
+                                ZStack {
+                                    Circle().fill(Color(hex: theme.background))
+                                    Circle().trim(from: 0, to: 0.5)
+                                        .fill(Color(hex: theme.accent))
+                                        .rotationEffect(.degrees(-45))
+                                    Circle().stroke(themeRaw == theme.rawValue ? Color.white : Color.white.opacity(0.15),
+                                                    lineWidth: themeRaw == theme.rawValue ? 3 : 1)
+                                }
+                                .frame(width: 46, height: 46)
+                                Text(theme.name)
+                                    .font(.caption2)
+                                    .foregroundStyle(themeRaw == theme.rawValue ? Theme.text : Theme.muted)
+                                    .lineLimit(1)
+                                    .minimumScaleFactor(0.8)
+                            }
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+                .padding(.vertical, 6)
+            }
+            .listRowBackground(Theme.card)
+
+            Section("Updates") {
+                LabeledContent("Installed", value: "\(updates.installedVersion) (build \(updates.installedBuild))")
+                if let release = updates.available {
+                    Button {
+                        openURL(UpdateChecker.downloadURL)
+                    } label: {
+                        Label("Download \(release.name)", systemImage: "arrow.down.circle.fill")
+                    }
+                    if !release.notes.isEmpty {
+                        Text(release.notes).font(.footnote).foregroundStyle(Theme.muted)
+                    }
+                } else {
+                    Button {
+                        Task { await updates.check(force: true) }
+                    } label: {
+                        HStack {
+                            Text(updates.lastChecked == nil ? "Check for updates" : "You're up to date · check again")
+                            Spacer()
+                            if updates.checking { ProgressView() }
+                        }
+                    }
+                }
+                if let problem = updates.problem {
+                    Text(problem).font(.footnote).foregroundStyle(Theme.muted)
+                }
+            }
+            .listRowBackground(Theme.card)
+
             Section("Server") {
                 LabeledContent("Address", value: session.serverAddress)
                 Button("Sign out", role: .destructive) { confirmSignOut = true }
@@ -29,6 +91,9 @@ struct SettingsView: View {
                     .disabled(comic.mode != .leftRight)
                 Toggle("Two pages when sideways", isOn: $comic.doublePage)
                     .disabled(comic.mode != .leftRight)
+                Toggle("Tap sides to turn pages", isOn: $comic.tapToTurn)
+                    .disabled(comic.mode == .webtoon)
+                Toggle("Manga reads right to left", isOn: $mangaRTL)
                 Picker("Image scaling", selection: $comic.scaling) {
                     ForEach(ScalingMode.allCases) { Text($0.label).tag($0) }
                 }
@@ -102,6 +167,8 @@ struct SettingsView: View {
         .onChange(of: book) { _, value in ReaderPrefsStore.book = value }
         .onChange(of: autoCount) { _, value in AutoDownload.count = value }
         .onChange(of: autoWifiOnly) { _, value in AutoDownload.wifiOnly = value }
+        .onChange(of: mangaRTL) { _, value in ReaderPrefsStore.mangaRightToLeft = value }
+        .task { await updates.check() }
         .confirmationDialog("Delete all downloads?", isPresented: $confirmDelete, titleVisibility: .visible) {
             Button("Delete all", role: .destructive) { downloads.deleteAll() }
         }

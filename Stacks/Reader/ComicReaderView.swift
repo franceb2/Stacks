@@ -21,7 +21,8 @@ struct ComicReaderView: View {
         self.context = context
         self.client = client
         self.actions = actions
-        _prefs = State(initialValue: ReaderPrefsStore.comic(seriesId: context.info.seriesId))
+        _prefs = State(initialValue: ReaderPrefsStore.comic(seriesId: context.info.seriesId,
+                                                             libraryType: context.info.libraryType))
         _page = State(initialValue: context.startPage)
         _scrubPage = State(initialValue: Double(context.startPage))
         _store = StateObject(wrappedValue: PageImageStore(client: client, chapterId: context.chapterId,
@@ -184,7 +185,7 @@ struct ComicReaderView: View {
 
     /// `x` is where the tap landed, from 0 (left edge) to 1 (right edge).
     private func handleTap(_ x: CGFloat) {
-        if x > 0.3 && x < 0.7 {
+        if !prefs.tapToTurn || (x > 0.3 && x < 0.7) {
             withAnimation(.easeOut(duration: 0.15)) { showChrome.toggle() }
             return
         }
@@ -299,6 +300,8 @@ struct ComicSettingsSheet: View {
                         .disabled(prefs.mode != .leftRight)
                     Toggle("Two pages when sideways", isOn: $prefs.doublePage)
                         .disabled(prefs.mode != .leftRight)
+                    Toggle("Tap sides to turn pages", isOn: $prefs.tapToTurn)
+                        .disabled(prefs.mode == .webtoon)
                     Picker("Image scaling", selection: $prefs.scaling) {
                         ForEach(ScalingMode.allCases) { Text($0.label).tag($0) }
                     }

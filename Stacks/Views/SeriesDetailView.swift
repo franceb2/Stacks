@@ -36,6 +36,8 @@ struct SeriesDetailView: View {
     @State private var wantToRead: Bool?
     @State private var listTarget: ListSheetTarget?
     @State private var downloadsQueued = 0
+    @State private var selecting = false
+    @State private var selected: Set<Int> = []
     @State private var error: String?
 
     var body: some View {
@@ -62,7 +64,16 @@ struct SeriesDetailView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(.hidden, for: .navigationBar)
         .toolbar {
-            ToolbarItem(placement: .topBarTrailing) { seriesMenu }
+            ToolbarItemGroup(placement: .topBarTrailing) {
+                Button(selecting ? "Done" : "Select") {
+                    withAnimation(.easeOut(duration: 0.2)) {
+                        selecting.toggle()
+                        selected = []
+                    }
+                }
+                .disabled(detail == nil)
+                if !selecting { seriesMenu }
+            }
         }
         .task { await load() }
         .refreshable { await load() }
@@ -77,6 +88,9 @@ struct SeriesDetailView: View {
         }
         .sheet(item: $listTarget) { item in
             AddToListSheet(target: item.target, title: item.title, client: client)
+        }
+        .safeAreaInset(edge: .bottom) {
+            if selecting { selectionBar.transition(.move(edge: .bottom).combined(with: .opacity)) }
         }
         .sensoryFeedback(.selection, trigger: wantToRead)
         .sensoryFeedback(.success, trigger: downloadsQueued)
@@ -285,8 +299,18 @@ struct SeriesDetailView: View {
                               progress: volume.progress,
                               unread: volume.pagesRead == 0,
                               downloaded: downloads.badge(forChapters: chapters.map(\.id)))
+        let ids = Set(chapters.map(\.id))
         Group {
-            if chapters.count == 1, let only = chapters.first {
+            if selecting {
+                Button { toggle(ids) } label: {
+                    KavitaCard(title: volume.displayName, subtitle: "\(volume.pages) pages",
+                               coverURL: client.volumeCoverURL(volume.id), progress: volume.progress,
+                               unread: volume.pagesRead == 0,
+                               downloaded: downloads.badge(forChapters: chapters.map(\.id)),
+                               selected: !ids.isEmpty && ids.isSubset(of: selected))
+                }
+                .buttonStyle(PressableStyle())
+            } else if chapters.count == 1, let only = chapters.first {
                 Button { reader = ReaderLaunch(chapterId: only.id) } label: { card }
                     .buttonStyle(PressableStyle())
             } else {
@@ -322,7 +346,7 @@ struct SeriesDetailView: View {
 
     private func chapterCard(_ chapter: Chapter) -> some View {
         Button {
-            reader = ReaderLaunch(chapterId: chapter.id)
+            if selecting { toggle([chapter.id]) } else { reader = ReaderLaunch(chapterId: chapter.id) }
         } label: {
             KavitaCard(title: name(for: chapter),
                        subtitle: chapter.isStarted ? "Page \(chapter.pagesRead + 1) of \(chapter.pages)"
@@ -330,7 +354,8 @@ struct SeriesDetailView: View {
                        coverURL: client.chapterCoverURL(chapter.id),
                        progress: chapter.progress,
                        unread: chapter.pagesRead == 0,
-                       downloaded: downloads.badge(for: chapter.id))
+                       downloaded: downloads.badge(for: chapter.id),
+                       selected: selecting ? selected.contains(chapter.id) : nil)
         }
         .buttonStyle(PressableStyle())
         .contextMenu { chapterMenu(chapter) }
@@ -393,6 +418,46 @@ struct SeriesDetailView: View {
     }
 
     private var isBook: Bool { series?.format == MangaFormat.epub.rawValue }
+
+    // MARK: Batch select
+
+    private var selectionBar: some View {
+        let all = detail?.allChapters ?? []
+        return HStack(spacing: 10) {
+            Menu {
+                Button("Select all") { selected = Set(all.map(\.id)) }
+                Button("Select unread") { selected = Set(all.filter { !$0.isRead }.map(\.id)) }
+                Button("Select not downloaded") {
+                    selected = Set(all.filter { downloads.items[$0.id]?.isComplete != true }.map(\.id))
+                }
+                Button("Clear") { selected = [] }
+            } label: {
+                Label("\(selected.count) selected", systemImage: "checklist")
+            }
+            .buttonStyle(SecondaryButtonStyle())
+            Spacer()
+            Button {
+                for c in all where selected.contains(c.id) { download(c, name: name(for: c), range: .all) }
+                withAnimation {
+                    selecting = false
+                    selected = []
+                }
+            } label: {
+                Label("Download (\(selected.count))", systemImage: "arrow.down.circle.fill")
+            }
+            .buttonStyle(PrimaryButtonStyle())
+            .disabled(selected.isEmpty)
+            .opacity(selected.isEmpty ? 0.5 : 1)
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 10)
+        .background(.ultraThinMaterial)
+    }
+
+    private func toggle(_ ids: Set<Int>) {
+        guard !ids.isEmpty else { return }
+        if ids.isSubset(of: selected) { selected.subtract(ids) } else { selected.formUnion(ids) }
+    }
 
     private func toggleWantToRead() {
         let newValue = !(wantToRead ?? false)

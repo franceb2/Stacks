@@ -53,6 +53,8 @@ struct ComicPrefs: Codable, Equatable {
     var background: ReaderBackground = .black
     /// Two pages side by side when the phone is sideways. Off by default.
     var doublePage = false
+    /// Tap the left or right side to turn pages. When off, taps only show the menu.
+    var tapToTurn = true
 
     init() {}
 
@@ -63,6 +65,7 @@ struct ComicPrefs: Codable, Equatable {
         scaling = try c.decodeIfPresent(ScalingMode.self, forKey: .scaling) ?? .automatic
         background = try c.decodeIfPresent(ReaderBackground.self, forKey: .background) ?? .black
         doublePage = try c.decodeIfPresent(Bool.self, forKey: .doublePage) ?? false
+        tapToTurn = try c.decodeIfPresent(Bool.self, forKey: .tapToTurn) ?? true
     }
 }
 
@@ -115,6 +118,20 @@ struct BookPrefs: Codable, Equatable {
     var margin = 22             // points on each side
     var theme: BookTheme = .dark
     var font: BookFont = .original
+    var tapToTurn = true
+
+    init() {}
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        paged = try c.decodeIfPresent(Bool.self, forKey: .paged) ?? true
+        fontSize = try c.decodeIfPresent(Int.self, forKey: .fontSize) ?? 100
+        lineHeight = try c.decodeIfPresent(Double.self, forKey: .lineHeight) ?? 1.5
+        margin = try c.decodeIfPresent(Int.self, forKey: .margin) ?? 22
+        theme = try c.decodeIfPresent(BookTheme.self, forKey: .theme) ?? .dark
+        font = try c.decodeIfPresent(BookFont.self, forKey: .font) ?? .original
+        tapToTurn = try c.decodeIfPresent(Bool.self, forKey: .tapToTurn) ?? true
+    }
 }
 
 /// Global defaults plus per-series overrides, like Kavita's reading profiles.
@@ -128,10 +145,22 @@ enum ReaderPrefsStore {
         set { UserDefaults.standard.set(try? JSONEncoder().encode(newValue), forKey: defaultsKey) }
     }
 
+    /// Manga libraries start right to left unless this is turned off in Settings.
+    static var mangaRightToLeft: Bool {
+        get { UserDefaults.standard.object(forKey: "mangaRightToLeft") as? Bool ?? true }
+        set { UserDefaults.standard.set(newValue, forKey: "mangaRightToLeft") }
+    }
+
+    /// Settings for a series: what you chose for it, or the defaults (right to left for Manga libraries).
     static func comic(seriesId: Int, libraryType: Int? = nil) -> ComicPrefs {
         let all: [String: ComicPrefs] = decode(UserDefaults.standard.data(forKey: seriesKey)) ?? [:]
         if let saved = all[String(seriesId)] { return saved }
-        return defaultComic
+        var prefs = defaultComic
+        if libraryType == 0 && mangaRightToLeft {
+            prefs.mode = .leftRight
+            prefs.rightToLeft = true
+        }
+        return prefs
     }
 
     static func setComic(_ prefs: ComicPrefs, seriesId: Int) {

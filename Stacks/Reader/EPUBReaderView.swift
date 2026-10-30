@@ -247,6 +247,8 @@ struct BookSettingsSheet: View {
                         Text("Scroll").tag(false)
                     }
                     .pickerStyle(.segmented)
+                    Toggle("Tap sides to turn pages", isOn: $prefs.tapToTurn)
+                        .disabled(!prefs.paged)
                 }
                 .listRowBackground(Theme.card)
 
@@ -496,19 +498,20 @@ struct BookWebView: UIViewRepresentable {
         body * { color: inherit !important; background-color: transparent !important; }
         p, div, li, span { line-height: \(prefs.lineHeight) !important; }
         img, svg, video { max-width: 100% !important; height: auto !important; object-fit: contain; }
-        a, a * { color: #4ac694 !important; }
+        a, a * { color: \(AppTheme.current.accentCSS) !important; }
         \(font)
         \(layout)
         </style></head><body>\(fragment)
-        <script>\(script(paged: prefs.paged))</script>
+        <script>\(script(paged: prefs.paged, tapToTurn: prefs.tapToTurn))</script>
         </body></html>
         """
     }
 
-    private static func script(paged: Bool) -> String {
+    private static func script(paged: Bool, tapToTurn: Bool) -> String {
         """
         (function(){
           var paged = \(paged ? "true" : "false");
+          var tapToTurn = \(tapToTurn ? "true" : "false");
           function post(m){ window.webkit.messageHandlers.book.postMessage(m); }
           function W(){ return window.innerWidth; }
           function docH(){ return document.documentElement.scrollHeight; }
@@ -576,8 +579,8 @@ struct BookWebView: UIViewRepresentable {
             }
             if (a && a.getAttribute('href') && a.getAttribute('href').indexOf('javascript') !== 0) return;
             var x = e.clientX / W();
-            if (paged && x < 0.3) stacksPrev();
-            else if (paged && x > 0.7) stacksNext();
+            if (paged && tapToTurn && x < 0.3) stacksPrev();
+            else if (paged && tapToTurn && x > 0.7) stacksNext();
             else post({type:'menu'});
           }, true);
         })();

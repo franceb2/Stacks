@@ -168,6 +168,8 @@ struct ChapterInfo: Codable {
     let seriesName: String?
     let title: String?
     let subtitle: String?
+    /// Kavita LibraryType (0 = Manga). Optional so older downloads still load.
+    let libraryType: Int?
 }
 
 /// Kavita MangaFormat

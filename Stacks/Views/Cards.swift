@@ -37,6 +37,8 @@ struct KavitaCard: View {
     var unread = false
     var badge: String? = nil
     var downloaded: DownloadBadge? = nil
+    /// nil when not selecting; true/false shows a check circle.
+    var selected: Bool? = nil
 
     enum DownloadBadge { case full, partial, downloading(Double) }
 
@@ -67,7 +69,7 @@ struct KavitaCard: View {
                     if let badge {
                         Text(badge)
                             .font(.caption2.bold())
-                            .foregroundStyle(.black)
+                            .foregroundStyle(Theme.onPrimary)
                             .padding(.horizontal, 6).padding(.vertical, 2)
                             .background(Theme.primary, in: Capsule())
                             .padding(5)
@@ -80,6 +82,22 @@ struct KavitaCard: View {
                 .overlay {
                     if progress >= 1 {
                         RoundedRectangle(cornerRadius: 5).fill(Color.black.opacity(0.35))
+                    }
+                }
+                .overlay {
+                    if let selected {
+                        ZStack(alignment: .topLeading) {
+                            RoundedRectangle(cornerRadius: 5)
+                                .fill(Color.black.opacity(selected ? 0 : 0.4))
+                            RoundedRectangle(cornerRadius: 5)
+                                .stroke(selected ? Theme.primary : Color.clear, lineWidth: 3)
+                            Image(systemName: selected ? "checkmark.circle.fill" : "circle")
+                                .font(.system(size: 22, weight: .semibold))
+                                .symbolRenderingMode(.palette)
+                                .foregroundStyle(selected ? Theme.onPrimary : Color.white,
+                                                 selected ? Theme.primary : Color.black.opacity(0.4))
+                                .padding(6)
+                        }
                     }
                 }
 
@@ -105,7 +123,7 @@ struct KavitaCard: View {
             Image(systemName: "arrow.down.circle.fill")
                 .font(.system(size: 17))
                 .symbolRenderingMode(.palette)
-                .foregroundStyle(.black, Theme.primary)
+                .foregroundStyle(Theme.onPrimary, Theme.primary)
         case .partial:
             Image(systemName: "arrow.down.circle.dotted")
                 .font(.system(size: 17, weight: .bold))

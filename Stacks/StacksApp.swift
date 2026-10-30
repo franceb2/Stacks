@@ -6,6 +6,8 @@ struct StacksApp: App {
     @StateObject private var session = AppSession()
     @StateObject private var downloads = Downloads.shared
 
+    @AppStorage("appTheme") private var themeRaw = AppTheme.kavita.rawValue
+
     init() {
         // Tell Kavita what kind of device this is (shows in its device list and reading history).
         let screen = UIScreen.main.bounds.size
@@ -13,7 +15,11 @@ struct StacksApp: App {
 
         // Bigger image cache so covers still show when the server is unreachable.
         URLCache.shared = URLCache(memoryCapacity: 40_000_000, diskCapacity: 300_000_000)
+        Self.applyBarAppearance()
+    }
 
+    /// Navigation and tab bars follow the current theme.
+    static func applyBarAppearance() {
         let nav = UINavigationBarAppearance()
         nav.configureWithOpaqueBackground()
         nav.backgroundColor = UIColor(Theme.navBar)
@@ -40,17 +46,22 @@ struct StacksApp: App {
                     LoginView()
                 }
             }
+            .id(themeRaw) // rebuild with the new colors when the theme changes
             .environmentObject(session)
             .environmentObject(downloads)
             .tint(Theme.primary)
             .preferredColorScheme(.dark)
+            .onChange(of: themeRaw) { _, raw in
+                AppTheme.current = AppTheme(rawValue: raw) ?? .kavita
+                Self.applyBarAppearance()
+            }
         }
     }
 }
 
 // MARK: - Navigation
 
-enum AppTab: Hashable { case home, library, lists, downloads, settings }
+enum AppTab: String, Hashable { case home, library, lists, downloads, settings }
 
 struct LibraryRoute: Hashable {
     var library: Library?          // nil = all series
@@ -91,12 +102,14 @@ struct RootView: View {
     @EnvironmentObject private var downloads: Downloads
     @Environment(\.scenePhase) private var scenePhase
 
-    @State private var tab: AppTab = .home
+    @AppStorage("selectedTab") private var tab: AppTab = .home
     @State private var homePath = NavigationPath()
     @State private var libraryPath = NavigationPath()
     @State private var tourStarted = false
     @State private var listsPath = NavigationPath()
     @Namespace private var hero
+    @StateObject private var updates = UpdateChecker.shared
+    @Environment(\.openURL) private var openURL
 
     var body: some View {
         TabView(selection: $tab) {
@@ -135,15 +148,33 @@ struct RootView: View {
             .tag(AppTab.settings)
         }
         .environment(\.heroNamespace, hero)
+        .alert(updates.available.map { "\($0.name) is available" } ?? "Update available",
+               isPresented: Binding(get: { updates.shouldAlert && !DemoTour.enabled },
+                                    set: { if !$0 { updates.dismissAlert() } })) {
+            Button("Download") {
+                openURL(UpdateChecker.downloadURL)
+                updates.dismissAlert()
+            }
+            Button("Later", role: .cancel) { updates.dismissAlert() }
+        } message: {
+            Text("A new version of Stacks is ready." + ((updates.available?.notes).map { $0.isEmpty ? "" : "\n\n\($0)" } ?? "")
+                 + "\n\nDownload it, then install it with Signulous like before.")
+        }
         .task {
             await downloads.flush(client: client)
+            await updates.check()
             if DemoTour.enabled && !tourStarted {
                 tourStarted = true
                 await runTour()
             }
         }
         .onChange(of: scenePhase) { _, phase in
-            if phase == .active { Task { await downloads.flush(client: client) } }
+            if phase == .active {
+                Task {
+                    await downloads.flush(client: client)
+                    await updates.check()
+                }
+            }
         }
     }
 

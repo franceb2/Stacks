@@ -21,7 +21,7 @@ struct ReadingListsView: View {
                     HStack(spacing: 14) {
                         Image(systemName: "heart.fill")
                             .font(.title3)
-                            .foregroundStyle(.black)
+                            .foregroundStyle(Theme.onPrimary)
                             .frame(width: 44, height: 44)
                             .background(Theme.primary, in: RoundedRectangle(cornerRadius: 10))
                         VStack(alignment: .leading, spacing: 2) {

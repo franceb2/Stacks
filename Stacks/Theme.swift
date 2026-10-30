@@ -1,15 +1,103 @@
 import SwiftUI
 
-/// Colors taken from Kavita's default dark theme so the app feels like Kavita.
+/// App color themes. Kavita green is the default; the rest are dark backgrounds with a colored trim.
+enum AppTheme: String, CaseIterable, Identifiable {
+    case kavita, crimson, cobalt, rose, violet, tangerine, teal, midnight, oled, gold
+
+    var id: String { rawValue }
+
+    var name: String {
+        switch self {
+        case .kavita: return "Kavita"
+        case .crimson: return "Crimson"
+        case .cobalt: return "Cobalt"
+        case .rose: return "Rose"
+        case .violet: return "Violet"
+        case .tangerine: return "Tangerine"
+        case .teal: return "Teal"
+        case .midnight: return "Midnight"
+        case .oled: return "OLED Black"
+        case .gold: return "Gold"
+        }
+    }
+
+    /// Trim color.
+    var accent: UInt32 {
+        switch self {
+        case .kavita: return 0x4AC694
+        case .crimson: return 0xE0303C
+        case .cobalt: return 0x3B82F6
+        case .rose: return 0xF0509A
+        case .violet: return 0xA35BF5
+        case .tangerine: return 0xF57C1F
+        case .teal: return 0x14B8A6
+        case .midnight: return 0x5B9BF0
+        case .oled: return 0x4AC694
+        case .gold: return 0xE3AA3B
+        }
+    }
+
+    var background: UInt32 {
+        switch self {
+        case .kavita: return 0x1F2020
+        case .crimson, .cobalt, .rose, .violet, .tangerine, .teal: return 0x0E0D0E
+        case .midnight: return 0x0B1322
+        case .oled: return 0x000000
+        case .gold: return 0x1A1918
+        }
+    }
+
+    var card: UInt32 {
+        switch self {
+        case .kavita: return 0x2B2C2C
+        case .crimson, .cobalt, .rose, .violet, .tangerine, .teal: return 0x1C1B1D
+        case .midnight: return 0x16233A
+        case .oled: return 0x121212
+        case .gold: return 0x282624
+        }
+    }
+
+    var bar: UInt32 {
+        switch self {
+        case .midnight: return 0x070D18
+        case .oled: return 0x000000
+        default: return 0x0A0A0A
+        }
+    }
+
+    /// Text color on top of the accent (dark on bright trims, white on deep ones).
+    var onAccentIsDark: Bool {
+        switch self {
+        case .kavita, .teal, .gold, .oled, .tangerine: return true
+        default: return false
+        }
+    }
+
+    /// "#rrggbb" for web views.
+    var accentCSS: String { String(format: "#%06X", accent) }
+
+    private static let key = "appTheme"
+    nonisolated(unsafe) static var current: AppTheme =
+        AppTheme(rawValue: UserDefaults.standard.string(forKey: key) ?? "") ?? .kavita
+
+    /// Switches theme. Bars are restyled first so the rebuilt screens pick up the new colors.
+    @MainActor
+    static func select(_ theme: AppTheme) {
+        current = theme
+        StacksApp.applyBarAppearance()
+        UserDefaults.standard.set(theme.rawValue, forKey: key)
+    }
+}
+
+/// Colors for the current theme (Kavita's dark theme by default).
 enum Theme {
-    static let primary = Color(hex: 0x4AC694)        // --primary-color
-    static let primaryDark = Color(hex: 0x3B9E76)    // --primary-color-dark-shade
-    static let background = Color(hex: 0x1F2020)     // --bs-body-bg
-    static let navBar = Color(hex: 0x121212)
-    static let card = Color(hex: 0x2B2C2C)           // elevation layer over the body
-    static let cardHigh = Color(hex: 0x333434)
-    static let text = Color(hex: 0xEFEFEF)           // --body-text-color
-    static let muted = Color.white.opacity(0.55)     // --text-muted-color (slightly lifted for small text)
+    static var primary: Color { Color(hex: AppTheme.current.accent) }
+    static var onPrimary: Color { AppTheme.current.onAccentIsDark ? .black : .white }
+    static var background: Color { Color(hex: AppTheme.current.background) }
+    static var navBar: Color { Color(hex: AppTheme.current.bar) }
+    static var card: Color { Color(hex: AppTheme.current.card) }
+    static let text = Color(hex: 0xEFEFEF)
+    static let muted = Color.white.opacity(0.55)
     static let danger = Color(hex: 0xE24B4A)
 }
 
@@ -54,7 +142,7 @@ struct PrimaryButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .font(.subheadline.weight(.semibold))
-            .foregroundStyle(.black)
+            .foregroundStyle(Theme.onPrimary)
             .padding(.horizontal, 16)
             .padding(.vertical, 10)
             .background(Theme.primary.opacity(configuration.isPressed ? 0.75 : 1),
