@@ -5,6 +5,9 @@ on:
     branches: [main]
   workflow_dispatch:
 
+permissions:
+  contents: write   # to publish the install link (a GitHub release)
+
 jobs:
   build:
     runs-on: macos-latest
@@ -23,6 +26,7 @@ jobs:
           xcodebuild -project Stacks.xcodeproj -target Stacks -configuration Release \
             -sdk iphoneos SYMROOT="$PWD/build" \
             CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
+            MARKETING_VERSION="1.${{ github.run_number }}" CURRENT_PROJECT_VERSION="${{ github.run_number }}" \
             build | tee build.log | grep -E "error:|warning: .*Stacks/|BUILD (SUCCEEDED|FAILED)" || true
           if [ ! -d build/Release-iphoneos/Stacks.app ]; then
             grep -E "error:" build.log | sort -u | head -40 | while IFS= read -r line; do echo "::error::$line"; done
@@ -48,3 +52,16 @@ jobs:
         with:
           name: build-log
           path: build.log
+
+      - name: Publish install link
+        # Always available at https://github.com/<you>/<repo>/releases/latest/download/Stacks.ipa
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="build-${{ github.run_number }}"
+          NOTES="$(git log -1 --pretty=%s)"
+          gh release create "$TAG" Stacks.ipa --target "${{ github.sha }}" \
+            --title "Stacks 1.${{ github.run_number }}" --notes "$NOTES" --latest
+          # Keep only the 5 newest builds
+          gh release list --limit 100 --json tagName -q '.[].tagName' | grep '^build-' | tail -n +6 | \
+            while read -r old; do gh release delete "$old" --yes --cleanup-tag; done

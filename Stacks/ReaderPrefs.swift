@@ -51,6 +51,19 @@ struct ComicPrefs: Codable, Equatable {
     var rightToLeft = false
     var scaling: ScalingMode = .automatic
     var background: ReaderBackground = .black
+    /// Two pages side by side when the phone is sideways. Off by default.
+    var doublePage = false
+
+    init() {}
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        mode = try c.decodeIfPresent(ReadingMode.self, forKey: .mode) ?? .leftRight
+        rightToLeft = try c.decodeIfPresent(Bool.self, forKey: .rightToLeft) ?? false
+        scaling = try c.decodeIfPresent(ScalingMode.self, forKey: .scaling) ?? .automatic
+        background = try c.decodeIfPresent(ReaderBackground.self, forKey: .background) ?? .black
+        doublePage = try c.decodeIfPresent(Bool.self, forKey: .doublePage) ?? false
+    }
 }
 
 enum BookTheme: String, Codable, CaseIterable, Identifiable {

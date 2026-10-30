@@ -12,6 +12,8 @@ struct HomeView: View {
     @State private var offline = false
     @State private var error: String?
     @State private var loaded = false
+    @State private var heroChapter: Chapter?
+    @State private var reader: ReaderLaunch?
 
     var body: some View {
         ScrollView {
@@ -21,13 +23,18 @@ struct HomeView: View {
                         .padding(.horizontal, 16)
                 }
 
+                if let hero = onDeck.first {
+                    heroCard(hero)
+                }
+
                 if !onDeck.isEmpty {
                     carousel("On Deck") {
                         ForEach(onDeck) { series in
                             NavigationLink(value: SeriesRoute(id: series.id, name: series.name)) {
                                 SeriesCard(series: series, client: client).frame(width: 118)
                             }
-                            .buttonStyle(.plain)
+                            .buttonStyle(PressableStyle())
+                            .zoomSource("series-\(series.id)")
                         }
                     }
                 }
@@ -41,7 +48,8 @@ struct HomeView: View {
                                            badge: item.count > 1 ? "\(item.count)" : nil)
                                     .frame(width: 118)
                             }
-                            .buttonStyle(.plain)
+                            .buttonStyle(PressableStyle())
+                            .zoomSource("series-\(item.seriesId)")
                         }
                     }
                 }
@@ -52,7 +60,8 @@ struct HomeView: View {
                             NavigationLink(value: SeriesRoute(id: series.id, name: series.name)) {
                                 SeriesCard(series: series, client: client).frame(width: 118)
                             }
-                            .buttonStyle(.plain)
+                            .buttonStyle(PressableStyle())
+                            .zoomSource("series-\(series.id)")
                         }
                     }
                 }
@@ -82,9 +91,59 @@ struct HomeView: View {
         }
         .refreshable { await load() }
         .task { if !loaded { await load() } }
+        .fullScreenCover(item: $reader, onDismiss: {
+            Task { await load() }
+        }) { launch in
+            ReaderView(client: client, startChapterId: launch.chapterId)
+        }
         .onReceive(NotificationCenter.default.publisher(for: .readingProgressChanged)) { _ in
             Task { await load() }
         }
+    }
+
+    /// The big "pick up where you left off" card at the top, Kavita-cinematic.
+    private func heroCard(_ series: Series) -> some View {
+        ZStack(alignment: .bottomLeading) {
+            Backdrop(url: client.seriesCoverURL(series.id))
+            LinearGradient(colors: [.clear, Color.black.opacity(0.55)], startPoint: .top, endPoint: .bottom)
+            HStack(alignment: .bottom, spacing: 14) {
+                NavigationLink(value: SeriesRoute(id: series.id, name: series.name)) {
+                    CoverImage(url: client.seriesCoverURL(series.id))
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                        .frame(width: 104)
+                        .shadow(color: .black.opacity(0.5), radius: 12, y: 6)
+                }
+                .buttonStyle(PressableStyle())
+                .zoomSource("series-\(series.id)")
+
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("CONTINUE READING")
+                        .font(.caption2.weight(.bold)).kerning(1.2)
+                        .foregroundStyle(Theme.primary)
+                    Text(series.name)
+                        .font(.title3.bold()).foregroundStyle(Theme.text).lineLimit(2)
+                    if let heroChapter {
+                        Text(heroChapter.isStarted
+                             ? "\(heroChapter.displayName) · page \(heroChapter.pagesRead + 1) of \(heroChapter.pages)"
+                             : heroChapter.displayName)
+                            .font(.caption).foregroundStyle(Theme.muted).lineLimit(1)
+                    }
+                    ProgressView(value: series.progress).tint(Theme.primary)
+                    Button {
+                        if let heroChapter { reader = ReaderLaunch(chapterId: heroChapter.id) }
+                    } label: {
+                        Label("Continue", systemImage: "play.fill").frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(PrimaryButtonStyle())
+                    .disabled(heroChapter == nil)
+                }
+            }
+            .padding(16)
+        }
+        .frame(height: 220)
+        .clipShape(RoundedRectangle(cornerRadius: 14))
+        .overlay(RoundedRectangle(cornerRadius: 14).stroke(Color.white.opacity(0.08)))
+        .padding(.horizontal, 16)
     }
 
     private func carousel<Content: View>(_ title: String, @ViewBuilder content: () -> Content) -> some View {
@@ -110,6 +169,11 @@ struct HomeView: View {
         }
         updated = (try? await upd) ?? updated
         added = (try? await new) ?? added
+        if let hero = onDeck.first {
+            heroChapter = try? await client.continuePoint(seriesId: hero.id)
+        } else {
+            heroChapter = nil
+        }
         loaded = true
         if !offline { await downloads.flush(client: client) }
     }

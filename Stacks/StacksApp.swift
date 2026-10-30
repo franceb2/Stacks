@@ -7,6 +7,10 @@ struct StacksApp: App {
     @StateObject private var downloads = Downloads.shared
 
     init() {
+        // Tell Kavita what kind of device this is (shows in its device list and reading history).
+        let screen = UIScreen.main.bounds.size
+        KavitaClient.clientHeader = "web-app/1.0 (Stacks/1.0; Ios; Mobile; \(Int(screen.width))x\(Int(screen.height)); portrait)"
+
         // Bigger image cache so covers still show when the server is unreachable.
         URLCache.shared = URLCache(memoryCapacity: 40_000_000, diskCapacity: 300_000_000)
 
@@ -46,7 +50,7 @@ struct StacksApp: App {
 
 // MARK: - Navigation
 
-enum AppTab: Hashable { case home, library, downloads, settings }
+enum AppTab: Hashable { case home, library, lists, downloads, settings }
 
 struct LibraryRoute: Hashable {
     var library: Library?          // nil = all series
@@ -68,8 +72,12 @@ extension View {
     func stacksDestinations(client: KavitaClient) -> some View {
         self
             .navigationDestination(for: LibraryRoute.self) { SeriesGridView(route: $0, client: client) }
-            .navigationDestination(for: SeriesRoute.self) { SeriesDetailView(route: $0, client: client) }
+            .navigationDestination(for: SeriesRoute.self) { route in
+                SeriesDetailView(route: route, client: client).zoomDestination("series-\(route.id)")
+            }
             .navigationDestination(for: VolumeRoute.self) { VolumeView(route: $0, client: client) }
+            .navigationDestination(for: ReadingListRoute.self) { ReadingListDetailView(route: $0, client: client) }
+            .navigationDestination(for: WantToReadRoute.self) { _ in WantToReadView(client: client) }
     }
 }
 
@@ -87,6 +95,8 @@ struct RootView: View {
     @State private var homePath = NavigationPath()
     @State private var libraryPath = NavigationPath()
     @State private var tourStarted = false
+    @State private var listsPath = NavigationPath()
+    @Namespace private var hero
 
     var body: some View {
         TabView(selection: $tab) {
@@ -104,6 +114,13 @@ struct RootView: View {
             .tabItem { Label("Library", systemImage: "books.vertical.fill") }
             .tag(AppTab.library)
 
+            NavigationStack(path: $listsPath) {
+                ReadingListsView(client: client)
+                    .stacksDestinations(client: client)
+            }
+            .tabItem { Label("Lists", systemImage: "list.bullet.rectangle.fill") }
+            .tag(AppTab.lists)
+
             NavigationStack {
                 DownloadsView(client: client)
             }
@@ -117,6 +134,7 @@ struct RootView: View {
             .tabItem { Label("Settings", systemImage: "gearshape.fill") }
             .tag(AppTab.settings)
         }
+        .environment(\.heroNamespace, hero)
         .task {
             await downloads.flush(client: client)
             if DemoTour.enabled && !tourStarted {

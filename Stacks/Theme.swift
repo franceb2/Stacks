@@ -75,3 +75,98 @@ struct SecondaryButtonStyle: ButtonStyle {
             .overlay(RoundedRectangle(cornerRadius: 6).stroke(Color.white.opacity(0.12)))
     }
 }
+
+// MARK: - Cinematic touches
+
+/// Cards shrink slightly and spring back when pressed.
+struct PressableStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .scaleEffect(configuration.isPressed ? 0.95 : 1)
+            .opacity(configuration.isPressed ? 0.9 : 1)
+            .animation(.spring(response: 0.3, dampingFraction: 0.65), value: configuration.isPressed)
+    }
+}
+
+/// A big blurred copy of the cover that fades into the page, used behind headers.
+struct Backdrop: View {
+    let url: URL?
+
+    var body: some View {
+        GeometryReader { geo in
+            AsyncImage(url: url) { phase in
+                if case .success(let image) = phase {
+                    image.resizable().aspectRatio(contentMode: .fill)
+                        .frame(width: geo.size.width, height: geo.size.height)
+                        .blur(radius: 30, opaque: true)
+                        .saturation(1.2)
+                        .opacity(0.65)
+                        .transition(.opacity)
+                } else {
+                    Color.clear
+                }
+            }
+            .frame(width: geo.size.width, height: geo.size.height)
+            .clipped()
+            .overlay(
+                LinearGradient(colors: [Theme.background.opacity(0.15), Theme.background.opacity(0.7), Theme.background],
+                               startPoint: .top, endPoint: .bottom)
+            )
+        }
+        .allowsHitTesting(false)
+    }
+}
+
+// MARK: - Zoom transitions (iOS 18 and later; older iOS uses the normal slide)
+
+private struct HeroNamespaceKey: EnvironmentKey {
+    static let defaultValue: Namespace.ID? = nil
+}
+
+extension EnvironmentValues {
+    var heroNamespace: Namespace.ID? {
+        get { self[HeroNamespaceKey.self] }
+        set { self[HeroNamespaceKey.self] = newValue }
+    }
+}
+
+private struct ZoomSourceModifier: ViewModifier {
+    let id: String
+    @Environment(\.heroNamespace) private var namespace
+
+    func body(content: Content) -> some View {
+        if let namespace {
+            if #available(iOS 18.0, *) {
+                content.matchedTransitionSource(id: id, in: namespace)
+            } else {
+                content
+            }
+        } else {
+            content
+        }
+    }
+}
+
+private struct ZoomDestinationModifier: ViewModifier {
+    let id: String
+    @Environment(\.heroNamespace) private var namespace
+
+    func body(content: Content) -> some View {
+        if let namespace {
+            if #available(iOS 18.0, *) {
+                content.navigationTransition(.zoom(sourceID: id, in: namespace))
+            } else {
+                content
+            }
+        } else {
+            content
+        }
+    }
+}
+
+extension View {
+    /// The card a zoom transition starts from.
+    func zoomSource(_ id: String) -> some View { modifier(ZoomSourceModifier(id: id)) }
+    /// The page a zoom transition opens into.
+    func zoomDestination(_ id: String) -> some View { modifier(ZoomDestinationModifier(id: id)) }
+}

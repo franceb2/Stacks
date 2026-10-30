@@ -22,6 +22,23 @@ struct KavitaClient {
     let baseURL: URL
     let apiKey: String
 
+    /// Lets Kavita show this app as an iPhone in its device list and reading history.
+    /// Set once at launch with the real screen size.
+    nonisolated(unsafe) static var clientHeader = "web-app/1.0 (Stacks/1.0; Ios; Mobile; 390x844; portrait)"
+
+    /// A stable id for this install, so Kavita sees one device rather than many.
+    static let deviceId: String = {
+        if let saved = UserDefaults.standard.string(forKey: "deviceId") { return saved }
+        let id = UUID().uuidString.lowercased()
+        UserDefaults.standard.set(id, forKey: "deviceId")
+        return id
+    }()
+
+    private func addClientHeaders(_ req: inout URLRequest) {
+        req.setValue(Self.clientHeader, forHTTPHeaderField: "X-Kavita-Client")
+        req.setValue(Self.deviceId, forHTTPHeaderField: "X-Device-Id")
+    }
+
     private static let session: URLSession = {
         let config = URLSessionConfiguration.default
         config.timeoutIntervalForRequest = 30
@@ -167,7 +184,8 @@ struct KavitaClient {
 
     func pageImageData(chapterId: Int, page: Int) async throws -> Data {
         try await raw("GET", "/api/Reader/image",
-                      query: ["chapterId": "\(chapterId)", "page": "\(page)", "extractPdf": "true"],
+                      query: ["chapterId": "\(chapterId)", "page": "\(page)", "extractPdf": "true",
+                              "apiKey": apiKey], // Kavita only reads the key from the URL here
                       accept: "image/*")
     }
 
@@ -175,6 +193,7 @@ struct KavitaClient {
     func fetch(_ url: URL) async throws -> Data {
         var req = URLRequest(url: url)
         req.setValue(apiKey, forHTTPHeaderField: "x-api-key")
+        addClientHeaders(&req)
         let (data, response) = try await Self.session.data(for: req)
         let code = (response as? HTTPURLResponse)?.statusCode ?? 0
         guard (200..<300).contains(code) else { throw KavitaError.http(code, "") }
@@ -203,6 +222,89 @@ struct KavitaClient {
             try await saveProgress(ProgressBody(volumeId: info.volumeId, chapterId: chapter.id, pageNum: 0,
                                                 seriesId: seriesId, libraryId: info.libraryId, bookScrollId: nil))
         }
+    }
+
+    // MARK: Reading lists
+
+    func readingLists() async throws -> [ReadingList] {
+        try await send("POST", "/api/ReadingList/lists",
+                       query: ["PageNumber": "1", "PageSize": "200", "includePromoted": "true",
+                               "sortByLastModified": "true"],
+                       body: Optional<String>.none)
+    }
+
+    func readingListItems(_ listId: Int) async throws -> [ReadingListItem] {
+        try await send("GET", "/api/ReadingList/items", query: ["readingListId": "\(listId)"])
+    }
+
+    func createReadingList(title: String) async throws -> ReadingList {
+        try await send("POST", "/api/ReadingList/create", body: CreateListBody(title: title))
+    }
+
+    func addToReadingList(_ listId: Int, _ target: ListTarget) async throws {
+        switch target {
+        case .series(let seriesId):
+            try await sendNoContent("POST", "/api/ReadingList/update-by-series",
+                                    body: AddSeriesBody(seriesId: seriesId, readingListId: listId))
+        case .volume(let seriesId, let volumeId):
+            try await sendNoContent("POST", "/api/ReadingList/update-by-volume",
+                                    body: AddVolumeBody(volumeId: volumeId, seriesId: seriesId, readingListId: listId))
+        case .chapter(let seriesId, let chapterId):
+            try await sendNoContent("POST", "/api/ReadingList/update-by-chapter",
+                                    body: AddChapterBody(chapterId: chapterId, seriesId: seriesId, readingListId: listId))
+        }
+    }
+
+    func removeFromReadingList(_ item: ReadingListItem) async throws {
+        try await sendNoContent("POST", "/api/ReadingList/delete-item",
+                                body: ListPositionBody(readingListId: item.readingListId, readingListItemId: item.id,
+                                                       fromPosition: item.order, toPosition: item.order))
+    }
+
+    func moveInReadingList(_ item: ReadingListItem, to position: Int) async throws {
+        try await sendNoContent("POST", "/api/ReadingList/update-position",
+                                body: ListPositionBody(readingListId: item.readingListId, readingListItemId: item.id,
+                                                       fromPosition: item.order, toPosition: position))
+    }
+
+    func removeReadItems(_ listId: Int) async throws {
+        _ = try await raw("POST", "/api/ReadingList/remove-read", query: ["readingListId": "\(listId)"])
+    }
+
+    func deleteReadingList(_ listId: Int) async throws {
+        _ = try await raw("DELETE", "/api/ReadingList", query: ["readingListId": "\(listId)"])
+    }
+
+    func nextInList(chapterId: Int, listId: Int) async throws -> Int? {
+        let id: Int = try await send("GET", "/api/ReadingList/next-chapter",
+                                     query: ["currentChapterId": "\(chapterId)", "readingListId": "\(listId)"])
+        return id > 0 ? id : nil
+    }
+
+    func previousInList(chapterId: Int, listId: Int) async throws -> Int? {
+        let id: Int = try await send("GET", "/api/ReadingList/prev-chapter",
+                                     query: ["currentChapterId": "\(chapterId)", "readingListId": "\(listId)"])
+        return id > 0 ? id : nil
+    }
+
+    func readingListCoverURL(_ listId: Int) -> URL? {
+        makeURL("/api/Image/readinglist-cover", ["readingListId": "\(listId)", "apiKey": apiKey])
+    }
+
+    // MARK: Want to Read
+
+    func wantToRead() async throws -> [Series] {
+        try await send("POST", "/api/want-to-read/v2", query: ["PageNumber": "1", "PageSize": "200"],
+                       body: SeriesFilter.make(libraryId: nil, search: nil, sort: .name))
+    }
+
+    func isWantToRead(_ seriesId: Int) async throws -> Bool {
+        try await send("GET", "/api/want-to-read", query: ["seriesId": "\(seriesId)"])
+    }
+
+    func setWantToRead(_ seriesId: Int, _ on: Bool) async throws {
+        try await sendNoContent("POST", on ? "/api/want-to-read/add-series" : "/api/want-to-read/remove-series",
+                                body: SeriesIdsBody(seriesIds: [seriesId]))
     }
 
     // MARK: URLs for image views
@@ -237,6 +339,7 @@ struct KavitaClient {
         req.httpMethod = method
         req.setValue(accept, forHTTPHeaderField: "Accept")
         if authenticated { req.setValue(apiKey, forHTTPHeaderField: "x-api-key") }
+        addClientHeaders(&req)
         if let body {
             req.httpBody = body
             req.setValue("application/json", forHTTPHeaderField: "Content-Type")

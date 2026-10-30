@@ -10,6 +10,8 @@ struct SettingsView: View {
     @State private var confirmDelete = false
     @State private var confirmSignOut = false
     @State private var resetDone = false
+    @State private var autoCount = AutoDownload.count
+    @State private var autoWifiOnly = AutoDownload.wifiOnly
 
     var body: some View {
         Form {
@@ -24,6 +26,8 @@ struct SettingsView: View {
                     ForEach(ReadingMode.allCases) { Label($0.label, systemImage: $0.systemImage).tag($0) }
                 }
                 Toggle("Right to left (manga)", isOn: $comic.rightToLeft)
+                    .disabled(comic.mode != .leftRight)
+                Toggle("Two pages when sideways", isOn: $comic.doublePage)
                     .disabled(comic.mode != .leftRight)
                 Picker("Image scaling", selection: $comic.scaling) {
                     ForEach(ScalingMode.allCases) { Text($0.label).tag($0) }
@@ -60,6 +64,22 @@ struct SettingsView: View {
             }
             .listRowBackground(Theme.card)
 
+            Section {
+                Picker("Download next", selection: $autoCount) {
+                    Text("Off").tag(0)
+                    Text("1 issue").tag(1)
+                    Text("2 issues").tag(2)
+                    Text("3 issues").tag(3)
+                }
+                Toggle("Only on Wi-Fi", isOn: $autoWifiOnly)
+                    .disabled(autoCount == 0)
+            } header: {
+                Text("Auto-download")
+            } footer: {
+                Text("When you finish an issue or chapter, the next ones download quietly so they're ready offline. Follows your reading list when you're reading from one.")
+            }
+            .listRowBackground(Theme.card)
+
             Section("Storage") {
                 LabeledContent("Downloads", value: downloads.totalBytes.fileSizeText)
                 Button("Delete all downloads", role: .destructive) { confirmDelete = true }
@@ -80,6 +100,8 @@ struct SettingsView: View {
             resetDone = false
         }
         .onChange(of: book) { _, value in ReaderPrefsStore.book = value }
+        .onChange(of: autoCount) { _, value in AutoDownload.count = value }
+        .onChange(of: autoWifiOnly) { _, value in AutoDownload.wifiOnly = value }
         .confirmationDialog("Delete all downloads?", isPresented: $confirmDelete, titleVisibility: .visible) {
             Button("Delete all", role: .destructive) { downloads.deleteAll() }
         }

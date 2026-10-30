@@ -61,6 +61,7 @@ struct SeriesGridView: View {
     @State private var search = ""
     @State private var error: String?
     @State private var generation = 0
+    @State private var listTarget: ListSheetTarget?
 
     private let pageSize = 60
     private var sort: SeriesSort { SeriesSort(rawValue: sortRaw) ?? .name }
@@ -73,10 +74,17 @@ struct SeriesGridView: View {
                     NavigationLink(value: SeriesRoute(id: series.id, name: series.name)) {
                         SeriesCard(series: series, client: client)
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(PressableStyle())
+                    .zoomSource("series-\(series.id)")
                     .contextMenu {
                         Button("Mark as read", systemImage: "checkmark.circle") { mark(series, read: true) }
                         Button("Mark as unread", systemImage: "circle") { mark(series, read: false) }
+                        Button("Want to Read", systemImage: "heart") {
+                            Task { try? await client.setWantToRead(series.id, true) }
+                        }
+                        Button("Add to reading list…", systemImage: "text.badge.plus") {
+                            listTarget = ListSheetTarget(target: .series(series.id), title: series.name)
+                        }
                     }
                     .onAppear {
                         if series.id == items.last?.id { Task { await loadMore() } }
@@ -114,6 +122,9 @@ struct SeriesGridView: View {
         .refreshable { await reload() }
         .onReceive(NotificationCenter.default.publisher(for: .readingProgressChanged)) { _ in
             Task { await reload() }
+        }
+        .sheet(item: $listTarget) { item in
+            AddToListSheet(target: item.target, title: item.title, client: client)
         }
     }
 

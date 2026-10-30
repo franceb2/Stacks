@@ -196,6 +196,42 @@ struct BookTOCItem: Decodable, Identifiable, Hashable {
     var id: String { "\(page)-\(title ?? "")" }
 }
 
+// MARK: - Reading lists
+
+struct ReadingList: Decodable, Identifiable, Hashable {
+    let id: Int
+    let title: String
+    let summary: String?
+    let itemCount: Int
+    let promoted: Bool
+}
+
+struct ReadingListItem: Decodable, Identifiable, Hashable {
+    let id: Int
+    let order: Int
+    let chapterId: Int
+    let seriesId: Int
+    let seriesName: String?
+    let seriesFormat: Int
+    let pagesRead: Int
+    let pagesTotal: Int
+    let title: String?
+    let volumeId: Int
+    let libraryId: Int
+    let readingListId: Int
+
+    var isRead: Bool { pagesTotal > 0 && pagesRead >= pagesTotal }
+    var isStarted: Bool { pagesRead > 0 && !isRead }
+    var progress: Double { pagesTotal > 0 ? min(1, Double(pagesRead) / Double(pagesTotal)) : 0 }
+}
+
+/// What to add to a reading list.
+enum ListTarget: Hashable {
+    case series(Int)
+    case volume(seriesId: Int, volumeId: Int)
+    case chapter(seriesId: Int, chapterId: Int)
+}
+
 // MARK: - Request bodies
 
 enum SeriesSort: Int, CaseIterable, Identifiable {
@@ -243,6 +279,17 @@ struct SeriesFilter: Encodable {
 }
 
 struct SeriesIdBody: Encodable { let seriesId: Int }
+struct SeriesIdsBody: Encodable { let seriesIds: [Int] }
+struct CreateListBody: Encodable { let title: String }
+struct AddSeriesBody: Encodable { let seriesId: Int; let readingListId: Int }
+struct AddVolumeBody: Encodable { let volumeId: Int; let seriesId: Int; let readingListId: Int }
+struct AddChapterBody: Encodable { let chapterId: Int; let seriesId: Int; let readingListId: Int }
+struct ListPositionBody: Encodable {
+    let readingListId: Int
+    let readingListItemId: Int
+    let fromPosition: Int
+    let toPosition: Int
+}
 struct VolumeReadBody: Encodable { let seriesId: Int; let volumeId: Int }
 struct ChapterReadBody: Encodable { let seriesId: Int; let chapterId: Int }
 struct LoginBody: Encodable { let username: String; let password: String }

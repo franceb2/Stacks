@@ -1,9 +1,8 @@
 name: Preview page
 
 # Every change gets screenshots and a walkthrough video at https://<user>.github.io/<repo>/
+# Manual only: run it from the Actions tab when you want screenshots.
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 permissions:

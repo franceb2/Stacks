@@ -38,6 +38,8 @@ struct ReaderActions {
 /// when offline), picks the right reader, saves progress as pages turn, and moves between chapters.
 struct ReaderView: View {
     let client: KavitaClient
+    /// When set, next and previous follow this reading list instead of the series.
+    var readingListId: Int? = nil
     @EnvironmentObject private var downloads: Downloads
     @Environment(\.dismiss) private var dismiss
 
@@ -48,9 +50,11 @@ struct ReaderView: View {
     @State private var error: String?
     @State private var lastSaved: Int?
     @State private var moved = false
+    @State private var autoDownloaded: Set<Int> = []
 
-    init(client: KavitaClient, startChapterId: Int) {
+    init(client: KavitaClient, startChapterId: Int, readingListId: Int? = nil) {
         self.client = client
+        self.readingListId = readingListId
         _chapterId = State(initialValue: startChapterId)
     }
 
@@ -135,11 +139,43 @@ struct ReaderView: View {
         context = ReaderContext(chapterId: chapterId, info: info, startPage: start, offline: offline)
 
         if !offline {
-            async let next = client.nextChapter(seriesId: info.seriesId, volumeId: info.volumeId, chapterId: chapterId)
-            async let prev = client.previousChapter(seriesId: info.seriesId, volumeId: info.volumeId,
-                                                    chapterId: chapterId)
-            nextChapterId = (try? await next) ?? nil
-            previousChapterId = (try? await prev) ?? nil
+            nextChapterId = await next(after: chapterId, info: info)
+            if let listId = readingListId {
+                previousChapterId = (try? await client.previousInList(chapterId: chapterId, listId: listId)) ?? nil
+            } else {
+                previousChapterId = (try? await client.previousChapter(seriesId: info.seriesId, volumeId: info.volumeId,
+                                                                       chapterId: chapterId)) ?? nil
+            }
+        }
+    }
+
+    /// The chapter after this one: next in the reading list, or next in the series.
+    private func next(after id: Int, info: ChapterInfo) async -> Int? {
+        if let listId = readingListId {
+            return (try? await client.nextInList(chapterId: id, listId: listId)) ?? nil
+        }
+        return (try? await client.nextChapter(seriesId: info.seriesId, volumeId: info.volumeId, chapterId: id)) ?? nil
+    }
+
+    /// After finishing, quietly download the next few chapters for offline reading.
+    private func autoDownloadNext(from context: ReaderContext) {
+        guard !context.offline, AutoDownload.allowedNow, !autoDownloaded.contains(context.chapterId) else { return }
+        autoDownloaded.insert(context.chapterId)
+        let count = AutoDownload.count
+        let client = client
+        Task {
+            var current = context.chapterId
+            var info = context.info
+            for _ in 0..<count {
+                guard let nextId = await next(after: current, info: info) else { break }
+                guard let nextInfo = try? await client.chapterInfo(chapterId: nextId) else { break }
+                if downloads.items[nextId]?.isComplete != true {
+                    downloads.start(client: client, chapterId: nextId, seriesId: nextInfo.seriesId,
+                                    seriesName: nextInfo.seriesName ?? "", title: "", range: .all)
+                }
+                current = nextId
+                info = nextInfo
+            }
         }
     }
 
@@ -159,6 +195,7 @@ struct ReaderView: View {
         guard pageNum != lastSaved else { return }
         lastSaved = pageNum
         downloads.rememberPage(min(pageNum, info.pages - 1), chapterId: context.chapterId)
+        if pageNum >= info.pages { autoDownloadNext(from: context) }
 
         let body = ProgressBody(volumeId: info.volumeId, chapterId: context.chapterId, pageNum: pageNum,
                                 seriesId: info.seriesId, libraryId: info.libraryId, bookScrollId: nil)
@@ -176,6 +213,7 @@ struct ReaderView: View {
         guard let context else { return }
         moved = true
         save(page: context.info.pages)
+        autoDownloadNext(from: context)
     }
 }
 

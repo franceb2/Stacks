@@ -14,6 +14,7 @@ struct ComicReaderView: View {
     @State private var scrubPage: Double
     @State private var showChrome = false
     @State private var showSettings = false
+    @State private var spreadActive = false
     @StateObject private var store: PageImageStore
 
     init(context: ReaderContext, client: KavitaClient, actions: ReaderActions) {
@@ -48,6 +49,7 @@ struct ComicReaderView: View {
             if showChrome { chrome.transition(.opacity) }
         }
         .statusBarHidden(!showChrome)
+        .sensoryFeedback(.impact(weight: .light, intensity: 0.5), trigger: page) { _, _ in prefs.mode != .webtoon }
         .onChange(of: page) { _, newPage in
             scrubPage = Double(min(newPage, pageCount - 1))
             if newPage < pageCount { actions.pageChanged(newPage) }
@@ -67,6 +69,60 @@ struct ComicReaderView: View {
     // MARK: Modes
 
     private var horizontalPager: some View {
+        GeometryReader { geo in
+            let sideways = geo.size.width > geo.size.height
+            Group {
+                if prefs.doublePage && sideways && pageCount > 2 {
+                    spreadPager
+                } else {
+                    singlePager
+                }
+            }
+            .onAppear { spreadActive = prefs.doublePage && sideways && pageCount > 2 }
+            .onChange(of: sideways) { _, value in spreadActive = prefs.doublePage && value && pageCount > 2 }
+            .onChange(of: prefs.doublePage) { _, value in spreadActive = value && sideways && pageCount > 2 }
+        }
+        .ignoresSafeArea()
+    }
+
+    /// Cover on its own, then pages in pairs.
+    private var spreads: [[Int]] {
+        var out: [[Int]] = [[0]]
+        var i = 1
+        while i < pageCount {
+            out.append(i + 1 < pageCount ? [i, i + 1] : [i])
+            i += 2
+        }
+        return out
+    }
+
+    private func spreadIndex(for page: Int) -> Int {
+        if page >= pageCount { return spreads.count }
+        return page == 0 ? 0 : (page + 1) / 2
+    }
+
+    private var spreadPager: some View {
+        let list = spreads
+        let selection = Binding<Int>(
+            get: { spreadIndex(for: page) },
+            set: { i in page = i >= list.count ? pageCount : (list[i].last ?? 0) }
+        )
+        return TabView(selection: selection) {
+            ForEach(list.indices, id: \.self) { i in
+                SpreadPage(pages: list[i], store: store, rightToLeft: prefs.rightToLeft, offline: context.offline,
+                           onTap: handleTap)
+                    .environment(\.layoutDirection, .leftToRight)
+                    .tag(i)
+            }
+            EndOfChapterView(actions: actions)
+                .environment(\.layoutDirection, .leftToRight)
+                .tag(list.count)
+        }
+        .tabViewStyle(.page(indexDisplayMode: .never))
+        .environment(\.layoutDirection, prefs.rightToLeft ? .rightToLeft : .leftToRight)
+    }
+
+    private var singlePager: some View {
         TabView(selection: $page) {
             ForEach(0..<pageCount, id: \.self) { index in
                 ComicPage(index: index, store: store, scaling: prefs.scaling, offline: context.offline,
@@ -139,7 +195,12 @@ struct ComicReaderView: View {
         let leftSide = x <= 0.3
         let forward = (prefs.mode == .leftRight && prefs.rightToLeft) ? leftSide : !leftSide
         withAnimation(.easeInOut(duration: 0.2)) {
-            if forward {
+            if spreadActive && prefs.mode == .leftRight {
+                let list = spreads
+                let i = spreadIndex(for: page) + (forward ? 1 : -1)
+                if i < 0 { return }
+                page = i >= list.count ? pageCount : (list[i].last ?? 0)
+            } else if forward {
                 page = min(page + 1, pageCount)
             } else {
                 page = max(page - 1, 0)
@@ -236,6 +297,8 @@ struct ComicSettingsSheet: View {
                 Section {
                     Toggle("Right to left (manga)", isOn: $prefs.rightToLeft)
                         .disabled(prefs.mode != .leftRight)
+                    Toggle("Two pages when sideways", isOn: $prefs.doublePage)
+                        .disabled(prefs.mode != .leftRight)
                     Picker("Image scaling", selection: $prefs.scaling) {
                         ForEach(ScalingMode.allCases) { Text($0.label).tag($0) }
                     }
@@ -294,6 +357,46 @@ private struct ComicPage: View {
             }
         }
         .onAppear { store.load(index) }
+    }
+}
+
+/// Two pages side by side (or the cover alone), for sideways reading.
+private struct SpreadPage: View {
+    let pages: [Int]
+    @ObservedObject var store: PageImageStore
+    let rightToLeft: Bool
+    let offline: Bool
+    let onTap: (CGFloat) -> Void
+
+    var body: some View {
+        GeometryReader { geo in
+            HStack(spacing: 0) {
+                let ordered = rightToLeft ? Array(pages.reversed()) : pages
+                ForEach(ordered.indices, id: \.self) { position in
+                    half(ordered[position],
+                         alignment: pages.count == 1 ? .center : (position == 0 ? .trailing : .leading))
+                }
+            }
+            .contentShape(Rectangle())
+            .onTapGesture(coordinateSpace: .local) { location in
+                onTap(geo.size.width > 0 ? location.x / geo.size.width : 0.5)
+            }
+        }
+        .onAppear { for i in pages { store.load(i) } }
+    }
+
+    @ViewBuilder
+    private func half(_ index: Int, alignment: Alignment) -> some View {
+        Group {
+            if let image = store.images[index] {
+                Image(uiImage: image).resizable().aspectRatio(contentMode: .fit)
+            } else if store.failed.contains(index) {
+                PageProblem(index: index, offline: offline) { store.load(index, force: true) }
+            } else {
+                ProgressView().tint(.white)
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: alignment)
     }
 }
 

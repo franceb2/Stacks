@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ReaderLaunch: Identifiable {
     let chapterId: Int
+    var readingListId: Int? = nil
     var id: Int { chapterId }
 }
 
@@ -32,12 +33,16 @@ struct SeriesDetailView: View {
     @State private var reader: ReaderLaunch?
     @State private var downloadTarget: DownloadTarget?
     @State private var summaryExpanded = false
+    @State private var wantToRead: Bool?
+    @State private var listTarget: ListSheetTarget?
+    @State private var downloadsQueued = 0
     @State private var error: String?
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 18) {
                 header
+                actionRow
                 if let summary = metadata?.summary, !summary.isEmpty { summaryView(summary) }
                 tags
                 if let detail {
@@ -55,6 +60,7 @@ struct SeriesDetailView: View {
         .kavitaBackground()
         .navigationTitle(route.name)
         .navigationBarTitleDisplayMode(.inline)
+        .toolbarBackground(.hidden, for: .navigationBar)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) { seriesMenu }
         }
@@ -69,6 +75,11 @@ struct SeriesDetailView: View {
         .sheet(item: $downloadTarget) { target in
             DownloadSheet(target: target, client: client)
         }
+        .sheet(item: $listTarget) { item in
+            AddToListSheet(target: item.target, title: item.title, client: client)
+        }
+        .sensoryFeedback(.selection, trigger: wantToRead)
+        .sensoryFeedback(.success, trigger: downloadsQueued)
         .onReceive(NotificationCenter.default.publisher(for: .tourOpenReader)) { _ in
             if let chapter = continueChapter { reader = ReaderLaunch(chapterId: chapter.id) }
         }
@@ -83,44 +94,75 @@ struct SeriesDetailView: View {
     // MARK: Header
 
     private var header: some View {
-        HStack(alignment: .top, spacing: 16) {
-            CoverImage(url: client.seriesCoverURL(route.id))
-                .clipShape(RoundedRectangle(cornerRadius: 5))
-                .frame(width: 124)
-                .overlay(alignment: .bottom) {
-                    if let series, series.progress > 0 && series.progress < 1 {
-                        GeometryReader { geo in
-                            ZStack(alignment: .leading) {
-                                Rectangle().fill(Color.black.opacity(0.5))
-                                Rectangle().fill(Theme.primary).frame(width: geo.size.width * series.progress)
-                            }
-                        }
-                        .frame(height: 5)
-                    }
-                }
+        ZStack(alignment: .bottom) {
+            Backdrop(url: client.seriesCoverURL(route.id))
+                .frame(height: 300)
+                .padding(.top, -120) // reach up under the navigation bar
 
-            VStack(alignment: .leading, spacing: 7) {
-                Text(series?.name ?? route.name)
-                    .font(.title3.bold())
-                    .foregroundStyle(Theme.text)
-                    .lineLimit(3)
-                if let writers = metadata?.writers, !writers.isEmpty {
-                    Text(writers.map(\.name).joined(separator: ", "))
-                        .font(.footnote).foregroundStyle(Theme.muted).lineLimit(2)
-                }
-                infoLine
-                if let continueChapter {
-                    Button {
-                        reader = ReaderLaunch(chapterId: continueChapter.id)
-                    } label: {
-                        Label(continueTitle(continueChapter), systemImage: "book.fill")
-                            .lineLimit(1)
-                            .frame(maxWidth: .infinity)
+            HStack(alignment: .bottom, spacing: 16) {
+                CoverImage(url: client.seriesCoverURL(route.id))
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                    .frame(width: 128)
+                    .overlay(alignment: .bottom) {
+                        if let series, series.progress > 0 && series.progress < 1 {
+                            GeometryReader { geo in
+                                ZStack(alignment: .leading) {
+                                    Rectangle().fill(Color.black.opacity(0.5))
+                                    Rectangle().fill(Theme.primary).frame(width: geo.size.width * series.progress)
+                                }
+                            }
+                            .frame(height: 5)
+                            .clipShape(RoundedRectangle(cornerRadius: 2))
+                        }
                     }
-                    .buttonStyle(PrimaryButtonStyle())
-                    .padding(.top, 4)
+                    .shadow(color: .black.opacity(0.55), radius: 16, y: 8)
+
+                VStack(alignment: .leading, spacing: 7) {
+                    Text(series?.name ?? route.name)
+                        .font(.title2.bold())
+                        .foregroundStyle(Theme.text)
+                        .lineLimit(3)
+                        .minimumScaleFactor(0.8)
+                    if let writers = metadata?.writers, !writers.isEmpty {
+                        Text(writers.map(\.name).joined(separator: ", "))
+                            .font(.footnote).foregroundStyle(Theme.muted).lineLimit(2)
+                    }
+                    infoLine
                 }
+                Spacer(minLength: 0)
             }
+            .padding(.horizontal, 16)
+        }
+    }
+
+    private var actionRow: some View {
+        HStack(spacing: 10) {
+            if let continueChapter {
+                Button {
+                    reader = ReaderLaunch(chapterId: continueChapter.id)
+                } label: {
+                    Label(continueTitle(continueChapter), systemImage: "play.fill")
+                        .lineLimit(1)
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(PrimaryButtonStyle())
+            }
+            Button {
+                toggleWantToRead()
+            } label: {
+                Image(systemName: wantToRead == true ? "heart.fill" : "heart")
+                    .foregroundStyle(wantToRead == true ? Theme.primary : Theme.text)
+                    .frame(width: 22)
+            }
+            .buttonStyle(SecondaryButtonStyle())
+            .accessibilityLabel(wantToRead == true ? "Remove from Want to Read" : "Add to Want to Read")
+            Button {
+                listTarget = ListSheetTarget(target: .series(route.id), title: series?.name ?? route.name)
+            } label: {
+                Image(systemName: "text.badge.plus").frame(width: 22)
+            }
+            .buttonStyle(SecondaryButtonStyle())
+            .accessibilityLabel("Add to reading list")
         }
         .padding(.horizontal, 16)
     }
@@ -246,11 +288,11 @@ struct SeriesDetailView: View {
         Group {
             if chapters.count == 1, let only = chapters.first {
                 Button { reader = ReaderLaunch(chapterId: only.id) } label: { card }
-                    .buttonStyle(.plain)
+                    .buttonStyle(PressableStyle())
             } else {
                 NavigationLink(value: VolumeRoute(seriesId: route.id, seriesName: series?.name ?? route.name,
                                                   volume: volume, isComic: d.chapterNoun == "Issues")) { card }
-                    .buttonStyle(.plain)
+                    .buttonStyle(PressableStyle())
             }
         }
         .contextMenu {
@@ -260,6 +302,10 @@ struct SeriesDetailView: View {
             Button("Mark as read", systemImage: "checkmark.circle") { markVolume(volume, read: true) }
             Button("Mark as unread", systemImage: "circle") { markVolume(volume, read: false) }
             Divider()
+            Button("Add to reading list…", systemImage: "text.badge.plus") {
+                listTarget = ListSheetTarget(target: .volume(seriesId: route.id, volumeId: volume.id),
+                                             title: volume.displayName)
+            }
             Button("Download volume", systemImage: "arrow.down.circle") {
                 for c in chapters { download(c, name: volume.displayName, range: .all) }
             }
@@ -286,7 +332,7 @@ struct SeriesDetailView: View {
                        unread: chapter.pagesRead == 0,
                        downloaded: downloads.badge(for: chapter.id))
         }
-        .buttonStyle(.plain)
+        .buttonStyle(PressableStyle())
         .contextMenu { chapterMenu(chapter) }
     }
 
@@ -295,6 +341,10 @@ struct SeriesDetailView: View {
         Button("Read", systemImage: "book") { reader = ReaderLaunch(chapterId: chapter.id) }
         Button("Mark as read", systemImage: "checkmark.circle") { markChapter(chapter, read: true) }
         Button("Mark as unread", systemImage: "circle") { markChapter(chapter, read: false) }
+        Button("Add to reading list…", systemImage: "text.badge.plus") {
+            listTarget = ListSheetTarget(target: .chapter(seriesId: route.id, chapterId: chapter.id),
+                                         title: name(for: chapter))
+        }
         Divider()
         Button("Download", systemImage: "arrow.down.circle") { download(chapter, name: name(for: chapter), range: .all) }
         Button("Download pages…", systemImage: "doc.on.doc") { askDownload(chapter) }
@@ -307,6 +357,9 @@ struct SeriesDetailView: View {
         Menu {
             Button("Mark all as read", systemImage: "checkmark.circle") { markSeries(read: true) }
             Button("Mark all as unread", systemImage: "circle") { markSeries(read: false) }
+            Button("Add to reading list…", systemImage: "text.badge.plus") {
+                listTarget = ListSheetTarget(target: .series(route.id), title: series?.name ?? route.name)
+            }
             Divider()
             Button("Download all", systemImage: "arrow.down.circle") {
                 for c in detail?.allChapters ?? [] { download(c, name: name(for: c), range: .all) }
@@ -341,7 +394,17 @@ struct SeriesDetailView: View {
 
     private var isBook: Bool { series?.format == MangaFormat.epub.rawValue }
 
+    private func toggleWantToRead() {
+        let newValue = !(wantToRead ?? false)
+        wantToRead = newValue
+        Task {
+            do { try await client.setWantToRead(route.id, newValue) }
+            catch { wantToRead = !newValue }
+        }
+    }
+
     private func download(_ chapter: Chapter, name: String, range: DownloadRange) {
+        downloadsQueued += 1
         downloads.start(client: client, chapter: chapter, seriesId: route.id,
                         seriesName: series?.name ?? route.name, title: name, range: range)
     }
@@ -361,6 +424,7 @@ struct SeriesDetailView: View {
             detail = try await d
             metadata = try? await m
             continueChapter = try? await c
+            wantToRead = try? await client.isWantToRead(route.id)
             error = nil
         } catch let urlError as URLError where urlError.code == .cancelled {
         } catch {

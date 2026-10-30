@@ -1,6 +1,34 @@
 import CryptoKit
 import Foundation
+import Network
 import UIKit
+
+/// Knows whether the phone is on Wi-Fi (or another unmetered connection).
+final class NetworkMonitor: @unchecked Sendable {
+    static let shared = NetworkMonitor()
+    private let monitor = NWPathMonitor()
+    private(set) var isUnmetered = true
+
+    private init() {
+        monitor.pathUpdateHandler = { [weak self] path in
+            self?.isUnmetered = path.status == .satisfied && !path.isExpensive && !path.isConstrained
+        }
+        monitor.start(queue: DispatchQueue(label: "network-monitor"))
+    }
+}
+
+/// Settings for downloading upcoming issues automatically.
+enum AutoDownload {
+    static var count: Int {
+        get { UserDefaults.standard.object(forKey: "autoDownloadCount") as? Int ?? 2 }
+        set { UserDefaults.standard.set(newValue, forKey: "autoDownloadCount") }
+    }
+    static var wifiOnly: Bool {
+        get { UserDefaults.standard.object(forKey: "autoDownloadWifiOnly") as? Bool ?? true }
+        set { UserDefaults.standard.set(newValue, forKey: "autoDownloadWifiOnly") }
+    }
+    static var allowedNow: Bool { count > 0 && (!wifiOnly || NetworkMonitor.shared.isUnmetered) }
+}
 
 /// A chapter (issue, volume file, book) saved on the phone, fully or as a page range.
 struct DownloadedChapter: Codable, Identifiable {
@@ -133,9 +161,16 @@ final class Downloads: ObservableObject {
     /// Adds a chapter to the download queue. Chapters download one at a time, 4 pages in parallel.
     func start(client: KavitaClient, chapter: Chapter, seriesId: Int, seriesName: String, title: String,
                range: DownloadRange) {
-        guard jobs[chapter.id] == nil else { return }
-        jobs[chapter.id] = Job(title: title, seriesName: seriesName)
-        queue.append(Request(client: client, chapterId: chapter.id, seriesId: seriesId, seriesName: seriesName,
+        start(client: client, chapterId: chapter.id, seriesId: seriesId, seriesName: seriesName, title: title,
+              range: range)
+    }
+
+    /// Pass an empty title to use the chapter's own name from Kavita.
+    func start(client: KavitaClient, chapterId: Int, seriesId: Int, seriesName: String, title: String,
+               range: DownloadRange) {
+        guard jobs[chapterId] == nil else { return }
+        jobs[chapterId] = Job(title: title.isEmpty ? "Next up" : title, seriesName: seriesName)
+        queue.append(Request(client: client, chapterId: chapterId, seriesId: seriesId, seriesName: seriesName,
                              title: title, range: range))
         pump()
     }
@@ -201,6 +236,12 @@ final class Downloads: ObservableObject {
             return
         }
 
+        var title = title
+        if title.isEmpty {
+            let name = [info.subtitle, info.title].compactMap { $0 }.first { !$0.isEmpty && $0 != info.seriesName }
+            title = name?.replacingOccurrences(of: "\(info.seriesName ?? "") - ", with: "") ?? "Chapter"
+            jobs[chapterId]?.title = title
+        }
         let all = 0..<max(info.pages, 0)
         var wanted: [Int]
         switch range {
