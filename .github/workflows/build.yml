@@ -24,7 +24,11 @@ jobs:
             -sdk iphoneos SYMROOT="$PWD/build" \
             CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
             build | tee build.log | grep -E "error:|warning: .*Stacks/|BUILD (SUCCEEDED|FAILED)" || true
-          test -d build/Release-iphoneos/Stacks.app || { echo "::error::Build failed, see build.log artifact"; exit 1; }
+          if [ ! -d build/Release-iphoneos/Stacks.app ]; then
+            grep -E "error:" build.log | sort -u | head -40 | while IFS= read -r line; do echo "::error::$line"; done
+            echo "::error::Build failed, see build.log artifact"
+            exit 1
+          fi
 
       - name: Package .ipa
         run: |

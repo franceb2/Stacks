@@ -67,6 +67,7 @@ struct LoginView: View {
                     Section { Text(error).foregroundStyle(.red) }
                 }
             }
+            .kavitaBackground()
             .navigationTitle("Stacks")
         }
     }

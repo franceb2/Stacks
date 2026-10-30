@@ -4,6 +4,9 @@ import UIKit
 extension Notification.Name {
     static let tourOpenReader = Notification.Name("tourOpenReader")
     static let tourCloseReader = Notification.Name("tourCloseReader")
+    static let tourShowMenu = Notification.Name("tourShowMenu")
+    static let tourReaderSettings = Notification.Name("tourReaderSettings")
+    static let tourDownloadSheet = Notification.Name("tourDownloadSheet")
 }
 
 /// Used only by the preview build: walks through the main screens and saves a screenshot of each

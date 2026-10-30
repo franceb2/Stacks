@@ -17,7 +17,7 @@ enum KavitaError: LocalizedError {
 
 /// Thin async wrapper around the Kavita REST API.
 /// Every request sends the user's Auth Key in the `x-api-key` header.
-/// Image and file URLs carry it as `?apiKey=` so they also work in image views and web views.
+/// Image URLs carry it as `?apiKey=` so they also work in image views and web views.
 struct KavitaClient {
     let baseURL: URL
     let apiKey: String
@@ -40,6 +40,15 @@ struct KavitaClient {
         return url
     }
 
+    /// True for errors that mean "the server couldn't be reached" rather than "the server said no".
+    static func isOffline(_ error: Error) -> Bool {
+        if error is URLError { return true }
+        if case KavitaError.http(let code, _) = error, code == 502 || code == 503 || code == 504 || code == 530 {
+            return true // Cloudflare answers with these when the PC or Kavita is down
+        }
+        return false
+    }
+
     // MARK: Auth
 
     static func login(server: URL, username: String, password: String) async throws -> String {
@@ -57,13 +66,24 @@ struct KavitaClient {
         try await send("GET", "/api/Library/libraries")
     }
 
-    func series(libraryId: Int, search: String?, page: Int, pageSize: Int = 60) async throws -> [Series] {
+    func series(libraryId: Int?, search: String?, sort: SeriesSort = .name, page: Int,
+                pageSize: Int = 60) async throws -> [Series] {
         try await send("POST", "/api/Series/all-v2", query: ["PageNumber": "\(page)", "PageSize": "\(pageSize)"],
-                       body: SeriesFilter.library(libraryId, search: search))
+                       body: SeriesFilter.make(libraryId: libraryId, search: search, sort: sort))
     }
 
     func onDeck() async throws -> [Series] {
         try await send("POST", "/api/Series/on-deck", query: ["PageNumber": "1", "PageSize": "30"],
+                       body: Optional<String>.none)
+    }
+
+    func recentlyAdded() async throws -> [Series] {
+        try await send("POST", "/api/Series/recently-added-v2", query: ["PageNumber": "1", "PageSize": "30"],
+                       body: SeriesFilter.make(libraryId: nil, search: nil, sort: .added))
+    }
+
+    func recentlyUpdated() async throws -> [GroupedSeries] {
+        try await send("POST", "/api/Series/recently-updated-series", query: ["PageNumber": "1", "PageSize": "30"],
                        body: Optional<String>.none)
     }
 
@@ -75,14 +95,19 @@ struct KavitaClient {
         try await send("GET", "/api/Series/series-detail", query: ["seriesId": "\(id)"])
     }
 
+    func metadata(seriesId: Int) async throws -> SeriesMetadata {
+        try await send("GET", "/api/Series/metadata", query: ["seriesId": "\(seriesId)"])
+    }
+
     func continuePoint(seriesId: Int) async throws -> Chapter {
         try await send("GET", "/api/Reader/continue-point", query: ["seriesId": "\(seriesId)"])
     }
 
     // MARK: Reading
 
+    /// `extractPdf` makes Kavita treat PDFs as page images, so they read like comics.
     func chapterInfo(chapterId: Int) async throws -> ChapterInfo {
-        try await send("GET", "/api/Reader/chapter-info", query: ["chapterId": "\(chapterId)"])
+        try await send("GET", "/api/Reader/chapter-info", query: ["chapterId": "\(chapterId)", "extractPdf": "true"])
     }
 
     func progress(chapterId: Int) async throws -> ProgressBody {
@@ -101,6 +126,14 @@ struct KavitaClient {
         return id > 0 ? id : nil
     }
 
+    /// Returns the previous chapter id, or nil when this is the first one.
+    func previousChapter(seriesId: Int, volumeId: Int, chapterId: Int) async throws -> Int? {
+        let id: Int = try await send("GET", "/api/Reader/prev-chapter",
+                                     query: ["seriesId": "\(seriesId)", "volumeId": "\(volumeId)",
+                                             "currentChapterId": "\(chapterId)"])
+        return id > 0 ? id : nil
+    }
+
     func bookInfo(chapterId: Int) async throws -> BookInfo {
         try await send("GET", "/api/Book/\(chapterId)/book-info")
     }
@@ -109,24 +142,43 @@ struct KavitaClient {
         try await send("GET", "/api/Book/\(chapterId)/chapters")
     }
 
+    /// One EPUB section as HTML. Resource links are rewritten to point at this server address,
+    /// so they work no matter which address Kavita thinks it is on.
     func bookPageHTML(chapterId: Int, page: Int) async throws -> String {
         let data = try await raw("GET", "/api/Book/\(chapterId)/book-page", query: ["page": "\(page)"],
                                  accept: "text/plain")
-        let text = String(decoding: data, as: UTF8.self)
+        var text = String(decoding: data, as: UTF8.self)
         // Kavita may JSON-encode the string depending on the Accept header; unwrap if so.
         if text.hasPrefix("\""), let decoded = try? JSONDecoder().decode(String.self, from: data) {
-            return decoded
+            text = decoded
         }
-        return text
+        return rewriteResourceLinks(text)
     }
 
-    func pdfData(chapterId: Int) async throws -> Data {
-        try await raw("GET", "/api/Reader/pdf", query: ["chapterId": "\(chapterId)"], accept: "application/pdf")
+    func rewriteResourceLinks(_ html: String) -> String {
+        guard let regex = try? NSRegularExpression(pattern: #"(?:https?:)?//[^"'\s)]+?/api/book/"#,
+                                                   options: [.caseInsensitive]) else { return html }
+        let base = baseURL.absoluteString.hasSuffix("/") ? String(baseURL.absoluteString.dropLast())
+                                                         : baseURL.absoluteString
+        let range = NSRange(html.startIndex..., in: html)
+        return regex.stringByReplacingMatches(in: html, range: range,
+                                              withTemplate: NSRegularExpression.escapedTemplate(for: base + "/api/book/"))
     }
 
     func pageImageData(chapterId: Int, page: Int) async throws -> Data {
-        try await raw("GET", "/api/Reader/image", query: ["chapterId": "\(chapterId)", "page": "\(page)"],
+        try await raw("GET", "/api/Reader/image",
+                      query: ["chapterId": "\(chapterId)", "page": "\(page)", "extractPdf": "true"],
                       accept: "image/*")
+    }
+
+    /// Fetches an absolute URL (used for EPUB images, which carry their own apiKey).
+    func fetch(_ url: URL) async throws -> Data {
+        var req = URLRequest(url: url)
+        req.setValue(apiKey, forHTTPHeaderField: "x-api-key")
+        let (data, response) = try await Self.session.data(for: req)
+        let code = (response as? HTTPURLResponse)?.statusCode ?? 0
+        guard (200..<300).contains(code) else { throw KavitaError.http(code, "") }
+        return data
     }
 
     // MARK: Read status
@@ -157,6 +209,10 @@ struct KavitaClient {
 
     func seriesCoverURL(_ seriesId: Int) -> URL? {
         makeURL("/api/Image/series-cover", ["seriesId": "\(seriesId)", "apiKey": apiKey])
+    }
+
+    func volumeCoverURL(_ volumeId: Int) -> URL? {
+        makeURL("/api/Image/volume-cover", ["volumeId": "\(volumeId)", "apiKey": apiKey])
     }
 
     func chapterCoverURL(_ chapterId: Int) -> URL? {

@@ -41,9 +41,12 @@ echo "::group::Build for simulator"
 xcodegen generate
 xcodebuild -project Stacks.xcodeproj -target Stacks -configuration Release \
   -sdk iphonesimulator ARCHS="$(uname -m)" ONLY_ACTIVE_ARCH=NO SYMROOT="$WORK/build" \
-  CODE_SIGNING_ALLOWED=NO build -quiet
+  CODE_SIGNING_ALLOWED=NO build -quiet > "$WORK/build.log" 2>&1 || true
 APP="$WORK/build/Release-iphonesimulator/Stacks.app"
-test -d "$APP"
+if [ ! -d "$APP" ]; then
+  grep -E "error:" "$WORK/build.log" | sort -u | head -40 | while IFS= read -r line; do echo "::error::$line"; done
+  exit 1
+fi
 echo "::endgroup::"
 
 echo "::group::Boot simulator"

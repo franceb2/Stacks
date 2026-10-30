@@ -9,13 +9,18 @@ from pathlib import Path
 out = Path(sys.argv[1])
 
 captions = {
-    "1-home": "Home",
-    "2-library": "Comics library",
-    "3-series": "Series page with read tracking",
-    "4-comic-reader": "Comic reader",
-    "5-manga-volumes": "Manga volumes",
-    "6-books": "Books library",
-    "7-book-reader": "EPUB reader",
+    "01-home": "Home",
+    "02-library": "Comics library",
+    "03-series": "Series page",
+    "04-comic-reader": "Comic reader",
+    "05-reader-menu": "Reader menu",
+    "06-reader-settings": "Reading modes",
+    "07-download-sheet": "Download pages",
+    "08-manga-volumes": "Manga volumes",
+    "09-book-reader": "Book reader",
+    "10-book-menu": "Book menu",
+    "11-downloads": "Downloads",
+    "12-settings": "Settings",
 }
 
 
