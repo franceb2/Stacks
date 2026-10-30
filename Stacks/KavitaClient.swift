@@ -59,7 +59,7 @@ struct KavitaClient {
 
     /// True for errors that mean "the server couldn't be reached" rather than "the server said no".
     static func isOffline(_ error: Error) -> Bool {
-        if error is URLError { return true }
+        if let urlError = error as? URLError { return urlError.code != .cancelled }
         if case KavitaError.http(let code, _) = error, code == 502 || code == 503 || code == 504 || code == 530 {
             return true // Cloudflare answers with these when the PC or Kavita is down
         }
@@ -347,15 +347,42 @@ struct KavitaClient {
         return req
     }
 
+    /// Browsing calls whose answers are saved for offline use. Reader calls are left out on purpose,
+    /// so opening something that isn't downloaded says so instead of failing page by page.
+    private static let cachedPosts: Set<String> = [
+        "/api/Series/all-v2", "/api/Series/on-deck", "/api/Series/recently-added-v2",
+        "/api/Series/recently-updated-series", "/api/ReadingList/lists", "/api/want-to-read/v2",
+    ]
+
+    private static func isCacheable(_ method: String, _ path: String) -> Bool {
+        if method == "POST" { return cachedPosts.contains(path) }
+        guard method == "GET" else { return false }
+        if path == "/api/Reader/continue-point" { return true }
+        return !path.hasPrefix("/api/Reader/") && !path.hasPrefix("/api/Book/")
+    }
+
     private func raw(_ method: String, _ path: String, query: [String: String] = [:], body: Data? = nil,
                      accept: String = "application/json", authenticated: Bool = true) async throws -> Data {
-        let req = try makeRequest(method, path, query: query, body: body, accept: accept, authenticated: authenticated)
-        let (data, response) = try await Self.session.data(for: req)
-        let code = (response as? HTTPURLResponse)?.statusCode ?? 0
-        guard (200..<300).contains(code) else {
-            throw KavitaError.http(code, String(decoding: data, as: UTF8.self))
+        let cacheKey = Self.isCacheable(method, path)
+            ? ResponseCache.key(method: method, path: path, query: query, body: body) : nil
+        do {
+            let req = try makeRequest(method, path, query: query, body: body, accept: accept,
+                                      authenticated: authenticated)
+            let (data, response) = try await Self.session.data(for: req)
+            let code = (response as? HTTPURLResponse)?.statusCode ?? 0
+            guard (200..<300).contains(code) else {
+                throw KavitaError.http(code, String(decoding: data, as: UTF8.self))
+            }
+            ConnectionStatus.report(offline: false)
+            if let cacheKey { ResponseCache.store(data, key: cacheKey) }
+            return data
+        } catch {
+            if Self.isOffline(error) {
+                ConnectionStatus.report(offline: true)
+                if let cacheKey, let saved = ResponseCache.load(key: cacheKey) { return saved }
+            }
+            throw error
         }
-        return data
     }
 
     private func send<T: Decodable, B: Encodable>(_ method: String, _ path: String, query: [String: String] = [:],

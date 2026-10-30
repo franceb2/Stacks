@@ -160,7 +160,11 @@ struct RootView: View {
             Text("A new version of Stacks is ready." + ((updates.available?.notes).map { $0.isEmpty ? "" : "\n\n\($0)" } ?? "")
                  + "\n\nDownload it, then install it with Signulous like before.")
         }
+        .onReceive(NotificationCenter.default.publisher(for: .networkReturned)) { _ in
+            Task { await downloads.flush(client: client) }
+        }
         .task {
+            downloads.removeOldFinished()
             await downloads.flush(client: client)
             await updates.check()
             if DemoTour.enabled && !tourStarted {
@@ -170,6 +174,7 @@ struct RootView: View {
         }
         .onChange(of: scenePhase) { _, phase in
             if phase == .active {
+                downloads.removeOldFinished()
                 Task {
                     await downloads.flush(client: client)
                     await updates.check()

@@ -182,18 +182,12 @@ struct Backdrop: View {
 
     var body: some View {
         GeometryReader { geo in
-            AsyncImage(url: url) { phase in
-                if case .success(let image) = phase {
-                    image.resizable().aspectRatio(contentMode: .fill)
-                        .frame(width: geo.size.width, height: geo.size.height)
-                        .blur(radius: 30, opaque: true)
-                        .saturation(1.2)
-                        .opacity(0.65)
-                        .transition(.opacity)
-                } else {
-                    Color.clear
-                }
-            }
+            CachedImage(url: url) { Color.clear }
+                .aspectRatio(contentMode: .fill)
+                .frame(width: geo.size.width, height: geo.size.height)
+                .blur(radius: 30, opaque: true)
+                .saturation(1.2)
+                .opacity(0.65)
             .frame(width: geo.size.width, height: geo.size.height)
             .clipped()
             .overlay(

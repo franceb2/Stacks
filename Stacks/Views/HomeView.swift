@@ -10,6 +10,7 @@ struct HomeView: View {
     @State private var updated: [GroupedSeries] = []
     @State private var added: [Series] = []
     @State private var offline = false
+    @ObservedObject private var connection = ConnectionStatus.shared
     @State private var error: String?
     @State private var loaded = false
     @State private var heroChapter: Chapter?
@@ -18,7 +19,7 @@ struct HomeView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 28) {
-                if offline {
+                if offline || connection.offline {
                     OfflineBanner(hasDownloads: !downloads.items.isEmpty, openDownloads: openDownloads)
                         .padding(.horizontal, 16)
                 }
@@ -187,10 +188,10 @@ struct OfflineBanner: View {
         HStack(alignment: .top, spacing: 12) {
             Image(systemName: "wifi.slash").font(.title3).foregroundStyle(Theme.primary)
             VStack(alignment: .leading, spacing: 6) {
-                Text("Can't reach your server").font(.subheadline.bold()).foregroundStyle(Theme.text)
+                Text("Offline · showing your saved library").font(.subheadline.bold()).foregroundStyle(Theme.text)
                 Text(hasDownloads
-                     ? "Your downloads still work. Reading progress syncs when you're back online."
-                     : "Check that your PC and Kavita are on. Pull down to try again.")
+                     ? "Downloads open as usual. Anything you read now syncs to Kavita when you're back online."
+                     : "You can browse, but only downloaded items open. Check that your PC and Kavita are on.")
                     .font(.footnote).foregroundStyle(Theme.muted)
                 if hasDownloads {
                     Button("Open downloads", action: openDownloads)

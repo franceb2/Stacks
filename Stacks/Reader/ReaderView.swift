@@ -118,7 +118,7 @@ struct ReaderView: View {
                 offline = true
             } else {
                 self.error = KavitaClient.isOffline(error)
-                    ? "Can't reach your server, and this isn't downloaded."
+                    ? "This isn't downloaded, and there's no connection to your server.\n\nDownload it next time you're online to read it anywhere."
                     : error.localizedDescription
                 return
             }

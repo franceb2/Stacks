@@ -9,9 +9,19 @@ final class NetworkMonitor: @unchecked Sendable {
     private let monitor = NWPathMonitor()
     private(set) var isUnmetered = true
 
+    private var wasConnected = true
+
     private init() {
         monitor.pathUpdateHandler = { [weak self] path in
-            self?.isUnmetered = path.status == .satisfied && !path.isExpensive && !path.isConstrained
+            guard let self else { return }
+            self.isUnmetered = path.status == .satisfied && !path.isExpensive && !path.isConstrained
+            let connected = path.status == .satisfied
+            if connected && !self.wasConnected {
+                DispatchQueue.main.async {
+                    NotificationCenter.default.post(name: .networkReturned, object: nil)
+                }
+            }
+            self.wasConnected = connected
         }
         monitor.start(queue: DispatchQueue(label: "network-monitor"))
     }
@@ -30,6 +40,18 @@ enum AutoDownload {
     static var allowedNow: Bool { count > 0 && (!wifiOnly || NetworkMonitor.shared.isUnmetered) }
 }
 
+/// Settings for removing downloads you've finished reading.
+enum AutoDelete {
+    static var enabled: Bool {
+        get { UserDefaults.standard.bool(forKey: "autoDeleteFinished") } // off unless turned on
+        set { UserDefaults.standard.set(newValue, forKey: "autoDeleteFinished") }
+    }
+    static var days: Int {
+        get { UserDefaults.standard.object(forKey: "autoDeleteDays") as? Int ?? 10 }
+        set { UserDefaults.standard.set(newValue, forKey: "autoDeleteDays") }
+    }
+}
+
 /// A chapter (issue, volume file, book) saved on the phone, fully or as a page range.
 struct DownloadedChapter: Codable, Identifiable {
     let chapterId: Int
@@ -43,6 +65,8 @@ struct DownloadedChapter: Codable, Identifiable {
     var date: Date
     /// Last page read on this phone, kept so offline reading resumes correctly.
     var lastPage: Int?
+    /// When the whole thing was read; used to clean up finished downloads.
+    var finishedAt: Date?
 
     var id: Int { chapterId }
     var totalPages: Int { info.pages }
@@ -359,8 +383,37 @@ final class Downloads: ObservableObject {
     func rememberPage(_ page: Int, chapterId: Int) {
         guard var entry = items[chapterId] else { return }
         entry.lastPage = page
+        if page >= entry.info.pages - 1 {
+            if entry.finishedAt == nil { entry.finishedAt = Date() }
+        } else {
+            entry.finishedAt = nil // reading it again, so keep it
+        }
         items[chapterId] = entry
         save()
+    }
+
+    /// Marks downloaded chapters as finished (for example after "Mark as read").
+    func markFinished(_ chapterIds: [Int], finished: Bool = true) {
+        var changed = false
+        for id in chapterIds {
+            guard var entry = items[id] else { continue }
+            entry.finishedAt = finished ? (entry.finishedAt ?? Date()) : nil
+            items[id] = entry
+            changed = true
+        }
+        if changed { save() }
+    }
+
+    /// Deletes downloads finished more than the chosen number of days ago, when that setting is on.
+    /// Anything still waiting to sync its reading position is kept until it has synced.
+    func removeOldFinished() {
+        guard AutoDelete.enabled else { return }
+        let cutoff = Date().addingTimeInterval(-Double(AutoDelete.days) * 86_400)
+        for item in items.values {
+            if let done = item.finishedAt, done < cutoff, pending[item.chapterId] == nil, jobs[item.chapterId] == nil {
+                delete(item.chapterId)
+            }
+        }
     }
 
     func queue(_ body: ProgressBody) {
@@ -375,18 +428,33 @@ final class Downloads: ObservableObject {
     }
 
     /// Sends progress saved while offline. Safe to call any time.
+    /// Sends reading positions saved while offline to Kavita. If Kavita already has you further
+    /// along (say you kept reading on another device), it keeps the further position.
     func flush(client: KavitaClient) async {
+        guard !flushing, !pending.isEmpty else { return }
+        flushing = true
+        defer { flushing = false }
+        var synced = 0
         for body in Array(pending.values) {
             do {
+                if let server = try? await client.progress(chapterId: body.chapterId), server.pageNum > body.pageNum {
+                    pending[body.chapterId] = nil
+                    continue
+                }
                 try await client.saveProgress(body)
                 pending[body.chapterId] = nil
+                synced += 1
             } catch {
                 if KavitaClient.isOffline(error) { break }
                 pending[body.chapterId] = nil // server rejected it; don't retry forever
             }
         }
         savePending()
+        removeOldFinished()
+        if synced > 0 { NotificationCenter.default.post(name: .readingProgressChanged, object: nil) }
     }
+
+    private var flushing = false
 
     // MARK: Persistence
 

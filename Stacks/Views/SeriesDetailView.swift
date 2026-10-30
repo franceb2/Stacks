@@ -386,6 +386,15 @@ struct SeriesDetailView: View {
                 listTarget = ListSheetTarget(target: .series(route.id), title: series?.name ?? route.name)
             }
             Divider()
+            Menu {
+                ForEach(Self.nextCounts, id: \.self) { n in
+                    Button("Next \(n)") {
+                        for c in upcoming(n) { download(c, name: name(for: c), range: .all) }
+                    }
+                }
+            } label: {
+                Label("Download next…", systemImage: "arrow.down.to.line")
+            }
             Button("Download all", systemImage: "arrow.down.circle") {
                 for c in detail?.allChapters ?? [] { download(c, name: name(for: c), range: .all) }
             }
@@ -425,6 +434,11 @@ struct SeriesDetailView: View {
         let all = detail?.allChapters ?? []
         return HStack(spacing: 10) {
             Menu {
+                Menu("Select next…") {
+                    ForEach(Self.nextCounts, id: \.self) { n in
+                        Button("Next \(n)") { selected = Set(upcoming(n).map(\.id)) }
+                    }
+                }
                 Button("Select all") { selected = Set(all.map(\.id)) }
                 Button("Select unread") { selected = Set(all.filter { !$0.isRead }.map(\.id)) }
                 Button("Select not downloaded") {
@@ -452,6 +466,16 @@ struct SeriesDetailView: View {
         .padding(.horizontal, 16)
         .padding(.vertical, 10)
         .background(.ultraThinMaterial)
+    }
+
+    static let nextCounts = [5, 10, 15, 20, 25, 30, 50]
+
+    /// The next `n` issues or chapters from where you are (starting at your current one).
+    private func upcoming(_ n: Int) -> [Chapter] {
+        let all = detail?.allChapters ?? []
+        let start = continueChapter.flatMap { c in all.firstIndex { $0.id == c.id } }
+            ?? all.firstIndex { !$0.isRead } ?? 0
+        return Array(all.dropFirst(start).prefix(n))
     }
 
     private func toggle(_ ids: Set<Int>) {
@@ -506,6 +530,7 @@ struct SeriesDetailView: View {
 
     private func markChapter(_ chapter: Chapter, read: Bool) {
         Task {
+            downloads.markFinished([chapter.id], finished: read)
             do { try await client.markChapter(seriesId: route.id, chapter: chapter, read: read) }
             catch { self.error = error.localizedDescription }
             await refreshAfterChange()
@@ -514,6 +539,7 @@ struct SeriesDetailView: View {
 
     private func markVolume(_ volume: Volume, read: Bool) {
         Task {
+            downloads.markFinished((volume.chapters ?? []).map(\.id), finished: read)
             do { try await client.markVolume(seriesId: route.id, volumeId: volume.id, read: read) }
             catch { self.error = error.localizedDescription }
             await refreshAfterChange()
@@ -522,6 +548,7 @@ struct SeriesDetailView: View {
 
     private func markSeries(read: Bool) {
         Task {
+            downloads.markFinished((detail?.allChapters ?? []).map(\.id), finished: read)
             do { try await client.markSeries(route.id, read: read) }
             catch { self.error = error.localizedDescription }
             await refreshAfterChange()

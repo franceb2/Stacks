@@ -132,6 +132,11 @@ struct DownloadsView: View {
     @EnvironmentObject private var downloads: Downloads
     @State private var reader: ReaderLaunch?
     @State private var confirmDeleteAll = false
+    @State private var collapsed: Set<String> = []
+    @State private var shown: [String: Int] = [:]
+    @State private var confirmDeleteSeries: String?
+
+    private static let pageSize = 5
 
     private struct SeriesGroup: Identifiable {
         let series: String
@@ -189,12 +194,61 @@ struct DownloadsView: View {
             }
 
             ForEach(groups) { group in
-                Section(group.series) {
-                    ForEach(group.items) { item in
-                        row(item).listRowBackground(Theme.card)
+                let isCollapsed = collapsed.contains(group.series)
+                let limit = shown[group.series] ?? Self.pageSize
+                let visible = Array(group.items.prefix(limit))
+                Section {
+                    if !isCollapsed {
+                        ForEach(visible) { item in
+                            row(item).listRowBackground(Theme.card)
+                        }
+                        .onDelete { offsets in
+                            for i in offsets { downloads.delete(visible[i].chapterId) }
+                        }
+                        if group.items.count > Self.pageSize {
+                            HStack {
+                                if limit < group.items.count {
+                                    Button("Show \(min(Self.pageSize, group.items.count - limit)) more") {
+                                        withAnimation { shown[group.series] = limit + Self.pageSize }
+                                    }
+                                    Spacer()
+                                    Button("Show all \(group.items.count)") {
+                                        withAnimation { shown[group.series] = group.items.count }
+                                    }
+                                } else {
+                                    Button("Show less") {
+                                        withAnimation { shown[group.series] = Self.pageSize }
+                                    }
+                                }
+                            }
+                            .font(.footnote.weight(.semibold))
+                            .buttonStyle(.borderless)
+                            .listRowBackground(Theme.card)
+                        }
                     }
-                    .onDelete { offsets in
-                        for i in offsets { downloads.delete(group.items[i].chapterId) }
+                } header: {
+                    Button {
+                        withAnimation {
+                            if isCollapsed { collapsed.remove(group.series) } else { collapsed.insert(group.series) }
+                        }
+                    } label: {
+                        HStack(spacing: 8) {
+                            Image(systemName: "chevron.right")
+                                .font(.caption.weight(.bold))
+                                .rotationEffect(.degrees(isCollapsed ? 0 : 90))
+                            Text(group.series).lineLimit(1)
+                            Spacer()
+                            Text("\(group.items.count) · \(group.items.reduce(Int64(0)) { $0 + $1.bytes }.fileSizeText)")
+                                .font(.caption.monospacedDigit())
+                        }
+                        .foregroundStyle(Theme.text)
+                        .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                    .contextMenu {
+                        Button("Delete \(group.series) downloads", systemImage: "trash", role: .destructive) {
+                            confirmDeleteSeries = group.series
+                        }
                     }
                 }
             }
@@ -204,10 +258,15 @@ struct DownloadsView: View {
                     LabeledContent("Space used", value: downloads.totalBytes.fileSizeText)
                         .listRowBackground(Theme.card)
                     if !downloads.pending.isEmpty {
-                        Label("\(downloads.pending.count) reading position(s) will sync when you're back online",
-                              systemImage: "arrow.triangle.2.circlepath")
-                            .font(.footnote).foregroundStyle(Theme.muted)
-                            .listRowBackground(Theme.card)
+                        VStack(alignment: .leading, spacing: 8) {
+                            Label("\(downloads.pending.count) reading position\(downloads.pending.count == 1 ? "" : "s") waiting to sync to Kavita",
+                                  systemImage: "arrow.triangle.2.circlepath")
+                                .font(.footnote).foregroundStyle(Theme.muted)
+                            Button("Sync now") { Task { await downloads.flush(client: client) } }
+                                .font(.footnote.weight(.semibold))
+                                .buttonStyle(.borderless)
+                        }
+                        .listRowBackground(Theme.card)
                     }
                     Button("Delete all downloads", role: .destructive) { confirmDeleteAll = true }
                         .listRowBackground(Theme.card)
@@ -218,6 +277,28 @@ struct DownloadsView: View {
         .navigationTitle("Downloads")
         .confirmationDialog("Delete all downloads?", isPresented: $confirmDeleteAll, titleVisibility: .visible) {
             Button("Delete all", role: .destructive) { downloads.deleteAll() }
+        }
+        .confirmationDialog("Delete these downloads?",
+                            isPresented: Binding(get: { confirmDeleteSeries != nil },
+                                                 set: { if !$0 { confirmDeleteSeries = nil } }),
+                            titleVisibility: .visible) {
+            Button("Delete \(confirmDeleteSeries ?? "")", role: .destructive) {
+                if let name = confirmDeleteSeries {
+                    for item in downloads.items.values where item.seriesName == name { downloads.delete(item.chapterId) }
+                }
+                confirmDeleteSeries = nil
+            }
+        }
+        .toolbar {
+            if groups.count > 1 {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button(collapsed.count == groups.count ? "Expand all" : "Collapse all") {
+                        withAnimation {
+                            collapsed = collapsed.count == groups.count ? [] : Set(groups.map(\.series))
+                        }
+                    }
+                }
+            }
         }
         .alert("Download problem", isPresented: Binding(get: { downloads.lastError != nil },
                                                         set: { if !$0 { downloads.lastError = nil } })) {

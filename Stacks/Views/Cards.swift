@@ -10,15 +10,11 @@ struct CoverImage: View {
             if let localFile, let image = UIImage(contentsOfFile: localFile.path) {
                 Image(uiImage: image).resizable().aspectRatio(contentMode: .fill)
             } else {
-                AsyncImage(url: url, transaction: Transaction(animation: .easeOut(duration: 0.2))) { phase in
-                    switch phase {
-                    case .success(let image):
-                        image.resizable().aspectRatio(contentMode: .fill)
-                    default:
-                        Rectangle().fill(Theme.card)
-                            .overlay(Image(systemName: "book.closed").foregroundStyle(Theme.muted))
-                    }
+                CachedImage(url: url) {
+                    Rectangle().fill(Theme.card)
+                        .overlay(Image(systemName: "book.closed").foregroundStyle(Theme.muted))
                 }
+                .aspectRatio(contentMode: .fill)
             }
         }
         .frame(minWidth: 0, maxWidth: .infinity)
@@ -81,7 +77,14 @@ struct KavitaCard: View {
                 .clipShape(RoundedRectangle(cornerRadius: 5))
                 .overlay {
                     if progress >= 1 {
-                        RoundedRectangle(cornerRadius: 5).fill(Color.black.opacity(0.35))
+                        ZStack {
+                            RoundedRectangle(cornerRadius: 5).fill(Color.black.opacity(0.4))
+                            Image(systemName: "eye.fill")
+                                .font(.system(size: 26, weight: .semibold))
+                                .foregroundStyle(.white.opacity(0.7))
+                                .shadow(color: .black.opacity(0.5), radius: 4)
+                        }
+                        .accessibilityLabel("Read")
                     }
                 }
                 .overlay {

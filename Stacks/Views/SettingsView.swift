@@ -13,6 +13,8 @@ struct SettingsView: View {
     @State private var autoCount = AutoDownload.count
     @State private var autoWifiOnly = AutoDownload.wifiOnly
     @State private var mangaRTL = ReaderPrefsStore.mangaRightToLeft
+    @State private var autoDelete = AutoDelete.enabled
+    @State private var autoDeleteDays = AutoDelete.days
     @AppStorage("appTheme") private var themeRaw = AppTheme.kavita.rawValue
     @StateObject private var updates = UpdateChecker.shared
     @Environment(\.openURL) private var openURL
@@ -145,6 +147,19 @@ struct SettingsView: View {
             }
             .listRowBackground(Theme.card)
 
+            Section {
+                Toggle("Delete finished downloads", isOn: $autoDelete)
+                Picker("After", selection: $autoDeleteDays) {
+                    ForEach([3, 7, 10, 14, 30], id: \.self) { Text("\($0) days").tag($0) }
+                }
+                .disabled(!autoDelete)
+            } header: {
+                Text("Clean up")
+            } footer: {
+                Text("Removes a download this many days after you finish reading all of it. Anything not yet synced to Kavita is kept until it syncs.")
+            }
+            .listRowBackground(Theme.card)
+
             Section("Storage") {
                 LabeledContent("Downloads", value: downloads.totalBytes.fileSizeText)
                 Button("Delete all downloads", role: .destructive) { confirmDelete = true }
@@ -168,6 +183,14 @@ struct SettingsView: View {
         .onChange(of: autoCount) { _, value in AutoDownload.count = value }
         .onChange(of: autoWifiOnly) { _, value in AutoDownload.wifiOnly = value }
         .onChange(of: mangaRTL) { _, value in ReaderPrefsStore.mangaRightToLeft = value }
+        .onChange(of: autoDelete) { _, value in
+            AutoDelete.enabled = value
+            downloads.removeOldFinished()
+        }
+        .onChange(of: autoDeleteDays) { _, value in
+            AutoDelete.days = value
+            downloads.removeOldFinished()
+        }
         .task { await updates.check() }
         .confirmationDialog("Delete all downloads?", isPresented: $confirmDelete, titleVisibility: .visible) {
             Button("Delete all", role: .destructive) { downloads.deleteAll() }
