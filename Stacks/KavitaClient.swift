@@ -291,6 +291,103 @@ struct KavitaClient {
         makeURL("/api/Image/readinglist-cover", ["readingListId": "\(listId)", "apiKey": apiKey])
     }
 
+    // MARK: Bookmarks
+
+    func chapterBookmarks(_ chapterId: Int) async throws -> [Bookmark] {
+        try await send("GET", "/api/Reader/chapter-bookmarks", query: ["chapterId": "\(chapterId)"])
+    }
+
+    func seriesBookmarks(_ seriesId: Int) async throws -> [Bookmark] {
+        try await send("GET", "/api/Reader/series-bookmarks", query: ["seriesId": "\(seriesId)"])
+    }
+
+    func allBookmarks() async throws -> [Bookmark] {
+        try await send("POST", "/api/Reader/all-bookmarks", body: SeriesFilter.make(libraryId: nil, search: nil))
+    }
+
+    func setBookmark(_ on: Bool, page: Int, chapterId: Int, volumeId: Int, seriesId: Int) async throws {
+        try await sendNoContent("POST", on ? "/api/Reader/bookmark" : "/api/Reader/unbookmark",
+                                body: BookmarkBody(page: page, volumeId: volumeId, seriesId: seriesId, chapterId: chapterId))
+    }
+
+    func bookmarkImageURL(_ b: Bookmark) -> URL? {
+        makeURL("/api/Image/bookmark", ["chapterId": "\(b.chapterId)", "pageNum": "\(b.page)", "imageOffset": "0",
+                                        "apiKey": apiKey])
+    }
+
+    // MARK: Mark several at once
+
+    func markMultiple(seriesId: Int, volumeIds: [Int], chapterIds: [Int], read: Bool) async throws {
+        try await sendNoContent("POST", read ? "/api/Reader/mark-multiple-read" : "/api/Reader/mark-multiple-unread",
+                                body: MarkMultipleBody(seriesId: seriesId, volumeIds: volumeIds, chapterIds: chapterIds,
+                                                       generateReadingSession: false))
+    }
+
+    // MARK: Collections
+
+    func collections() async throws -> [KavitaCollection] {
+        try await send("GET", "/api/Collection", query: ["ownedOnly": "false"])
+    }
+
+    func seriesInCollection(_ collectionId: Int, page: Int) async throws -> [Series] {
+        var filter = SeriesFilter.make(libraryId: nil, search: nil)
+        filter.statements = [.init(comparison: 0, field: 7, value: String(collectionId))] // Collection tags == id
+        return try await send("POST", "/api/Series/all-v2", query: ["PageNumber": "\(page)", "PageSize": "60"],
+                              body: filter)
+    }
+
+    func addToCollection(seriesId: Int, collectionId: Int, title: String) async throws {
+        try await sendNoContent("POST", "/api/Collection/update-for-series",
+                                body: AddToCollectionBody(collectionTagId: collectionId, collectionTagTitle: title,
+                                                          seriesIds: [seriesId]))
+    }
+
+    func collectionCoverURL(_ id: Int) -> URL? {
+        makeURL("/api/Image/collection-cover", ["collectionTagId": "\(id)", "apiKey": apiKey])
+    }
+
+    // MARK: Search and people
+
+    func search(_ text: String) async throws -> SearchResults {
+        try await send("GET", "/api/Search/search", query: ["queryString": text, "includeChapterAndFiles": "false"])
+    }
+
+    func seriesFor(personId: Int) async throws -> [Series] {
+        try await send("GET", "/api/Person/series-known-for", query: ["personId": "\(personId)"])
+    }
+
+    func personCoverURL(_ id: Int) -> URL? {
+        makeURL("/api/Image/person-cover", ["personId": "\(id)", "apiKey": apiKey])
+    }
+
+    // MARK: Stats
+
+    func account() async throws -> AccountInfo {
+        try await send("GET", "/api/Account")
+    }
+
+    func readStats(userId: Int) async throws -> UserReadStats {
+        try await send("GET", "/api/Stats/user-read", query: ["userId": "\(userId)"])
+    }
+
+    func profileStats(userId: Int) async throws -> ProfileStats {
+        try await send("GET", "/api/Stats/user-stats", query: ["userId": "\(userId)"])
+    }
+
+    func readsByMonth(userId: Int) async throws -> [MonthCount] {
+        try await send("GET", "/api/Stats/reads-by-month", query: ["userId": "\(userId)"])
+    }
+
+    func readingHistory(pageSize: Int = 200) async throws -> [ReadingSession] {
+        try await send("GET", "/api/Stats/reading-history",
+                       query: ["PageNumber": "1", "PageSize": "\(pageSize)",
+                               "TimeZoneId": TimeZone.current.identifier])
+    }
+
+    func favoriteAuthors(userId: Int) async throws -> [FavoriteAuthor] {
+        try await send("GET", "/api/Stats/favorite-authors", query: ["userId": "\(userId)"])
+    }
+
     // MARK: Want to Read
 
     func wantToRead() async throws -> [Series] {
@@ -378,7 +475,7 @@ struct KavitaClient {
             return data
         } catch {
             if Self.isOffline(error) {
-                ConnectionStatus.report(offline: true)
+                ConnectionStatus.report(ServerProblem.from(error) ?? .unreachable)
                 if let cacheKey, let saved = ResponseCache.load(key: cacheKey) { return saved }
             }
             throw error

@@ -295,3 +295,130 @@ struct ListPositionBody: Encodable {
 struct VolumeReadBody: Encodable { let seriesId: Int; let volumeId: Int }
 struct ChapterReadBody: Encodable { let seriesId: Int; let chapterId: Int }
 struct LoginBody: Encodable { let username: String; let password: String }
+
+// MARK: - Bookmarks, collections, search, stats
+
+struct Bookmark: Codable, Identifiable, Hashable {
+    let id: Int
+    let page: Int
+    let volumeId: Int
+    let seriesId: Int
+    let chapterId: Int
+    let chapterTitle: String?
+    let series: BookmarkSeries?
+
+    struct BookmarkSeries: Codable, Hashable { let name: String }
+}
+
+struct BookmarkBody: Encodable {
+    let page: Int
+    let volumeId: Int
+    let seriesId: Int
+    let chapterId: Int
+}
+
+struct MarkMultipleBody: Encodable {
+    let seriesId: Int
+    let volumeIds: [Int]
+    let chapterIds: [Int]
+    let generateReadingSession: Bool
+}
+
+struct KavitaCollection: Decodable, Identifiable, Hashable {
+    let id: Int
+    let title: String
+    let summary: String?
+    let itemCount: Int
+    let owner: String?
+}
+
+struct AddToCollectionBody: Encodable {
+    let collectionTagId: Int
+    let collectionTagTitle: String
+    let seriesIds: [Int]
+}
+
+struct Person: Decodable, Identifiable, Hashable {
+    let id: Int
+    let name: String
+    let roles: [Int]?
+
+    /// Kavita PersonRole names.
+    var roleText: String {
+        let names: [Int: String] = [3: "Writer", 4: "Penciller", 5: "Inker", 6: "Colorist", 7: "Letterer",
+                                    8: "Cover artist", 9: "Editor", 10: "Publisher", 11: "Character",
+                                    12: "Translator", 13: "Imprint", 14: "Team", 15: "Location"]
+        return (roles ?? []).compactMap { names[$0] }.joined(separator: ", ")
+    }
+}
+
+struct SearchResults: Decodable {
+    struct SeriesHit: Decodable, Identifiable, Hashable {
+        let seriesId: Int
+        let name: String
+        let libraryName: String?
+        var id: Int { seriesId }
+    }
+    let series: [SeriesHit]?
+    let persons: [Person]?
+    let collections: [KavitaCollection]?
+    let readingLists: [ReadingList]?
+}
+
+struct AccountInfo: Decodable { let id: Int; let username: String }
+
+struct UserReadStats: Decodable {
+    let totalPagesRead: Int
+    let totalWordsRead: Int
+    let timeSpentReading: Int          // hours
+    let avgHoursPerWeekSpentReading: Double
+}
+
+struct ProfileStats: Decodable {
+    let booksRead: Int
+    let comicsRead: Int
+    let pagesRead: Int
+    let authorsRead: Int
+}
+
+struct MonthCount: Decodable, Identifiable {
+    struct YearMonth: Decodable { let year: Int; let month: Int }
+    let value: YearMonth
+    let count: Int
+    var id: String { "\(value.year)-\(value.month)" }
+    var date: Date {
+        Calendar.current.date(from: DateComponents(year: value.year, month: value.month, day: 1)) ?? Date()
+    }
+}
+
+struct ReadingSession: Decodable, Identifiable {
+    struct ChapterItem: Decodable {
+        let chapterId: Int
+        let label: String?
+        let pagesRead: Int
+        let completed: Bool
+    }
+    let sessionId: Int
+    let startTimeUtc: String?
+    let localDate: String?
+    let seriesId: Int
+    let seriesName: String?
+    let chapters: [ChapterItem]?
+    let pagesRead: Int
+    let durationSeconds: Int
+    var id: Int { sessionId }
+
+    /// "yyyy-MM-dd" day this session happened on.
+    var day: String? {
+        if let localDate, localDate.count >= 10 { return String(localDate.prefix(10)) }
+        if let startTimeUtc, startTimeUtc.count >= 10 { return String(startTimeUtc.prefix(10)) }
+        return nil
+    }
+}
+
+struct FavoriteAuthor: Decodable, Identifiable {
+    let authorId: Int
+    let authorName: String
+    let totalChaptersRead: Int
+    var id: Int { authorId }
+}

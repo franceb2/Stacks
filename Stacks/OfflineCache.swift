@@ -3,15 +3,70 @@ import Foundation
 import SwiftUI
 import UIKit
 
-/// Whether the app is currently showing saved data because the server can't be reached.
+/// Why the server can't be reached, in plain words.
+enum ServerProblem: Equatable {
+    case phoneOffline      // no internet on the phone
+    case tunnelDown        // Cloudflare can't reach the PC (error 1033 / HTTP 530)
+    case kavitaDown        // tunnel is fine but Kavita isn't answering (HTTP 502/504)
+    case unreachable       // server address can't be reached (home address while away, PC off, etc.)
+
+    var title: String {
+        switch self {
+        case .phoneOffline: return "Your phone is offline"
+        case .tunnelDown: return "Your PC or its tunnel is offline"
+        case .kavitaDown: return "Kavita isn't running on your PC"
+        case .unreachable: return "Can't reach your server"
+        }
+    }
+
+    var detail: String {
+        switch self {
+        case .phoneOffline:
+            return "Connect to Wi-Fi or cellular. Downloads still open."
+        case .tunnelDown:
+            return "Cloudflare can't reach your PC (error 1033). Make sure the PC is on and awake, and the Cloudflared service is running."
+        case .kavitaDown:
+            return "Your PC is reachable, but Kavita isn't answering (error 502). Start Kavita, or its service, on the PC."
+        case .unreachable:
+            return "Check that the PC is on and the server address is right."
+        }
+    }
+
+    static func from(_ error: Error) -> ServerProblem? {
+        if let urlError = error as? URLError {
+            switch urlError.code {
+            case .cancelled: return nil
+            case .notConnectedToInternet, .networkConnectionLost, .dataNotAllowed, .internationalRoamingOff:
+                return .phoneOffline
+            default: return .unreachable
+            }
+        }
+        if case KavitaError.http(let code, let body) = error {
+            if code == 530 || body.contains("1033") { return .tunnelDown }
+            if code == 502 || code == 504 { return .kavitaDown }
+            if code == 503 { return .unreachable }
+        }
+        return nil
+    }
+}
+
+/// Whether the app is currently showing saved data because the server can't be reached, and why.
 @MainActor
 final class ConnectionStatus: ObservableObject {
     static let shared = ConnectionStatus()
-    @Published private(set) var offline = false
+    @Published private(set) var problem: ServerProblem?
+    var offline: Bool { problem != nil }
 
     nonisolated static func report(offline: Bool) {
+        guard !offline else { return }
         Task { @MainActor in
-            if shared.offline != offline { shared.offline = offline }
+            if shared.problem != nil { shared.problem = nil }
+        }
+    }
+
+    nonisolated static func report(_ problem: ServerProblem) {
+        Task { @MainActor in
+            if shared.problem != problem { shared.problem = problem }
         }
     }
 }

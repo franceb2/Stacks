@@ -3,6 +3,8 @@ import SwiftUI
 struct ReaderLaunch: Identifiable {
     let chapterId: Int
     var readingListId: Int? = nil
+    /// Open at this page instead of the saved spot (from a bookmark).
+    var page: Int? = nil
     var id: Int { chapterId }
 }
 
@@ -37,6 +39,9 @@ struct SeriesDetailView: View {
     @State private var listTarget: ListSheetTarget?
     @State private var downloadsQueued = 0
     @State private var selecting = false
+    @AppStorage("hideReadIssues") private var hideRead = false
+    @State private var showBookmarks = false
+    @State private var showCollections = false
     @State private var selected: Set<Int> = []
     @State private var error: String?
 
@@ -81,13 +86,23 @@ struct SeriesDetailView: View {
             Task { await load() }
             NotificationCenter.default.post(name: .readingProgressChanged, object: nil)
         }) { launch in
-            ReaderView(client: client, startChapterId: launch.chapterId)
+            ReaderView(client: client, startChapterId: launch.chapterId, readingListId: launch.readingListId,
+                       startPage: launch.page)
         }
         .sheet(item: $downloadTarget) { target in
             DownloadSheet(target: target, client: client)
         }
         .sheet(item: $listTarget) { item in
             AddToListSheet(target: item.target, title: item.title, client: client)
+        }
+        .sheet(isPresented: $showBookmarks) {
+            BookmarksSheet(client: client, seriesId: route.id, title: series?.name ?? route.name) { bookmark in
+                showBookmarks = false
+                reader = ReaderLaunch(chapterId: bookmark.chapterId, page: bookmark.page)
+            }
+        }
+        .sheet(isPresented: $showCollections) {
+            AddToCollectionSheet(client: client, seriesId: route.id, title: series?.name ?? route.name)
         }
         .safeAreaInset(edge: .bottom) {
             if selecting { selectionBar.transition(.move(edge: .bottom).combined(with: .opacity)) }
@@ -246,7 +261,8 @@ struct SeriesDetailView: View {
     private func tabBar(_ d: SeriesDetail) -> some View {
         let tabs = availableTabs(d)
         let selected = tab.flatMap { tabs.contains($0) ? $0 : nil } ?? tabs.first
-        return ScrollView(.horizontal, showsIndicators: false) {
+        return HStack(spacing: 0) {
+        ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 22) {
                 ForEach(tabs, id: \.self) { t in
                     Button {
@@ -267,6 +283,17 @@ struct SeriesDetailView: View {
             }
             .padding(.horizontal, 16)
         }
+            Button {
+                withAnimation(.easeOut(duration: 0.2)) { hideRead.toggle() }
+            } label: {
+                Label(hideRead ? "Unread" : "All", systemImage: hideRead ? "eye.slash" : "eye")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(hideRead ? Theme.primary : Theme.muted)
+            }
+            .buttonStyle(.plain)
+            .padding(.trailing, 16)
+            .accessibilityLabel(hideRead ? "Showing unread only" : "Showing all")
+        }
         .overlay(alignment: .bottom) { Rectangle().fill(Color.white.opacity(0.08)).frame(height: 1) }
     }
 
@@ -277,11 +304,11 @@ struct SeriesDetailView: View {
         CardGrid {
             switch selected {
             case .volumes:
-                ForEach(d.volumes.sorted { ($0.minNumber ?? 0) < ($1.minNumber ?? 0) }) { volumeCard($0, d) }
+                ForEach(sortedVolumes(d).filter { !hideRead || !$0.isRead }) { volumeCard($0, d) }
             case .chapters:
-                ForEach(d.looseChapters) { chapterCard($0) }
+                ForEach(d.looseChapters.filter { !hideRead || !$0.isRead }) { chapterCard($0) }
             case .specials, .books:
-                ForEach(d.specials) { chapterCard($0) }
+                ForEach(d.specials.filter { !hideRead || !$0.isRead }) { chapterCard($0) }
             case nil:
                 EmptyView()
             }
@@ -326,6 +353,9 @@ struct SeriesDetailView: View {
             Button("Mark as read", systemImage: "checkmark.circle") { markVolume(volume, read: true) }
             Button("Mark as unread", systemImage: "circle") { markVolume(volume, read: false) }
             Divider()
+            Button("Mark volumes before this as read", systemImage: "checkmark.circle.badge.questionmark") {
+                markPrevious(before: volume, in: d)
+            }
             Button("Add to reading list…", systemImage: "text.badge.plus") {
                 listTarget = ListSheetTarget(target: .volume(seriesId: route.id, volumeId: volume.id),
                                              title: volume.displayName)
@@ -366,6 +396,9 @@ struct SeriesDetailView: View {
         Button("Read", systemImage: "book") { reader = ReaderLaunch(chapterId: chapter.id) }
         Button("Mark as read", systemImage: "checkmark.circle") { markChapter(chapter, read: true) }
         Button("Mark as unread", systemImage: "circle") { markChapter(chapter, read: false) }
+        Button("Mark everything before this as read", systemImage: "checkmark.circle.badge.questionmark") {
+            markPrevious(before: chapter)
+        }
         Button("Add to reading list…", systemImage: "text.badge.plus") {
             listTarget = ListSheetTarget(target: .chapter(seriesId: route.id, chapterId: chapter.id),
                                          title: name(for: chapter))
@@ -385,6 +418,8 @@ struct SeriesDetailView: View {
             Button("Add to reading list…", systemImage: "text.badge.plus") {
                 listTarget = ListSheetTarget(target: .series(route.id), title: series?.name ?? route.name)
             }
+            Button("Add to collection…", systemImage: "square.stack.3d.up") { showCollections = true }
+            Button("Bookmarks", systemImage: "bookmark") { showBookmarks = true }
             Divider()
             Menu {
                 ForEach(Self.nextCounts, id: \.self) { n in
@@ -427,6 +462,37 @@ struct SeriesDetailView: View {
     }
 
     private var isBook: Bool { series?.format == MangaFormat.epub.rawValue }
+
+    // MARK: Mark previous
+
+    private func sortedVolumes(_ d: SeriesDetail) -> [Volume] {
+        d.volumes.sorted { ($0.minNumber ?? 0) < ($1.minNumber ?? 0) }
+    }
+
+    /// Marks every issue/chapter before this one as read (handy when starting a series partway in).
+    private func markPrevious(before chapter: Chapter) {
+        let all = detail?.allChapters ?? []
+        guard let index = all.firstIndex(where: { $0.id == chapter.id }), index > 0 else { return }
+        let ids = all[..<index].map(\.id)
+        Task {
+            downloads.markFinished(Array(ids))
+            do { try await client.markMultiple(seriesId: route.id, volumeIds: [], chapterIds: Array(ids), read: true) }
+            catch { self.error = error.localizedDescription }
+            await refreshAfterChange()
+        }
+    }
+
+    private func markPrevious(before volume: Volume, in d: SeriesDetail) {
+        let volumes = sortedVolumes(d)
+        guard let index = volumes.firstIndex(where: { $0.id == volume.id }), index > 0 else { return }
+        let earlier = Array(volumes[..<index])
+        Task {
+            downloads.markFinished(earlier.flatMap { ($0.chapters ?? []).map(\.id) })
+            do { try await client.markMultiple(seriesId: route.id, volumeIds: earlier.map(\.id), chapterIds: [], read: true) }
+            catch { self.error = error.localizedDescription }
+            await refreshAfterChange()
+        }
+    }
 
     // MARK: Batch select
 
@@ -615,7 +681,8 @@ struct VolumeView: View {
             Task { await reload() }
             NotificationCenter.default.post(name: .readingProgressChanged, object: nil)
         }) { launch in
-            ReaderView(client: client, startChapterId: launch.chapterId)
+            ReaderView(client: client, startChapterId: launch.chapterId, readingListId: launch.readingListId,
+                       startPage: launch.page)
         }
         .sheet(item: $downloadTarget) { DownloadSheet(target: $0, client: client) }
     }

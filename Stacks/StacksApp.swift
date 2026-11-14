@@ -3,7 +3,10 @@ import UIKit
 
 @main
 struct StacksApp: App {
+    @UIApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @StateObject private var session = AppSession()
+    @StateObject private var lock = AppLock.shared
+    @Environment(\.scenePhase) private var phase
     @StateObject private var downloads = Downloads.shared
 
     @AppStorage("appTheme") private var themeRaw = AppTheme.kavita.rawValue
@@ -47,6 +50,12 @@ struct StacksApp: App {
                 }
             }
             .id(themeRaw) // rebuild with the new colors when the theme changes
+            .overlay {
+                if lock.locked { LockScreen(lock: lock) }
+            }
+            .onChange(of: phase) { _, newPhase in
+                if newPhase == .background { lock.lockIfEnabled() }
+            }
             .environmentObject(session)
             .environmentObject(downloads)
             .tint(Theme.primary)
@@ -89,6 +98,11 @@ extension View {
             .navigationDestination(for: VolumeRoute.self) { VolumeView(route: $0, client: client) }
             .navigationDestination(for: ReadingListRoute.self) { ReadingListDetailView(route: $0, client: client) }
             .navigationDestination(for: WantToReadRoute.self) { _ in WantToReadView(client: client) }
+            .navigationDestination(for: CollectionRoute.self) { CollectionView(route: $0, client: client) }
+            .navigationDestination(for: PersonRoute.self) { PersonView(route: $0, client: client) }
+            .navigationDestination(for: SearchRoute.self) { _ in SearchView(client: client) }
+            .navigationDestination(for: StatsRoute.self) { _ in StatsView(client: client) }
+            .navigationDestination(for: BookmarksRoute.self) { _ in AllBookmarksView(client: client) }
     }
 }
 
@@ -103,6 +117,7 @@ struct RootView: View {
     @Environment(\.scenePhase) private var scenePhase
 
     @AppStorage("selectedTab") private var tab: AppTab = .home
+    @State private var shortcutLaunch: ReaderLaunch?
     @State private var homePath = NavigationPath()
     @State private var libraryPath = NavigationPath()
     @State private var tourStarted = false
@@ -159,6 +174,21 @@ struct RootView: View {
         } message: {
             Text("A new version of Stacks is ready." + ((updates.available?.notes).map { $0.isEmpty ? "" : "\n\n\($0)" } ?? "")
                  + "\n\nDownload it, then install it with Signulous like before.")
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .openFromShortcut)) { _ in
+            shortcutLaunch = QuickActions.pending
+            QuickActions.pending = nil
+        }
+        .onAppear {
+            if let pending = QuickActions.pending {
+                shortcutLaunch = pending
+                QuickActions.pending = nil
+            }
+        }
+        .fullScreenCover(item: $shortcutLaunch, onDismiss: {
+            NotificationCenter.default.post(name: .readingProgressChanged, object: nil)
+        }) { launch in
+            ReaderView(client: client, startChapterId: launch.chapterId, readingListId: launch.readingListId)
         }
         .onReceive(NotificationCenter.default.publisher(for: .networkReturned)) { _ in
             Task {

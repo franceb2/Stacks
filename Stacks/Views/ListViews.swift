@@ -8,6 +8,7 @@ struct ReadingListsView: View {
     let client: KavitaClient
 
     @State private var lists: [ReadingList] = []
+    @State private var collections: [KavitaCollection] = []
     @State private var loaded = false
     @State private var error: String?
     @State private var creating = false
@@ -17,24 +18,14 @@ struct ReadingListsView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 22) {
-                NavigationLink(value: WantToReadRoute()) {
-                    HStack(spacing: 14) {
-                        Image(systemName: "heart.fill")
-                            .font(.title3)
-                            .foregroundStyle(Theme.onPrimary)
-                            .frame(width: 44, height: 44)
-                            .background(Theme.primary, in: RoundedRectangle(cornerRadius: 10))
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text("Want to Read").font(.headline).foregroundStyle(Theme.text)
-                            Text("Series you've saved for later").font(.caption).foregroundStyle(Theme.muted)
-                        }
-                        Spacer()
-                        Image(systemName: "chevron.right").foregroundStyle(Theme.muted)
-                    }
-                    .padding(14)
-                    .background(Theme.card, in: RoundedRectangle(cornerRadius: 12))
+                VStack(spacing: 10) {
+                    shortcutRow(WantToReadRoute(), icon: "heart.fill", title: "Want to Read",
+                                subtitle: "Series you've saved for later")
+                    shortcutRow(BookmarksRoute(), icon: "bookmark.fill", title: "Bookmarks",
+                                subtitle: "Pages you've saved while reading")
+                    shortcutRow(StatsRoute(), icon: "chart.bar.fill", title: "Reading stats",
+                                subtitle: "Pages, hours, streaks and history from Kavita")
                 }
-                .buttonStyle(PressableStyle())
                 .padding(.horizontal, 16)
 
                 SectionHeader("Reading lists") {
@@ -65,6 +56,20 @@ struct ReadingListsView: View {
                         .buttonStyle(PressableStyle())
                     }
                 }
+
+                if !collections.isEmpty {
+                    SectionHeader("Collections")
+                    CardGrid {
+                        ForEach(collections) { c in
+                            NavigationLink(value: CollectionRoute(collection: c)) {
+                                KavitaCard(title: c.title,
+                                           subtitle: "\(c.itemCount) series",
+                                           coverURL: client.collectionCoverURL(c.id))
+                            }
+                            .buttonStyle(PressableStyle())
+                        }
+                    }
+                }
             }
             .padding(.vertical, 16)
         }
@@ -81,7 +86,30 @@ struct ReadingListsView: View {
         .sensoryFeedback(.success, trigger: created)
     }
 
+    private func shortcutRow<Route: Hashable>(_ route: Route, icon: String, title: String,
+                                               subtitle: String) -> some View {
+        NavigationLink(value: route) {
+            HStack(spacing: 14) {
+                Image(systemName: icon)
+                    .font(.title3)
+                    .foregroundStyle(Theme.onPrimary)
+                    .frame(width: 44, height: 44)
+                    .background(Theme.primary, in: RoundedRectangle(cornerRadius: 10))
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(title).font(.headline).foregroundStyle(Theme.text)
+                    Text(subtitle).font(.caption).foregroundStyle(Theme.muted)
+                }
+                Spacer()
+                Image(systemName: "chevron.right").foregroundStyle(Theme.muted)
+            }
+            .padding(14)
+            .background(Theme.card, in: RoundedRectangle(cornerRadius: 12))
+        }
+        .buttonStyle(PressableStyle())
+    }
+
     private func load() async {
+        collections = (try? await client.collections()) ?? collections
         do {
             lists = try await client.readingLists()
             error = nil
@@ -191,7 +219,8 @@ struct ReadingListDetailView: View {
             Task { await load() }
             NotificationCenter.default.post(name: .readingProgressChanged, object: nil)
         }) { launch in
-            ReaderView(client: client, startChapterId: launch.chapterId, readingListId: launch.readingListId)
+            ReaderView(client: client, startChapterId: launch.chapterId, readingListId: launch.readingListId,
+                       startPage: launch.page)
         }
         .confirmationDialog("Delete \(list.title)?", isPresented: $confirmDelete, titleVisibility: .visible) {
             Button("Delete list", role: .destructive) {

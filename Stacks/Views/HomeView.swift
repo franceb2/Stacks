@@ -20,7 +20,8 @@ struct HomeView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 28) {
                 if offline || connection.offline {
-                    OfflineBanner(hasDownloads: !downloads.items.isEmpty, openDownloads: openDownloads)
+                    OfflineBanner(problem: connection.problem, hasDownloads: !downloads.items.isEmpty,
+                                  openDownloads: openDownloads)
                         .padding(.horizontal, 16)
                 }
 
@@ -85,7 +86,7 @@ struct HomeView: View {
         .navigationTitle("Home")
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                NavigationLink(value: LibraryRoute(library: nil)) {
+                NavigationLink(value: SearchRoute()) {
                     Image(systemName: "magnifyingglass")
                 }
             }
@@ -95,7 +96,8 @@ struct HomeView: View {
         .fullScreenCover(item: $reader, onDismiss: {
             Task { await load() }
         }) { launch in
-            ReaderView(client: client, startChapterId: launch.chapterId)
+            ReaderView(client: client, startChapterId: launch.chapterId, readingListId: launch.readingListId,
+                       startPage: launch.page)
         }
         .onReceive(NotificationCenter.default.publisher(for: .readingProgressChanged)) { _ in
             Task { await load() }
@@ -181,6 +183,7 @@ struct HomeView: View {
 }
 
 struct OfflineBanner: View {
+    var problem: ServerProblem? = nil
     let hasDownloads: Bool
     let openDownloads: () -> Void
 
@@ -188,10 +191,12 @@ struct OfflineBanner: View {
         HStack(alignment: .top, spacing: 12) {
             Image(systemName: "wifi.slash").font(.title3).foregroundStyle(Theme.primary)
             VStack(alignment: .leading, spacing: 6) {
-                Text("Offline · showing your saved library").font(.subheadline.bold()).foregroundStyle(Theme.text)
+                Text(problem?.title ?? "Offline").font(.subheadline.bold()).foregroundStyle(Theme.text)
+                Text(problem?.detail ?? "Check that your PC and Kavita are on.")
+                    .font(.footnote).foregroundStyle(Theme.muted)
                 Text(hasDownloads
-                     ? "Downloads open as usual. Anything you read now syncs to Kavita when you're back online."
-                     : "You can browse, but only downloaded items open. Check that your PC and Kavita are on.")
+                     ? "Showing your saved library. Downloads open, and anything you read syncs when you're back."
+                     : "Showing your saved library. Only downloaded items open.")
                     .font(.footnote).foregroundStyle(Theme.muted)
                 if hasDownloads {
                     Button("Open downloads", action: openDownloads)

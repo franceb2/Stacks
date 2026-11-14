@@ -52,10 +52,14 @@ struct ReaderView: View {
     @State private var moved = false
     @State private var autoDownloaded: Set<Int> = []
 
-    init(client: KavitaClient, startChapterId: Int, readingListId: Int? = nil) {
+    /// Open the first chapter at this page instead of the saved spot (used by bookmarks).
+    @State private var pageOverride: Int?
+
+    init(client: KavitaClient, startChapterId: Int, readingListId: Int? = nil, startPage: Int? = nil) {
         self.client = client
         self.readingListId = readingListId
         _chapterId = State(initialValue: startChapterId)
+        _pageOverride = State(initialValue: startPage)
     }
 
     var body: some View {
@@ -83,6 +87,8 @@ struct ReaderView: View {
         }
         .preferredColorScheme(.dark)
         .task(id: chapterId) { await load() }
+        .onAppear { UIApplication.shared.isIdleTimerDisabled = true }   // keep the screen on while reading
+        .onDisappear { UIApplication.shared.isIdleTimerDisabled = false }
         .onReceive(NotificationCenter.default.publisher(for: .tourCloseReader)) { _ in
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) { dismiss() }
         }
@@ -117,9 +123,11 @@ struct ReaderView: View {
                 info = item.info
                 offline = true
             } else {
-                self.error = KavitaClient.isOffline(error)
-                    ? "This isn't downloaded, and there's no connection to your server.\n\nDownload it next time you're online to read it anywhere."
-                    : error.localizedDescription
+                if let problem = ServerProblem.from(error) {
+                    self.error = "This isn't downloaded, and the server can't be reached.\n\n\(problem.title). \(problem.detail)"
+                } else {
+                    self.error = error.localizedDescription
+                }
                 return
             }
         }
@@ -134,9 +142,15 @@ struct ReaderView: View {
             saved = last
         }
         // A finished chapter re-opens from the start; otherwise resume where you left off.
-        let start = (saved >= info.pages || saved < 0) ? 0 : saved
+        var start = (saved >= info.pages || saved < 0) ? 0 : saved
+        if let override = pageOverride {
+            start = min(max(override, 0), max(info.pages - 1, 0))
+            pageOverride = nil
+        }
         lastSaved = saved
         context = ReaderContext(chapterId: chapterId, info: info, startPage: start, offline: offline)
+        QuickActions.setContinue(chapterId: chapterId, readingListId: readingListId,
+                                 seriesName: info.seriesName ?? "", chapterTitle: context?.chapterTitle ?? "")
 
         if !offline {
             nextChapterId = await next(after: chapterId, info: info)

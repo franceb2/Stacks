@@ -15,6 +15,8 @@ struct ComicReaderView: View {
     @State private var showChrome = false
     @State private var showSettings = false
     @State private var spreadActive = false
+    @State private var bookmarks: Set<Int> = []
+    @State private var bookmarkError: String?
     @StateObject private var store: PageImageStore
 
     init(context: ReaderContext, client: KavitaClient, actions: ReaderActions) {
@@ -58,6 +60,18 @@ struct ComicReaderView: View {
         }
         .onChange(of: prefs) { _, value in ReaderPrefsStore.setComic(value, seriesId: context.info.seriesId) }
         .onAppear { store.prefetch(around: page, count: pageCount) }
+        .task {
+            guard !context.offline else { return }
+            let list = (try? await client.chapterBookmarks(context.chapterId)) ?? []
+            bookmarks = Set(list.map(\.page))
+        }
+        .sensoryFeedback(.selection, trigger: bookmarks)
+        .alert("Couldn't bookmark", isPresented: Binding(get: { bookmarkError != nil },
+                                                        set: { if !$0 { bookmarkError = nil } })) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(bookmarkError ?? "")
+        }
         .sheet(isPresented: $showSettings) {
             ComicSettingsSheet(prefs: $prefs)
                 .presentationDetents([.medium, .large])
@@ -209,6 +223,28 @@ struct ComicReaderView: View {
         }
     }
 
+    // MARK: Bookmarks
+
+    private func toggleBookmark() {
+        let target = shownPage
+        let on = !bookmarks.contains(target)
+        if on { bookmarks.insert(target) } else { bookmarks.remove(target) }
+        let info = context.info
+        Task {
+            do {
+                try await client.setBookmark(on, page: target, chapterId: context.chapterId,
+                                             volumeId: info.volumeId, seriesId: info.seriesId)
+            } catch {
+                if on { bookmarks.remove(target) } else { bookmarks.insert(target) }
+                if case KavitaError.http(let code, _) = error, code == 401 || code == 403 {
+                    bookmarkError = "Your Kavita account doesn't have bookmark permission. In Kavita on your PC, go to Settings → Users, edit your account, and turn on the Bookmark role."
+                } else {
+                    bookmarkError = error.localizedDescription
+                }
+            }
+        }
+    }
+
     // MARK: Menu
 
     private var chrome: some View {
@@ -226,6 +262,14 @@ struct ComicReaderView: View {
                 Spacer()
                 if context.offline {
                     Image(systemName: "wifi.slash").foregroundStyle(Theme.muted)
+                }
+                if !context.offline {
+                    Button { toggleBookmark() } label: {
+                        Image(systemName: bookmarks.contains(shownPage) ? "bookmark.fill" : "bookmark")
+                            .font(.headline).frame(width: 36, height: 36)
+                            .foregroundStyle(bookmarks.contains(shownPage) ? Theme.primary : .white)
+                    }
+                    .accessibilityLabel(bookmarks.contains(shownPage) ? "Remove bookmark" : "Bookmark this page")
                 }
                 Button { showSettings = true } label: {
                     Image(systemName: "gearshape.fill").font(.headline).frame(width: 36, height: 36)

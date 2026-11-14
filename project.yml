@@ -32,6 +32,7 @@ targets:
           NSAllowsArbitraryLoads: true
           NSAllowsLocalNetworking: true
         NSLocalNetworkUsageDescription: Stacks connects to the Kavita server on your PC to load your books and comics.
+        NSFaceIDUsageDescription: Stacks uses Face ID to lock the app when you turn that on in Settings.
         ITSAppUsesNonExemptEncryption: false
     settings:
       base:

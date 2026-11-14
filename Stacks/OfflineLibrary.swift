@@ -80,8 +80,8 @@ final class OfflineLibrary: ObservableObject {
                         _ = try? await client.isWantToRead(id)
                         guard wifi else { return }
                         await ImageCache.shared.warm(client.seriesCoverURL(id))
-                        // Issue and volume covers for series you've downloaded from.
-                        if downloadedSeries.contains(id), let detail {
+                        // Issue and volume covers, so series pages look complete offline.
+                        if let detail {
                             for v in detail.volumes { await ImageCache.shared.warm(client.volumeCoverURL(v.id)) }
                             for c in detail.allChapters { await ImageCache.shared.warm(client.chapterCoverURL(c.id)) }
                         }

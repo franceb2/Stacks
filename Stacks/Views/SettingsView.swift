@@ -18,6 +18,8 @@ struct SettingsView: View {
     @AppStorage("appTheme") private var themeRaw = AppTheme.kavita.rawValue
     @StateObject private var updates = UpdateChecker.shared
     @StateObject private var offlineLibrary = OfflineLibrary.shared
+    @State private var faceID = AppLock.enabled
+    @State private var faceIDProblem = false
     @Environment(\.openURL) private var openURL
 
     var body: some View {
@@ -77,6 +79,17 @@ struct SettingsView: View {
                 if let problem = updates.problem {
                     Text(problem).font(.footnote).foregroundStyle(Theme.muted)
                 }
+            }
+            .listRowBackground(Theme.card)
+
+            Section {
+                Toggle("Lock with \(AppLock.biometryName)", isOn: $faceID)
+            } header: {
+                Text("Privacy")
+            } footer: {
+                Text(faceIDProblem
+                     ? "Couldn't turn it on. Check that \(AppLock.biometryName) or a passcode is set up on this iPhone."
+                     : "Asks for \(AppLock.biometryName) (or your passcode) each time you open Stacks, and hides it in the app switcher.")
             }
             .listRowBackground(Theme.card)
 
@@ -165,7 +178,7 @@ struct SettingsView: View {
             } header: {
                 Text("Offline library")
             } footer: {
-                Text("Your libraries, series pages, lists and covers are saved in the background so you can browse with no connection. Series pages and covers save on Wi-Fi. Only downloaded issues open offline.")
+                Text("Your libraries, series pages, lists and covers (including issue and volume covers) are saved in the background so you can browse with no connection. No pages are downloaded. Series pages and covers save on Wi-Fi.")
             }
             .listRowBackground(Theme.card)
 
@@ -205,6 +218,14 @@ struct SettingsView: View {
         .onChange(of: autoCount) { _, value in AutoDownload.count = value }
         .onChange(of: autoWifiOnly) { _, value in AutoDownload.wifiOnly = value }
         .onChange(of: mangaRTL) { _, value in ReaderPrefsStore.mangaRightToLeft = value }
+        .onChange(of: faceID) { _, value in
+            guard value != AppLock.enabled else { return }
+            Task {
+                let ok = await AppLock.shared.enable(value)
+                faceIDProblem = value && !ok
+                if !ok { faceID = AppLock.enabled }
+            }
+        }
         .onChange(of: autoDelete) { _, value in
             AutoDelete.enabled = value
             downloads.removeOldFinished()

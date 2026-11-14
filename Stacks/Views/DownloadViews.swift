@@ -309,7 +309,8 @@ struct DownloadsView: View {
         .fullScreenCover(item: $reader, onDismiss: {
             NotificationCenter.default.post(name: .readingProgressChanged, object: nil)
         }) { launch in
-            ReaderView(client: client, startChapterId: launch.chapterId)
+            ReaderView(client: client, startChapterId: launch.chapterId, readingListId: launch.readingListId,
+                       startPage: launch.page)
         }
     }
 
