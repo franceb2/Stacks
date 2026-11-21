@@ -18,6 +18,7 @@ struct SettingsView: View {
     @AppStorage("appTheme") private var themeRaw = AppTheme.kavita.rawValue
     @StateObject private var updates = UpdateChecker.shared
     @StateObject private var offlineLibrary = OfflineLibrary.shared
+    @ObservedObject private var scanner = LibraryScanner.shared
     @State private var faceID = AppLock.enabled
     @State private var faceIDProblem = false
     @Environment(\.openURL) private var openURL
@@ -93,9 +94,23 @@ struct SettingsView: View {
             }
             .listRowBackground(Theme.card)
 
-            Section("Server") {
+            Section {
                 LabeledContent("Address", value: session.serverAddress)
+                Button {
+                    scanner.scan(client: client, library: nil)
+                } label: {
+                    HStack {
+                        Text("Scan all libraries")
+                        Spacer()
+                        if scanner.scanning { ProgressView() }
+                    }
+                }
+                .disabled(scanner.scanning)
                 Button("Sign out", role: .destructive) { confirmSignOut = true }
+            } header: {
+                Text("Server")
+            } footer: {
+                Text(scanner.message ?? "Added comics or books on your PC? Scan so Kavita finds them. Needs an admin account. Turning on Folder Watching in Kavita does this automatically.")
             }
             .listRowBackground(Theme.card)
 

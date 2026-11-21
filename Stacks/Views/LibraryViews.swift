@@ -7,9 +7,17 @@ struct LibrariesView: View {
     @State private var libraries: [Library] = []
     @State private var error: String?
     @State private var loaded = false
+    @ObservedObject private var scanner = LibraryScanner.shared
 
     var body: some View {
         List {
+            if scanner.message != nil {
+                Section {
+                    ScanBanner()
+                        .listRowInsets(EdgeInsets())
+                        .listRowBackground(Color.clear)
+                }
+            }
             Section {
                 NavigationLink(value: LibraryRoute(library: nil)) {
                     Label("All series", systemImage: "square.grid.2x2.fill")
@@ -22,6 +30,17 @@ struct LibrariesView: View {
                         Label(library.name, systemImage: library.systemImage)
                     }
                     .listRowBackground(Theme.card)
+                    .contextMenu {
+                        Button("Scan library", systemImage: "arrow.triangle.2.circlepath") {
+                            scanner.scan(client: client, library: library)
+                        }
+                    }
+                    .swipeActions(edge: .trailing) {
+                        Button("Scan", systemImage: "arrow.triangle.2.circlepath") {
+                            scanner.scan(client: client, library: library)
+                        }
+                        .tint(Theme.primary)
+                    }
                 }
                 if loaded && libraries.isEmpty {
                     Text(error ?? "No libraries yet. Add one in Kavita on your PC.")
@@ -32,8 +51,36 @@ struct LibrariesView: View {
         }
         .kavitaBackground()
         .navigationTitle("Library")
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Menu {
+                    Button("Scan all libraries", systemImage: "arrow.triangle.2.circlepath") {
+                        scanner.scan(client: client, library: nil)
+                    }
+                    if !libraries.isEmpty {
+                        Section("Scan one library") {
+                            ForEach(libraries) { library in
+                                Button(library.name) { scanner.scan(client: client, library: library) }
+                            }
+                        }
+                    }
+                } label: {
+                    if scanner.scanning {
+                        ProgressView()
+                    } else {
+                        Image(systemName: "arrow.triangle.2.circlepath")
+                    }
+                }
+                .disabled(scanner.scanning)
+                .accessibilityLabel("Scan for new files")
+            }
+        }
+        .animation(.easeOut(duration: 0.2), value: scanner.message)
         .refreshable { await load() }
         .task { if !loaded { await load() } }
+        .onReceive(NotificationCenter.default.publisher(for: .readingProgressChanged)) { _ in
+            Task { await load() }
+        }
     }
 
     private func load() async {
@@ -62,6 +109,7 @@ struct SeriesGridView: View {
     @State private var error: String?
     @State private var generation = 0
     @State private var listTarget: ListSheetTarget?
+    @ObservedObject private var scanner = LibraryScanner.shared
 
     private let pageSize = 60
     private var sort: SeriesSort { SeriesSort(rawValue: sortRaw) ?? .name }
@@ -69,6 +117,9 @@ struct SeriesGridView: View {
 
     var body: some View {
         ScrollView {
+            if scanner.message != nil {
+                ScanBanner().padding(.horizontal, 16).padding(.top, 12)
+            }
             CardGrid {
                 ForEach(items) { series in
                     NavigationLink(value: SeriesRoute(id: series.id, name: series.name)) {
@@ -109,8 +160,14 @@ struct SeriesGridView: View {
                     Picker("Sort by", selection: $sortRaw) {
                         ForEach(SeriesSort.allCases) { Text($0.label).tag($0.rawValue) }
                     }
+                    Divider()
+                    Button(route.library == nil ? "Scan all libraries" : "Scan this library",
+                           systemImage: "arrow.triangle.2.circlepath") {
+                        scanner.scan(client: client, library: route.library)
+                    }
+                    .disabled(scanner.scanning)
                 } label: {
-                    Image(systemName: "arrow.up.arrow.down")
+                    Image(systemName: "ellipsis.circle")
                 }
             }
         }

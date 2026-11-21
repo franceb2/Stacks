@@ -83,6 +83,12 @@ final class ReadingOrderStore: ObservableObject {
         (resolved[order.id] ?? []).compactMap { $0.chapter?.id }
     }
 
+    /// After a library scan, the next lookup reloads the series list.
+    func invalidateLibrary() {
+        libraryLoaded = nil
+        lastResolved = [:]
+    }
+
     /// Every series in the library, grouped by loose title. Reused for a few minutes.
     func libraryIndex(client: KavitaClient, force: Bool = false) async -> [String: [Series]] {
         if force || library.isEmpty || Date().timeIntervalSince(libraryLoaded ?? .distantPast) > 600 {

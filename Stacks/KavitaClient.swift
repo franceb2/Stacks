@@ -271,6 +271,16 @@ struct KavitaClient {
         _ = try await raw("POST", "/api/ReadingList/remove-read", query: ["readingListId": "\(listId)"])
     }
 
+    /// Asks Kavita to look for new or changed files in one library (admin accounts only).
+    func scanLibrary(_ libraryId: Int) async throws {
+        _ = try await raw("POST", "/api/Library/scan", query: ["libraryId": "\(libraryId)", "force": "false"])
+    }
+
+    /// Asks Kavita to look for new or changed files in every library (admin accounts only).
+    func scanAllLibraries() async throws {
+        _ = try await raw("POST", "/api/Library/scan-all", query: ["force": "false"])
+    }
+
     func deleteReadingList(_ listId: Int) async throws {
         _ = try await raw("DELETE", "/api/ReadingList", query: ["readingListId": "\(listId)"])
     }
