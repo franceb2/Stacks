@@ -5,6 +5,8 @@ struct ReaderLaunch: Identifiable {
     var readingListId: Int? = nil
     /// Open at this page instead of the saved spot (from a bookmark).
     var page: Int? = nil
+    /// Chapter ids to follow for next/previous (a bundled reading order).
+    var order: [Int]? = nil
     var id: Int { chapterId }
 }
 
@@ -18,7 +20,7 @@ struct DownloadTarget: Identifiable {
 }
 
 private enum DetailTab: String, Hashable {
-    case volumes = "Volumes", chapters, specials = "Specials", books = "Books"
+    case order = "Reading order", volumes = "Volumes", chapters, specials = "Specials", books = "Books"
 }
 
 /// Kavita's series page: cover, info, Continue button, then tabs of volume/chapter cards.
@@ -40,6 +42,7 @@ struct SeriesDetailView: View {
     @State private var downloadsQueued = 0
     @State private var selecting = false
     @AppStorage("hideReadIssues") private var hideRead = false
+    @ObservedObject private var orderStore = ReadingOrderStore.shared
     @State private var showBookmarks = false
     @State private var showCollections = false
     @State private var selected: Set<Int> = []
@@ -87,7 +90,7 @@ struct SeriesDetailView: View {
             NotificationCenter.default.post(name: .readingProgressChanged, object: nil)
         }) { launch in
             ReaderView(client: client, startChapterId: launch.chapterId, readingListId: launch.readingListId,
-                       startPage: launch.page)
+                       startPage: launch.page, order: launch.order)
         }
         .sheet(item: $downloadTarget) { target in
             DownloadSheet(target: target, client: client)
@@ -251,8 +254,15 @@ struct SeriesDetailView: View {
         if !d.volumes.isEmpty { tabs.append(.volumes) }
         if !d.looseChapters.isEmpty { tabs.append(.chapters) }
         if !d.specials.isEmpty { tabs.append(d.volumes.isEmpty && d.looseChapters.isEmpty ? .books : .specials) }
+        if let order = readingOrder {
+            // First (and open by default) on the main series, e.g. Spawn; last on its side series.
+            if orderStore.isHost(order, seriesName: seriesName) { tabs.insert(.order, at: 0) } else { tabs.append(.order) }
+        }
         return tabs
     }
+
+    private var seriesName: String { series?.name ?? route.name }
+    private var readingOrder: ReadingOrder? { orderStore.orders(for: seriesName).first }
 
     private func tabLabel(_ t: DetailTab, _ d: SeriesDetail) -> String {
         t == .chapters ? d.chapterNoun : t.rawValue
@@ -301,6 +311,11 @@ struct SeriesDetailView: View {
     private func cards(_ d: SeriesDetail) -> some View {
         let tabs = availableTabs(d)
         let selected = tab.flatMap { tabs.contains($0) ? $0 : nil } ?? tabs.first
+        if selected == .order, let order = readingOrder {
+            ReadingOrderSection(order: order, client: client, hideRead: hideRead) { chapterId, ids in
+                reader = ReaderLaunch(chapterId: chapterId, order: ids)
+            }
+        } else {
         CardGrid {
             switch selected {
             case .volumes:
@@ -309,9 +324,10 @@ struct SeriesDetailView: View {
                 ForEach(d.looseChapters.filter { !hideRead || !$0.isRead }) { chapterCard($0) }
             case .specials, .books:
                 ForEach(d.specials.filter { !hideRead || !$0.isRead }) { chapterCard($0) }
-            case nil:
+            case nil, .order:
                 EmptyView()
             }
+        }
         }
     }
 
@@ -682,7 +698,7 @@ struct VolumeView: View {
             NotificationCenter.default.post(name: .readingProgressChanged, object: nil)
         }) { launch in
             ReaderView(client: client, startChapterId: launch.chapterId, readingListId: launch.readingListId,
-                       startPage: launch.page)
+                       startPage: launch.page, order: launch.order)
         }
         .sheet(item: $downloadTarget) { DownloadSheet(target: $0, client: client) }
     }

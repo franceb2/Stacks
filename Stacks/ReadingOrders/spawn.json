@@ -1,0 +1,5492 @@
+{
+ "id": "spawn",
+ "title": "Spawn reading order",
+ "credit": "Reading order by Blake Whitlow (last updated July 7, 2026)",
+ "note": "Essential titles only: main series, essential spin-offs and one-shots. Non-essential (gray) titles left out.",
+ "hosts": [
+  "Spawn"
+ ],
+ "entries": [
+  {
+   "series": "Spawn",
+   "label": "Spawn #001 , Questions, Part 1",
+   "kind": "main",
+   "section": "main",
+   "number": "001"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #002, Questions, Part 2",
+   "kind": "main",
+   "section": "main",
+   "number": "002"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #003, Questions, Part 3",
+   "kind": "main",
+   "section": "main",
+   "number": "003"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #004, Questions, Part 4",
+   "kind": "main",
+   "section": "main",
+   "number": "004"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #005, Justice",
+   "kind": "main",
+   "section": "main",
+   "number": "005"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #006, Payback, Part 1",
+   "kind": "main",
+   "section": "main",
+   "number": "006"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #007, Payback, Part 2",
+   "kind": "main",
+   "section": "main",
+   "number": "007"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #008, In Heaven",
+   "kind": "main",
+   "section": "main",
+   "number": "008"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #009, Angela",
+   "kind": "main",
+   "section": "main",
+   "number": "009"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #010, Crossing Over",
+   "kind": "main",
+   "section": "main",
+   "number": "010"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #011, Home",
+   "kind": "main",
+   "section": "main",
+   "number": "011"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #012, Flashback, Part 1",
+   "kind": "main",
+   "section": "main",
+   "number": "012"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #013, Flashback, Part 2",
+   "kind": "main",
+   "section": "main",
+   "number": "013"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #014, Myths, Part 1",
+   "kind": "main",
+   "section": "main",
+   "number": "014"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #015, Myths, Part 2",
+   "kind": "main",
+   "section": "main",
+   "number": "015"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #016, Reflections, Part 1",
+   "kind": "main",
+   "section": "main",
+   "number": "016"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #017, Reflections, Part 2",
+   "kind": "main",
+   "section": "main",
+   "number": "017"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #018, Reflections, Part 3",
+   "kind": "main",
+   "section": "main",
+   "number": "018"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #019, Showtime, Part 1",
+   "kind": "main",
+   "section": "main",
+   "number": "019"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #020, Showtime, Part 2",
+   "kind": "main",
+   "section": "main",
+   "number": "020"
+  },
+  {
+   "series": "Spawn/Batman",
+   "label": "Spawn/Batman (One-Shot)",
+   "kind": "oneshot",
+   "section": "main"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #021, The Hunt, Part 1",
+   "kind": "main",
+   "section": "main",
+   "number": "021"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #022, The Hunt, Part 2",
+   "kind": "main",
+   "section": "main",
+   "number": "022"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #023, The Hunt, Part 3",
+   "kind": "main",
+   "section": "main",
+   "number": "023"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #024, The Hunt, Part 4",
+   "kind": "main",
+   "section": "main",
+   "number": "024"
+  },
+  {
+   "series": "Violator",
+   "label": "Violator #1, The World, Part 1",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "1"
+  },
+  {
+   "series": "Violator",
+   "label": "Violator #2, The World, Part 2",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "2"
+  },
+  {
+   "series": "Violator",
+   "label": "Violator #3, The World, Part 3",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "3"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #025, Tremors",
+   "kind": "main",
+   "section": "main",
+   "number": "025"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #026, The Dark",
+   "kind": "main",
+   "section": "main",
+   "number": "026"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #027, Cursed",
+   "kind": "main",
+   "section": "main",
+   "number": "027"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #028, Protector",
+   "kind": "main",
+   "section": "main",
+   "number": "028"
+  },
+  {
+   "series": "Angela",
+   "label": "Angela #1",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "1"
+  },
+  {
+   "series": "Angela",
+   "label": "Angela #2",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "2"
+  },
+  {
+   "series": "Angela",
+   "label": "Angela #3",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "3"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #029, Father",
+   "kind": "main",
+   "section": "main",
+   "number": "029"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #030, The Clan",
+   "kind": "main",
+   "section": "main",
+   "number": "030"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #031, The Homecoming",
+   "kind": "main",
+   "section": "main",
+   "number": "031"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #032, Appearances / Blood Feud: Preludes and Nocturnes",
+   "kind": "main",
+   "section": "main",
+   "number": "032"
+  },
+  {
+   "series": "Spawn: Blood Feud",
+   "label": "Spawn: Blood Feud #1",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "1"
+  },
+  {
+   "series": "Spawn: Blood Feud",
+   "label": "Spawn: Blood Feud #2",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "2"
+  },
+  {
+   "series": "Spawn: Blood Feud",
+   "label": "Spawn: Blood Feud #3",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "3"
+  },
+  {
+   "series": "Spawn: Blood Feud",
+   "label": "Spawn: Blood Feud #4",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "4"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #033, Shadows",
+   "kind": "main",
+   "section": "main",
+   "number": "033"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #034, Ripples",
+   "kind": "main",
+   "section": "main",
+   "number": "034"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #035, Set Up, Part 1",
+   "kind": "main",
+   "section": "main",
+   "number": "035"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #036, Set Up, Part 2",
+   "kind": "main",
+   "section": "main",
+   "number": "036"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #037, The Freak",
+   "kind": "main",
+   "section": "main",
+   "number": "037"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #038, Mind Games",
+   "kind": "main",
+   "section": "main",
+   "number": "038"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #039, Noel",
+   "kind": "main",
+   "section": "main",
+   "number": "039"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #040, Fugitives, Part 1",
+   "kind": "main",
+   "section": "main",
+   "number": "040"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #041, Fugitives, Part 2",
+   "kind": "main",
+   "section": "main",
+   "number": "041"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #042, Fanboy",
+   "kind": "main",
+   "section": "main",
+   "number": "042"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #043, Evil",
+   "kind": "main",
+   "section": "main",
+   "number": "043"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #044, Avenger",
+   "kind": "main",
+   "section": "main",
+   "number": "044"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #045, Warriors",
+   "kind": "main",
+   "section": "main",
+   "number": "045"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #046, Revenge",
+   "kind": "main",
+   "section": "main",
+   "number": "046"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #047, Twisted",
+   "kind": "main",
+   "section": "main",
+   "number": "047"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #048, The System",
+   "kind": "main",
+   "section": "main",
+   "number": "048"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #049, Helter Skelter",
+   "kind": "main",
+   "section": "main",
+   "number": "049"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #050 , Choices",
+   "kind": "main",
+   "section": "main",
+   "number": "050"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #051, Freefall",
+   "kind": "main",
+   "section": "main",
+   "number": "051"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #052, Messiah",
+   "kind": "main",
+   "section": "main",
+   "number": "052"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #053, The Reckoning",
+   "kind": "main",
+   "section": "main",
+   "number": "053"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #054, Reconciliation",
+   "kind": "main",
+   "section": "main",
+   "number": "054"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #055, Sabotage",
+   "kind": "main",
+   "section": "main",
+   "number": "055"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #056, Kahn",
+   "kind": "main",
+   "section": "main",
+   "number": "056"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #057, The Beast",
+   "kind": "main",
+   "section": "main",
+   "number": "057"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #058, Orphans",
+   "kind": "main",
+   "section": "main",
+   "number": "058"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #059, Vanished",
+   "kind": "main",
+   "section": "main",
+   "number": "059"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #060, Dwarfed",
+   "kind": "main",
+   "section": "main",
+   "number": "060"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #061, Sanctuary",
+   "kind": "main",
+   "section": "main",
+   "number": "061"
+  },
+  {
+   "series": "Curse of the Spawn",
+   "label": "Curse of the Spawn #12, Codename: Priest",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "12"
+  },
+  {
+   "series": "Curse of the Spawn",
+   "label": "Curse of the Spawn #13, Heart of Darkness",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "13"
+  },
+  {
+   "series": "Curse of the Spawn",
+   "label": "Curse of the Spawn #14, Apocalypse When",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "14"
+  },
+  {
+   "series": "Curse of the Spawn",
+   "label": "Curse of the Spawn #05, Suture",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "05"
+  },
+  {
+   "series": "Curse of the Spawn",
+   "label": "Curse of the Spawn #06, Blood and Rain",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "06"
+  },
+  {
+   "series": "Curse of the Spawn",
+   "label": "Curse of the Spawn #07, Tombs",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "07"
+  },
+  {
+   "series": "Curse of the Spawn",
+   "label": "Curse of the Spawn #08, Carnival of Souls",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "08"
+  },
+  {
+   "series": "Curse of the Spawn",
+   "label": "Curse of the Spawn #09, Limbo",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "09"
+  },
+  {
+   "series": "Curse of the Spawn",
+   "label": "Curse of the Spawn #10, A Fall of Doves",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "10"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #062, Return",
+   "kind": "main",
+   "section": "main",
+   "number": "062"
+  },
+  {
+   "series": "Curse of the Spawn",
+   "label": "Curse of the Spawn #11, Cataclysm",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "11"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #063, Identity",
+   "kind": "main",
+   "section": "main",
+   "number": "063"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #064, Checkmate",
+   "kind": "main",
+   "section": "main",
+   "number": "064"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #065, The Past",
+   "kind": "main",
+   "section": "main",
+   "number": "065"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #066, Demons",
+   "kind": "main",
+   "section": "main",
+   "number": "066"
+  },
+  {
+   "series": "Curse of the Spawn",
+   "label": "Curse of the Spawn #15, Sympathy for an Angel, Part 1",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "15"
+  },
+  {
+   "series": "Curse of the Spawn",
+   "label": "Curse of the Spawn #16, Sympathy for an Angel, Part 2",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "16"
+  },
+  {
+   "series": "Curse of the Spawn",
+   "label": "Curse of the Spawn #17, Twist of Fate",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "17"
+  },
+  {
+   "series": "Curse of the Spawn",
+   "label": "Curse of the Spawn #18, Gunshot",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "18"
+  },
+  {
+   "series": "Curse of the Spawn",
+   "label": "Curse of the Spawn #19, Curse the Curse",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "19"
+  },
+  {
+   "series": "Curse of the Spawn",
+   "label": "Curse of the Spawn #01, Dark Future",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "01"
+  },
+  {
+   "series": "Curse of the Spawn",
+   "label": "Curse of the Spawn #02, Blood Lust",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "02"
+  },
+  {
+   "series": "Curse of the Spawn",
+   "label": "Curse of the Spawn #03, Corpse Candles",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "03"
+  },
+  {
+   "series": "Curse of the Spawn",
+   "label": "Curse of the Spawn #04, Damnation War",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "04"
+  },
+  {
+   "series": "Spawn: Blood & Salvation",
+   "label": "Spawn: Blood & Salvation (One-Shot)",
+   "kind": "oneshot",
+   "section": "main"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #067, Homeland",
+   "kind": "main",
+   "section": "main",
+   "number": "067"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #068, Intersection",
+   "kind": "main",
+   "section": "main",
+   "number": "068"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #069, Freaky",
+   "kind": "main",
+   "section": "main",
+   "number": "069"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #070, Darkness",
+   "kind": "main",
+   "section": "main",
+   "number": "070"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #071, Apparitions",
+   "kind": "main",
+   "section": "main",
+   "number": "071"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #072, Bloodless",
+   "kind": "main",
+   "section": "main",
+   "number": "072"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #073, The Heap",
+   "kind": "main",
+   "section": "main",
+   "number": "073"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #074, The Void",
+   "kind": "main",
+   "section": "main",
+   "number": "074"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #075, Sacred Ground",
+   "kind": "main",
+   "section": "main",
+   "number": "075"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #076, Farewell Dance",
+   "kind": "main",
+   "section": "main",
+   "number": "076"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #077, Relics",
+   "kind": "main",
+   "section": "main",
+   "number": "077"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #078, Bloodstains",
+   "kind": "main",
+   "section": "main",
+   "number": "078"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #079, Exterminator",
+   "kind": "main",
+   "section": "main",
+   "number": "079"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #080, The Cleansing",
+   "kind": "main",
+   "section": "main",
+   "number": "080"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #081, The Devil Inside, Part 1",
+   "kind": "main",
+   "section": "main",
+   "number": "081"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #082, The Devil Inside, Part 2",
+   "kind": "main",
+   "section": "main",
+   "number": "082"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #083, The Conqueror",
+   "kind": "main",
+   "section": "main",
+   "number": "083"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #084, The Waiting",
+   "kind": "main",
+   "section": "main",
+   "number": "084"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #085, Endgame",
+   "kind": "main",
+   "section": "main",
+   "number": "085"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #086, Abdication",
+   "kind": "main",
+   "section": "main",
+   "number": "086"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #087, Folklore",
+   "kind": "main",
+   "section": "main",
+   "number": "087"
+  },
+  {
+   "series": "Curse of the Spawn",
+   "label": "Curse of the Spawn #26, Brother's Keeper",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "26"
+  },
+  {
+   "series": "Curse of the Spawn",
+   "label": "Curse of the Spawn #27, Ghosts",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "27"
+  },
+  {
+   "series": "Curse of the Spawn",
+   "label": "Curse of the Spawn #28, Bleed",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "28"
+  },
+  {
+   "series": "Sam and Twitch",
+   "label": "Sam and Twitch #01, Udaku, Part 1",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "01"
+  },
+  {
+   "series": "Sam and Twitch",
+   "label": "Sam and Twitch #02, Udaku, Part 2",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "02"
+  },
+  {
+   "series": "Sam and Twitch",
+   "label": "Sam and Twitch #03, Udaku, Part 3",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "03"
+  },
+  {
+   "series": "Sam and Twitch",
+   "label": "Sam and Twitch #04, Udaku, Part 4",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "04"
+  },
+  {
+   "series": "Sam and Twitch",
+   "label": "Sam and Twitch #05, Udaku, Part 5",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "05"
+  },
+  {
+   "series": "Sam and Twitch",
+   "label": "Sam and Twitch #06, Udaku, Part 6",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "06"
+  },
+  {
+   "series": "Sam and Twitch",
+   "label": "Sam and Twitch #07, Udaku, Part 7",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "07"
+  },
+  {
+   "series": "Sam and Twitch",
+   "label": "Sam and Twitch #08, Udaku, Part 8",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "08"
+  },
+  {
+   "series": "Spawn, The Undead",
+   "label": "Spawn, The Undead #1, A Face in the Crowd",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "1"
+  },
+  {
+   "series": "Spawn, The Undead",
+   "label": "Spawn, The Undead #2, The Door to Nowhere",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "2"
+  },
+  {
+   "series": "Spawn, The Undead",
+   "label": "Spawn, The Undead #3, My Soul to Keep",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "3"
+  },
+  {
+   "series": "Spawn, The Undead",
+   "label": "Spawn, The Undead #4, Song Sung Bloo",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "4"
+  },
+  {
+   "series": "Spawn, The Undead",
+   "label": "Spawn, The Undead #5, The Wind That Shakes the Barley, Part 1",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "5"
+  },
+  {
+   "series": "Spawn, The Undead",
+   "label": "Spawn, The Undead #6, The Wind That Shakes the Barley, Part 2",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "6"
+  },
+  {
+   "series": "Spawn, The Undead",
+   "label": "Spawn, The Undead #7, Up the Down Stairs",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "7"
+  },
+  {
+   "series": "Spawn, The Undead",
+   "label": "Spawn, The Undead #8, A Day in the Life",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "8"
+  },
+  {
+   "series": "Spawn, The Undead",
+   "label": "Spawn, The Undead #9, Waiting for Sparky",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "9"
+  },
+  {
+   "series": "Spawn: Blood & Shadows",
+   "label": "Spawn: Blood & Shadows (One-Shot)",
+   "kind": "oneshot",
+   "section": "main"
+  },
+  {
+   "series": "Spawn, The Dark Ages",
+   "label": "Spawn, The Dark Ages #01, Devil's Knight",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "01"
+  },
+  {
+   "series": "Spawn, The Dark Ages",
+   "label": "Spawn, The Dark Ages #02, Forsaken",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "02"
+  },
+  {
+   "series": "Spawn, The Dark Ages",
+   "label": "Spawn, The Dark Ages #03, Onward",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "03"
+  },
+  {
+   "series": "Spawn, The Dark Ages",
+   "label": "Spawn, The Dark Ages #04, Death and Glory",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "04"
+  },
+  {
+   "series": "Spawn, The Dark Ages",
+   "label": "Spawn, The Dark Ages #05, Crimson Shadows",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "05"
+  },
+  {
+   "series": "Spawn, The Dark Ages",
+   "label": "Spawn, The Dark Ages #06, Benediction",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "06"
+  },
+  {
+   "series": "Spawn, The Dark Ages",
+   "label": "Spawn, The Dark Ages #07, Providence",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "07"
+  },
+  {
+   "series": "Spawn, The Dark Ages",
+   "label": "Spawn, The Dark Ages #08, Acts of Contrition",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "08"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #088, Seasons of Change",
+   "kind": "main",
+   "section": "main",
+   "number": "088"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #089, The Devil You Know",
+   "kind": "main",
+   "section": "main",
+   "number": "089"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #090, Three Uses of the Knife",
+   "kind": "main",
+   "section": "main",
+   "number": "090"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #091, Black Cat Bones, Part 1",
+   "kind": "main",
+   "section": "main",
+   "number": "091"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #092, Black Cat Bones, Part 2",
+   "kind": "main",
+   "section": "main",
+   "number": "092"
+  },
+  {
+   "series": "Sam and Twitch",
+   "label": "Sam and Twitch #09, One Really Bad Day",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "09"
+  },
+  {
+   "series": "Sam and Twitch",
+   "label": "Sam and Twitch #10, Witchcraft, Part 1",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "10"
+  },
+  {
+   "series": "Sam and Twitch",
+   "label": "Sam and Twitch #11, Witchcraft, Part 2",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "11"
+  },
+  {
+   "series": "Sam and Twitch",
+   "label": "Sam and Twitch #12, Witchcraft, Part 3",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "12"
+  },
+  {
+   "series": "Sam and Twitch",
+   "label": "Sam and Twitch #13, Witchcraft, Part 4",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "13"
+  },
+  {
+   "series": "Sam and Twitch",
+   "label": "Sam and Twitch #14, Dumb Laws and Eggs",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "14"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #093, The Devil's Banquet",
+   "kind": "main",
+   "section": "main",
+   "number": "093"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #094, The Children's Hour",
+   "kind": "main",
+   "section": "main",
+   "number": "094"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #095, Cracks in the Foundation",
+   "kind": "main",
+   "section": "main",
+   "number": "095"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #096, Rules of Engagement",
+   "kind": "main",
+   "section": "main",
+   "number": "096"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #097, Heaven's Folly",
+   "kind": "main",
+   "section": "main",
+   "number": "097"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #098, The Trouble with Angels",
+   "kind": "main",
+   "section": "main",
+   "number": "098"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #099, The Edge of Darkness",
+   "kind": "main",
+   "section": "main",
+   "number": "099"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #100 , Milestone",
+   "kind": "main",
+   "section": "main",
+   "number": "100"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #101, Aftermath",
+   "kind": "main",
+   "section": "main",
+   "number": "101"
+  },
+  {
+   "series": "Sam and Twitch",
+   "label": "Sam and Twitch #15, Bounty Hunter Wars, Part 1",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "15"
+  },
+  {
+   "series": "Sam and Twitch",
+   "label": "Sam and Twitch #16, Bounty Hunter Wars, Part 2",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "16"
+  },
+  {
+   "series": "Sam and Twitch",
+   "label": "Sam and Twitch #17, Bounty Hunter Wars, Part 3",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "17"
+  },
+  {
+   "series": "Sam and Twitch",
+   "label": "Sam and Twitch #18, Bounty Hunter Wars, Part 4",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "18"
+  },
+  {
+   "series": "Sam and Twitch",
+   "label": "Sam and Twitch #19, Bounty Hunter Wars, Part 5",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "19"
+  },
+  {
+   "series": "Spawn, The Dark Ages",
+   "label": "Spawn, The Dark Ages #09, The Child's Crusade, Prologue, A Merry Round of Cheer",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "09"
+  },
+  {
+   "series": "Spawn, The Dark Ages",
+   "label": "Spawn, The Dark Ages #10, The Child's Crusade, Part 1, A Questing Tale",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "10"
+  },
+  {
+   "series": "Spawn, The Dark Ages",
+   "label": "Spawn, The Dark Ages #11, The Child's Crusade, Part 2, The Ghost on the Hill",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "11"
+  },
+  {
+   "series": "Spawn, The Dark Ages",
+   "label": "Spawn, The Dark Ages #12, The Child's Crusade, Part 3, The Faithful",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "12"
+  },
+  {
+   "series": "Spawn, The Dark Ages",
+   "label": "Spawn, The Dark Ages #13, The Child's Crusade, Part 4, Sacrifices",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "13"
+  },
+  {
+   "series": "Spawn, The Dark Ages",
+   "label": "Spawn, The Dark Ages #14, The Child's Crusade, Part 5, Finale",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "14"
+  },
+  {
+   "series": "Spawn: Simony",
+   "label": "Spawn: Simony (One-Shot)",
+   "kind": "oneshot",
+   "section": "main"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #102, Cautionary Tales, Part 1, The Speed of Night",
+   "kind": "main",
+   "section": "main",
+   "number": "102"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #103, Cautionary Tales, Part 2, Remains",
+   "kind": "main",
+   "section": "main",
+   "number": "103"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #104, Cautionary Tales, Part 3, A Town Called Malice",
+   "kind": "main",
+   "section": "main",
+   "number": "104"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #105, Retribution Overdrive, Part 1",
+   "kind": "main",
+   "section": "main",
+   "number": "105"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #106, Retribution Overdrive, Part 2",
+   "kind": "main",
+   "section": "main",
+   "number": "106"
+  },
+  {
+   "series": "Sam and Twitch",
+   "label": "Sam and Twitch #20, The John Doe Affair, Part 1",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "20"
+  },
+  {
+   "series": "Sam and Twitch",
+   "label": "Sam and Twitch #21, The John Doe Affair, Part 2",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "21"
+  },
+  {
+   "series": "Sam and Twitch",
+   "label": "Sam and Twitch #22, The John Doe Affair, Part 3",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "22"
+  },
+  {
+   "series": "Sam and Twitch",
+   "label": "Sam and Twitch #23, The John Doe Affair, Part 4",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "23"
+  },
+  {
+   "series": "Sam and Twitch",
+   "label": "Sam and Twitch #24, The John Doe Affair, Part 5",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "24"
+  },
+  {
+   "series": "Sam and Twitch",
+   "label": "Sam and Twitch #25, The John Doe Affair, Part 6",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "25"
+  },
+  {
+   "series": "Sam and Twitch",
+   "label": "Sam and Twitch #26, The John Doe Affair, Part 7",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "26"
+  },
+  {
+   "series": "Hellspawn",
+   "label": "Hellspawn #01, The Clown, Part 1",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "01"
+  },
+  {
+   "series": "Hellspawn",
+   "label": "Hellspawn #02, The Clown, Part 2",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "02"
+  },
+  {
+   "series": "Hellspawn",
+   "label": "Hellspawn #03, Hate Me",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "03"
+  },
+  {
+   "series": "Hellspawn",
+   "label": "Hellspawn #04, Hate You",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "04"
+  },
+  {
+   "series": "Hellspawn",
+   "label": "Hellspawn #05, Selling Fear",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "05"
+  },
+  {
+   "series": "Hellspawn",
+   "label": "Hellspawn #06, The Big Leagues",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "06"
+  },
+  {
+   "series": "Hellspawn",
+   "label": "Hellspawn #07, Shed",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "07"
+  },
+  {
+   "series": "Hellspawn",
+   "label": "Hellspawn #08, The Suicide Gate",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "08"
+  },
+  {
+   "series": "Hellspawn",
+   "label": "Hellspawn #09, Chains",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "09"
+  },
+  {
+   "series": "Hellspawn",
+   "label": "Hellspawn #10, Clash",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "10"
+  },
+  {
+   "series": "Hellspawn",
+   "label": "Hellspawn #11, Conflict of Interest",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "11"
+  },
+  {
+   "series": "Hellspawn",
+   "label": "Hellspawn #12, Call Her Hel",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "12"
+  },
+  {
+   "series": "Hellspawn",
+   "label": "Hellspawn #13, Hellworld, Part 1",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "13"
+  },
+  {
+   "series": "Hellspawn",
+   "label": "Hellspawn #14, Hellworld, Part 2",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "14"
+  },
+  {
+   "series": "Hellspawn",
+   "label": "Hellspawn #15, Hellworld, Part 3",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "15"
+  },
+  {
+   "series": "Hellspawn",
+   "label": "Hellspawn #16, Hellworld, Part 4",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "16"
+  },
+  {
+   "series": "Spawn, The Dark Ages",
+   "label": "Spawn, The Dark Ages #15, Dark Days Coming",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "15"
+  },
+  {
+   "series": "Spawn, The Dark Ages",
+   "label": "Spawn, The Dark Ages #16, Heart of the Hellspawn",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "16"
+  },
+  {
+   "series": "Spawn, The Dark Ages",
+   "label": "Spawn, The Dark Ages #17, The Circle and the Worm",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "17"
+  },
+  {
+   "series": "Spawn, The Dark Ages",
+   "label": "Spawn, The Dark Ages #18, Crucified",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "18"
+  },
+  {
+   "series": "Spawn, The Dark Ages",
+   "label": "Spawn, The Dark Ages #19, Like Any Other Man",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "19"
+  },
+  {
+   "series": "Spawn, The Dark Ages",
+   "label": "Spawn, The Dark Ages #20, Voices in the Dark",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "20"
+  },
+  {
+   "series": "Spawn, The Dark Ages",
+   "label": "Spawn, The Dark Ages #21, Sins of the Hellspawn",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "21"
+  },
+  {
+   "series": "Spawn, The Dark Ages",
+   "label": "Spawn, The Dark Ages #22, The Seeding",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "22"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #107, The Kingdom, Part 1",
+   "kind": "main",
+   "section": "main",
+   "number": "107"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #108, The Kingdom, Part 2",
+   "kind": "main",
+   "section": "main",
+   "number": "108"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #109, The Kingdom, Part 3",
+   "kind": "main",
+   "section": "main",
+   "number": "109"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #110, The Kingdom, Part 4",
+   "kind": "main",
+   "section": "main",
+   "number": "110"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #111, The Kingdom, Part 5",
+   "kind": "main",
+   "section": "main",
+   "number": "111"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #112, The Kingdom, Part 6",
+   "kind": "main",
+   "section": "main",
+   "number": "112"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #113, The Kingdom, Part 7",
+   "kind": "main",
+   "section": "main",
+   "number": "113"
+  },
+  {
+   "series": "Spawn, The Dark Ages",
+   "label": "Spawn, The Dark Ages #23, The Beast",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "23"
+  },
+  {
+   "series": "Spawn, The Dark Ages",
+   "label": "Spawn, The Dark Ages #24, Bleed Pagan Bleed",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "24"
+  },
+  {
+   "series": "Spawn, The Dark Ages",
+   "label": "Spawn, The Dark Ages #25, Plague of Man",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "25"
+  },
+  {
+   "series": "Spawn, The Dark Ages",
+   "label": "Spawn, The Dark Ages #26, Lesion",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "26"
+  },
+  {
+   "series": "Spawn, The Dark Ages",
+   "label": "Spawn, The Dark Ages #27, Bubonic Nights",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "27"
+  },
+  {
+   "series": "Spawn, The Dark Ages",
+   "label": "Spawn, The Dark Ages #28, The End",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "28"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #114, The Bridge, Part 1",
+   "kind": "main",
+   "section": "main",
+   "number": "114"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #115, The Bridge, Part 2",
+   "kind": "main",
+   "section": "main",
+   "number": "115"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #116, Consequences",
+   "kind": "main",
+   "section": "main",
+   "number": "116"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #117, A Season in Hell, Part 1",
+   "kind": "main",
+   "section": "main",
+   "number": "117"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #118, A Season in Hell, Part 2",
+   "kind": "main",
+   "section": "main",
+   "number": "118"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #119, A Season in Hell, Part 3",
+   "kind": "main",
+   "section": "main",
+   "number": "119"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #120, A Season in Hell, Part 4",
+   "kind": "main",
+   "section": "main",
+   "number": "120"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #121, Salvation Road, Part 1",
+   "kind": "main",
+   "section": "main",
+   "number": "121"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #122, Salvation Road, Part 2",
+   "kind": "main",
+   "section": "main",
+   "number": "122"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #123, Salvation Road, Part 3",
+   "kind": "main",
+   "section": "main",
+   "number": "123"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #124, Salvation Road, Part 4",
+   "kind": "main",
+   "section": "main",
+   "number": "124"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #125, Wake Up Dreaming, Part 1",
+   "kind": "main",
+   "section": "main",
+   "number": "125"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #126, Wake Up Dreaming, Part 2",
+   "kind": "main",
+   "section": "main",
+   "number": "126"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #127, Wake Up Dreaming, Part 3",
+   "kind": "main",
+   "section": "main",
+   "number": "127"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #128, Wake Up Dreaming, Part 4",
+   "kind": "main",
+   "section": "main",
+   "number": "128"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #129, Wake Up Dreaming, Part 5",
+   "kind": "main",
+   "section": "main",
+   "number": "129"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #130, Seven and a Half Ghosts, Part 1",
+   "kind": "main",
+   "section": "main",
+   "number": "130"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #131, Seven and a Half Ghosts, Part 2",
+   "kind": "main",
+   "section": "main",
+   "number": "131"
+  },
+  {
+   "series": "Spawn: Architects of Fear",
+   "label": "Spawn: Architects of Fear (One-Shot)",
+   "kind": "oneshot",
+   "section": "main"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #132, Pratfall",
+   "kind": "main",
+   "section": "main",
+   "number": "132"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #133, The Gentleman Caller",
+   "kind": "main",
+   "section": "main",
+   "number": "133"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #134, A Thousand Clowns, Part 1",
+   "kind": "main",
+   "section": "main",
+   "number": "134"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #135, A Thousand Clowns, Part 2",
+   "kind": "main",
+   "section": "main",
+   "number": "135"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #136, A Thousand Clowns, Part 3",
+   "kind": "main",
+   "section": "main",
+   "number": "136"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #137, A Thousand Clowns, Part 4",
+   "kind": "main",
+   "section": "main",
+   "number": "137"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #138, A Thousand Clowns, Part 5",
+   "kind": "main",
+   "section": "main",
+   "number": "138"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #139, Hellbound, Part 1",
+   "kind": "main",
+   "section": "main",
+   "number": "139"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #140, Hellbound, Part 2",
+   "kind": "main",
+   "section": "main",
+   "number": "140"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #141, Hellbound, Part 3",
+   "kind": "main",
+   "section": "main",
+   "number": "141"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #142, Devil To Pay, Part 1",
+   "kind": "main",
+   "section": "main",
+   "number": "142"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #143, Devil To Pay, Part 2",
+   "kind": "main",
+   "section": "main",
+   "number": "143"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #144, Devil To Pay, Part 3",
+   "kind": "main",
+   "section": "main",
+   "number": "144"
+  },
+  {
+   "series": "Case Files, Sam and Twitch",
+   "label": "Case Files, Sam and Twitch #01, Have You Seen Me, Part 1",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "01"
+  },
+  {
+   "series": "Case Files, Sam and Twitch",
+   "label": "Case Files, Sam and Twitch #02, Have You Seen Me, Part 2",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "02"
+  },
+  {
+   "series": "Case Files, Sam and Twitch",
+   "label": "Case Files, Sam and Twitch #03, Have You Seen Me, Part 3",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "03"
+  },
+  {
+   "series": "Case Files, Sam and Twitch",
+   "label": "Case Files, Sam and Twitch #04, Have You Seen Me, Part 4",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "04"
+  },
+  {
+   "series": "Case Files, Sam and Twitch",
+   "label": "Case Files, Sam and Twitch #05, Have You Seen Me, Part 5",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "05"
+  },
+  {
+   "series": "Case Files, Sam and Twitch",
+   "label": "Case Files, Sam and Twitch #06, Have You Seen Me, Part 6",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "06"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #145, Destination: Anywhere, Part 1",
+   "kind": "main",
+   "section": "main",
+   "number": "145"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #146, Destination: Anywhere, Part 2",
+   "kind": "main",
+   "section": "main",
+   "number": "146"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #147, Howl",
+   "kind": "main",
+   "section": "main",
+   "number": "147"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #148, Random Patterns, Part 1",
+   "kind": "main",
+   "section": "main",
+   "number": "148"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #149, Random Patterns, Part 2",
+   "kind": "main",
+   "section": "main",
+   "number": "149"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #150 , Thamuz, Part 1",
+   "kind": "main",
+   "section": "main",
+   "number": "150"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #151, Thamuz, Part 2",
+   "kind": "main",
+   "section": "main",
+   "number": "151"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #152, Thamuz, Part 3",
+   "kind": "main",
+   "section": "main",
+   "number": "152"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #153, Thamuz, Part 4",
+   "kind": "main",
+   "section": "main",
+   "number": "153"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #154, Armageddon, Part 1",
+   "kind": "main",
+   "section": "main",
+   "number": "154"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #155, Armageddon, Part 2",
+   "kind": "main",
+   "section": "main",
+   "number": "155"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #156, Armageddon, Part 3",
+   "kind": "main",
+   "section": "main",
+   "number": "156"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #157, Armageddon, Part 4",
+   "kind": "main",
+   "section": "main",
+   "number": "157"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #158, Armageddon, Part 5",
+   "kind": "main",
+   "section": "main",
+   "number": "158"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #159, Armageddon, Part 6",
+   "kind": "main",
+   "section": "main",
+   "number": "159"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #160, Armageddon, Part 7",
+   "kind": "main",
+   "section": "main",
+   "number": "160"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #161, Armageddon, Part 8",
+   "kind": "main",
+   "section": "main",
+   "number": "161"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #162, Armageddon, Part 9",
+   "kind": "main",
+   "section": "main",
+   "number": "162"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #163, Armageddon, Part 10",
+   "kind": "main",
+   "section": "main",
+   "number": "163"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #164, Home Coming",
+   "kind": "main",
+   "section": "main",
+   "number": "164"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #165, Mandarin Spawn",
+   "kind": "main",
+   "section": "main",
+   "number": "165"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #166, The Voice-Hearers, Part 1, Skin Deep",
+   "kind": "main",
+   "section": "main",
+   "number": "166"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #167, The Voice-Hearers, Part 2, The Peanut Butter Lady",
+   "kind": "main",
+   "section": "main",
+   "number": "167"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #168, The Voice-Hearers, Part 3, Laughter in the Dark",
+   "kind": "main",
+   "section": "main",
+   "number": "168"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #169, Voodoo Child",
+   "kind": "main",
+   "section": "main",
+   "number": "169"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #170, A Tale of Three Brothers, Part 1, Hellhouse",
+   "kind": "main",
+   "section": "main",
+   "number": "170"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #171, A Tale of Three Brothers, Part 2, Remembrance",
+   "kind": "main",
+   "section": "main",
+   "number": "171"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #172, A Tale of Three Brothers, Part 3, Past Sins",
+   "kind": "main",
+   "section": "main",
+   "number": "172"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #173, A Tale of Three Brothers, Part 4, Secrets and Lies",
+   "kind": "main",
+   "section": "main",
+   "number": "173"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #174, Gunslinger Spawn, Part 1",
+   "kind": "main",
+   "section": "main",
+   "number": "174"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #175, Gunslinger Spawn, Part 2",
+   "kind": "main",
+   "section": "main",
+   "number": "175"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #176, The Monster in the Bubble, Part 1",
+   "kind": "main",
+   "section": "main",
+   "number": "176"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #177, The Monster in the Bubble, Part 2",
+   "kind": "main",
+   "section": "main",
+   "number": "177"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #178, Dead Man Walking",
+   "kind": "main",
+   "section": "main",
+   "number": "178"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #179, War Spawn",
+   "kind": "main",
+   "section": "main",
+   "number": "179"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #180, (Untitled) (suggested title: Dear Diary)",
+   "kind": "main",
+   "section": "main",
+   "number": "180"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #181, The Best of Times",
+   "kind": "main",
+   "section": "main",
+   "number": "181"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #182, Bad Blood",
+   "kind": "main",
+   "section": "main",
+   "number": "182"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #183, Transformations",
+   "kind": "main",
+   "section": "main",
+   "number": "183"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #184 , The End",
+   "kind": "main",
+   "section": "main",
+   "number": "184"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #185 , Endgame, Part 1",
+   "kind": "main",
+   "section": "main",
+   "number": "185"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #186, Endgame, Part 2",
+   "kind": "main",
+   "section": "main",
+   "number": "186"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #187, Endgame, Part 3",
+   "kind": "main",
+   "section": "main",
+   "number": "187"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #188, Endgame, Part 4",
+   "kind": "main",
+   "section": "main",
+   "number": "188"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #189, Endgame, Part 5",
+   "kind": "main",
+   "section": "main",
+   "number": "189"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #190, Endgame, Part 6",
+   "kind": "main",
+   "section": "main",
+   "number": "190"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #191, Endgame, Part 7",
+   "kind": "main",
+   "section": "main",
+   "number": "191"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #192, Endgame, Part 8",
+   "kind": "main",
+   "section": "main",
+   "number": "192"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #193, Endgame, Part 9",
+   "kind": "main",
+   "section": "main",
+   "number": "193"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #194, Endgame, Part 10",
+   "kind": "main",
+   "section": "main",
+   "number": "194"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #195, Endgame, Part 11",
+   "kind": "main",
+   "section": "main",
+   "number": "195"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #196, Endgame, Conclusion",
+   "kind": "main",
+   "section": "main",
+   "number": "196"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #197, (Untitled) (suggested title: The Redeemer's Return)",
+   "kind": "main",
+   "section": "main",
+   "number": "197"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #198, (Untitled) (suggested title: Patient 46)",
+   "kind": "main",
+   "section": "main",
+   "number": "198"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #199, (Untitled) (suggested title: The Devil's Ghost)",
+   "kind": "main",
+   "section": "main",
+   "number": "199"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #200 , (Untitled) (suggested title: Alpha and Omega)",
+   "kind": "main",
+   "section": "main",
+   "number": "200"
+  },
+  {
+   "series": "Haunt",
+   "label": "Haunt #01, Shillinger's Notes, Part 1",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "01"
+  },
+  {
+   "series": "Haunt",
+   "label": "Haunt #02, Shillinger's Notes, Part 2",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "02"
+  },
+  {
+   "series": "Haunt",
+   "label": "Haunt #03, Shillinger's Notes, Part 3",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "03"
+  },
+  {
+   "series": "Haunt",
+   "label": "Haunt #04, Shillinger's Notes, Part 4",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "04"
+  },
+  {
+   "series": "Haunt",
+   "label": "Haunt #05, Shillinger's Notes, Part 5",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "05"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #201, New Beginnings, Part 1",
+   "kind": "main",
+   "section": "main",
+   "number": "201"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #202, New Beginnings, Part 2",
+   "kind": "main",
+   "section": "main",
+   "number": "202"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #203, New Beginnings, Part 3",
+   "kind": "main",
+   "section": "main",
+   "number": "203"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #204, New Beginnings, Part 4",
+   "kind": "main",
+   "section": "main",
+   "number": "204"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #205, New Beginnings, Part 5",
+   "kind": "main",
+   "section": "main",
+   "number": "205"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #206, New Beginnings, Part 6",
+   "kind": "main",
+   "section": "main",
+   "number": "206"
+  },
+  {
+   "series": "Haunt",
+   "label": "Haunt #06, Agent Kilgore, Part 1",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "06"
+  },
+  {
+   "series": "Haunt",
+   "label": "Haunt #07, Agent Kilgore, Part 2",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "07"
+  },
+  {
+   "series": "Haunt",
+   "label": "Haunt #08, Agent Kilgore, Part 3",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "08"
+  },
+  {
+   "series": "Haunt",
+   "label": "Haunt #09, Agent Kilgore, Part 4",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "09"
+  },
+  {
+   "series": "Haunt",
+   "label": "Haunt #10, Agent Kilgore, Part 5",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "10"
+  },
+  {
+   "series": "Haunt",
+   "label": "Haunt #11, Agent Kilgore, Part 6",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "11"
+  },
+  {
+   "series": "Haunt",
+   "label": "Haunt #12, Agent Kilgore, Part 7",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "12"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #207, Q & A, Part 1",
+   "kind": "main",
+   "section": "main",
+   "number": "207"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #208, Q & A, Part 2",
+   "kind": "main",
+   "section": "main",
+   "number": "208"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #209, Q & A, Part 3",
+   "kind": "main",
+   "section": "main",
+   "number": "209"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #210, Q & A, Part 4",
+   "kind": "main",
+   "section": "main",
+   "number": "210"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #211, Violation of Trust, Part 1",
+   "kind": "main",
+   "section": "main",
+   "number": "211"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #212, Violation of Trust, Part 2",
+   "kind": "main",
+   "section": "main",
+   "number": "212"
+  },
+  {
+   "series": "Haunt",
+   "label": "Haunt #13, The Apparition, Part 1",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "13"
+  },
+  {
+   "series": "Haunt",
+   "label": "Haunt #14, The Apparition, Part 2",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "14"
+  },
+  {
+   "series": "Haunt",
+   "label": "Haunt #15, The Apparition, Part 3",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "15"
+  },
+  {
+   "series": "Haunt",
+   "label": "Haunt #16, The Apparition, Part 4",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "16"
+  },
+  {
+   "series": "Haunt",
+   "label": "Haunt #17, The Apparition, Part 5",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "17"
+  },
+  {
+   "series": "Haunt",
+   "label": "Haunt #18, The Apparition, Part 6",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "18"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #213, The Gathering Storm, Part 1",
+   "kind": "main",
+   "section": "main",
+   "number": "213"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #214, The Gathering Storm, Part 2",
+   "kind": "main",
+   "section": "main",
+   "number": "214"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #215, The Gathering Storm, Part 3",
+   "kind": "main",
+   "section": "main",
+   "number": "215"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #216, The Gathering Storm, Part 4",
+   "kind": "main",
+   "section": "main",
+   "number": "216"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #217, The Gathering Storm, Part 5",
+   "kind": "main",
+   "section": "main",
+   "number": "217"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #218, The Gathering Storm, Part 6",
+   "kind": "main",
+   "section": "main",
+   "number": "218"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #219, Eye of the Storm",
+   "kind": "main",
+   "section": "main",
+   "number": "219"
+  },
+  {
+   "series": "Haunt",
+   "label": "Haunt #19, The Second Church, Part 1, Headwires On Fire",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "19"
+  },
+  {
+   "series": "Haunt",
+   "label": "Haunt #20, The Second Church, Part 2, A Conspiracy",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "20"
+  },
+  {
+   "series": "Haunt",
+   "label": "Haunt #21, The Second Church, Part 3, The Glorious Orgy",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "21"
+  },
+  {
+   "series": "Haunt",
+   "label": "Haunt #22, The Second Church, Part 4, Backflash 1979",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "22"
+  },
+  {
+   "series": "Haunt",
+   "label": "Haunt #23, The Second Church, Part 5, Return Trip",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "23"
+  },
+  {
+   "series": "Haunt",
+   "label": "Haunt #24, The Second Church, Part 6, Kick-Ash!",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "24"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #220, Origin of the Species, Part 1",
+   "kind": "main",
+   "section": "main",
+   "number": "220"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #221, Origin of the Species, Part 2",
+   "kind": "main",
+   "section": "main",
+   "number": "221"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #222, Origin of the Species, Part 3",
+   "kind": "main",
+   "section": "main",
+   "number": "222"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #223, Origin of the Species, Part 4",
+   "kind": "main",
+   "section": "main",
+   "number": "223"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #224, Origin of the Species, Part 5",
+   "kind": "main",
+   "section": "main",
+   "number": "224"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #225, De-Programmed, Part 1",
+   "kind": "main",
+   "section": "main",
+   "number": "225"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #226, De-Programmed, Part 2",
+   "kind": "main",
+   "section": "main",
+   "number": "226"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #227, De-Programmed, Part 3",
+   "kind": "main",
+   "section": "main",
+   "number": "227"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #228, Collateral Damage",
+   "kind": "main",
+   "section": "main",
+   "number": "228"
+  },
+  {
+   "series": "Haunt",
+   "label": "Haunt #25, Lady Haunt, Part 1, Insecticided",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "25"
+  },
+  {
+   "series": "Haunt",
+   "label": "Haunt #26, Lady Haunt, Part 2, Mind Worms",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "26"
+  },
+  {
+   "series": "Haunt",
+   "label": "Haunt #27, Lady Haunt, Part 3, Get Happy!",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "27"
+  },
+  {
+   "series": "Haunt",
+   "label": "Haunt #28, Lady Haunt, Part 4, While You Were Beaten!",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "28"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #229, Celebrity Savior, Part 1",
+   "kind": "main",
+   "section": "main",
+   "number": "229"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #230, Celebrity Savior, Part 2",
+   "kind": "main",
+   "section": "main",
+   "number": "230"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #231, Celebrity Savior, Part 3",
+   "kind": "main",
+   "section": "main",
+   "number": "231"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #232, Celebrity Savior, Part 4",
+   "kind": "main",
+   "section": "main",
+   "number": "232"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #233, Celebrity Savior, Part 5 / Spawn Costume Origin, Part 1",
+   "kind": "main",
+   "section": "main",
+   "number": "233"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #234, Celebrity Savior, Part 6 / Spawn Costume Origin, Part 2",
+   "kind": "main",
+   "section": "main",
+   "number": "234"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #235, Bluddlines",
+   "kind": "main",
+   "section": "main",
+   "number": "235"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #236, Battle For the Costume, Part 1",
+   "kind": "main",
+   "section": "main",
+   "number": "236"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #237, Battle For the Costume, Part 2",
+   "kind": "main",
+   "section": "main",
+   "number": "237"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #238, The Dead Zone, Part 1",
+   "kind": "main",
+   "section": "main",
+   "number": "238"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #239, The Dead Zone, Part 2",
+   "kind": "main",
+   "section": "main",
+   "number": "239"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #240, The Dead Zone, Part 3",
+   "kind": "main",
+   "section": "main",
+   "number": "240"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #241, The Dead Zone, Part 4",
+   "kind": "main",
+   "section": "main",
+   "number": "241"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #242, Disappearance, Part 1",
+   "kind": "main",
+   "section": "main",
+   "number": "242"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #243, Disappearance, Part 2",
+   "kind": "main",
+   "section": "main",
+   "number": "243"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #244, Disappearance, Part 3",
+   "kind": "main",
+   "section": "main",
+   "number": "244"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #245, Disappearance, Part 4",
+   "kind": "main",
+   "section": "main",
+   "number": "245"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #246, Coma, Part 1",
+   "kind": "main",
+   "section": "main",
+   "number": "246"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #247, Coma, Part 2",
+   "kind": "main",
+   "section": "main",
+   "number": "247"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #248, Coma, Part 3",
+   "kind": "main",
+   "section": "main",
+   "number": "248"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #249, Coma, Part 4",
+   "kind": "main",
+   "section": "main",
+   "number": "249"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #250 , (Untitled) (suggested title: The King Is Dead, Long Live the King)",
+   "kind": "main",
+   "section": "main",
+   "number": "250"
+  },
+  {
+   "series": "Spawn: Resurrection",
+   "label": "Spawn: Resurrection (One-Shot)",
+   "kind": "oneshot",
+   "section": "main"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #251, Resurrection, Part 2, A Cold Day in Hell",
+   "kind": "main",
+   "section": "main",
+   "number": "251"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #252, Resurrection, Part 3",
+   "kind": "main",
+   "section": "main",
+   "number": "252"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #253, Resurrection, Part 4",
+   "kind": "main",
+   "section": "main",
+   "number": "253"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #254, Resurrection, Part 5",
+   "kind": "main",
+   "section": "main",
+   "number": "254"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #255, Resurrection, Part 6",
+   "kind": "main",
+   "section": "main",
+   "number": "255"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #256, The Satan Saga Wars, Part 1",
+   "kind": "main",
+   "section": "main",
+   "number": "256"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #257, The Satan Saga Wars, Part 2",
+   "kind": "main",
+   "section": "main",
+   "number": "257"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #258, The Satan Saga Wars, Part 3",
+   "kind": "main",
+   "section": "main",
+   "number": "258"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #259, The Satan Saga Wars, Part 4",
+   "kind": "main",
+   "section": "main",
+   "number": "259"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #260, The Satan Saga Wars, Part 5",
+   "kind": "main",
+   "section": "main",
+   "number": "260"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #261, The Satan Saga Wars, Part 6",
+   "kind": "main",
+   "section": "main",
+   "number": "261"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #262, The Satan Saga Wars, Part 7",
+   "kind": "main",
+   "section": "main",
+   "number": "262"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #263, Return to Earth, Part 1",
+   "kind": "main",
+   "section": "main",
+   "number": "263"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #264, Return to Earth, Part 2",
+   "kind": "main",
+   "section": "main",
+   "number": "264"
+  },
+  {
+   "series": "Ant",
+   "label": "Ant #01",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "01"
+  },
+  {
+   "series": "Ant",
+   "label": "Ant #02",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "02"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #265, Alzayah Stone, Part 1",
+   "kind": "main",
+   "section": "main",
+   "number": "265"
+  },
+  {
+   "series": "Ant",
+   "label": "Ant #3",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "3"
+  },
+  {
+   "series": "Savage Dragon",
+   "label": "Savage Dragon #216, Alzayah Stone, Part 2",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "216"
+  },
+  {
+   "series": "Ant",
+   "label": "Ant #04",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "04"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #266, Alzayah Stone, Part 3",
+   "kind": "main",
+   "section": "main",
+   "number": "266"
+  },
+  {
+   "series": "Ant",
+   "label": "Ant #05",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "05"
+  },
+  {
+   "series": "Savage Dragon",
+   "label": "Savage Dragon #217, Alzayah Stone, Part 4",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "217"
+  },
+  {
+   "series": "Ant",
+   "label": "Ant #06",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "06"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #267, Hell On Earth, Part 1",
+   "kind": "main",
+   "section": "main",
+   "number": "267"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #268, Hell On Earth, Part 2",
+   "kind": "main",
+   "section": "main",
+   "number": "268"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #269, Hell On Earth, Part 3",
+   "kind": "main",
+   "section": "main",
+   "number": "269"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #270, Hell On Earth, Part 4",
+   "kind": "main",
+   "section": "main",
+   "number": "270"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #271, Hell On Earth, Part 5",
+   "kind": "main",
+   "section": "main",
+   "number": "271"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #272, Hell On Earth, Part 6",
+   "kind": "main",
+   "section": "main",
+   "number": "272"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #273, Hell On Earth, Part 7",
+   "kind": "main",
+   "section": "main",
+   "number": "273"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #274, Hell On Earth, Part 8",
+   "kind": "main",
+   "section": "main",
+   "number": "274"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #275, Hell On Earth, Part 9",
+   "kind": "main",
+   "section": "main",
+   "number": "275"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #276, Dark Horror, Part 1",
+   "kind": "main",
+   "section": "main",
+   "number": "276"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #277, Dark Horror, Part 2",
+   "kind": "main",
+   "section": "main",
+   "number": "277"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #278, Dark Horror, Part 3",
+   "kind": "main",
+   "section": "main",
+   "number": "278"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #279, Dark Horror, Part 4",
+   "kind": "main",
+   "section": "main",
+   "number": "279"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #280, Dark Horror, Part 5",
+   "kind": "main",
+   "section": "main",
+   "number": "280"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #281, Dark Horror, Part 6",
+   "kind": "main",
+   "section": "main",
+   "number": "281"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #282, Dark Horror, Part 7",
+   "kind": "main",
+   "section": "main",
+   "number": "282"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #283, Dark Horror, Part 8",
+   "kind": "main",
+   "section": "main",
+   "number": "283"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #284, Enemy of the State, Part 1",
+   "kind": "main",
+   "section": "main",
+   "number": "284"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #285, Enemy of the State, Part 2",
+   "kind": "main",
+   "section": "main",
+   "number": "285"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #286, Enemy of the State, Part 3",
+   "kind": "main",
+   "section": "main",
+   "number": "286"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #287, Enemy of the State, Part 4",
+   "kind": "main",
+   "section": "main",
+   "number": "287"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #288, Enemy of the State, Part 5",
+   "kind": "main",
+   "section": "main",
+   "number": "288"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #289, Enemy of the State, Part 6",
+   "kind": "main",
+   "section": "main",
+   "number": "289"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #290, Enemy of the State, Part 7",
+   "kind": "main",
+   "section": "main",
+   "number": "290"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #291, Vengeance, Part 1",
+   "kind": "main",
+   "section": "main",
+   "number": "291"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #292, Vengeance, Part 2",
+   "kind": "main",
+   "section": "main",
+   "number": "292"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #293, Vengeance, Part 3",
+   "kind": "main",
+   "section": "main",
+   "number": "293"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #294, Vengeance, Part 4",
+   "kind": "main",
+   "section": "main",
+   "number": "294"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #295, Vengeance, Part 5",
+   "kind": "main",
+   "section": "main",
+   "number": "295"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #296, The History of Al Simmons, Part 1",
+   "kind": "main",
+   "section": "main",
+   "number": "296"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #297, The History of Al Simmons, Part 2",
+   "kind": "main",
+   "section": "main",
+   "number": "297"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #298, The Record-Breaker, Part 1",
+   "kind": "main",
+   "section": "main",
+   "number": "298"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #299, The Record-Breaker, Part 2",
+   "kind": "main",
+   "section": "main",
+   "number": "299"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #300 , The Record-Breaker, Part 3",
+   "kind": "main",
+   "section": "main",
+   "number": "300"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #301, The Record-Breaker, Part 4",
+   "kind": "main",
+   "section": "main",
+   "number": "301"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #302, Hell Hunt, Part 1",
+   "kind": "main",
+   "section": "main",
+   "number": "302"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #303, Hell Hunt, Part 2",
+   "kind": "main",
+   "section": "main",
+   "number": "303"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #304, Hell Hunt, Part 3",
+   "kind": "main",
+   "section": "main",
+   "number": "304"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #305, Hell Hunt, Part 4",
+   "kind": "main",
+   "section": "main",
+   "number": "305"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #306, Prophecy of Death, Part 1",
+   "kind": "main",
+   "section": "main",
+   "number": "306"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #307, Prophecy of Death, Part 2",
+   "kind": "main",
+   "section": "main",
+   "number": "307"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #308, Consequence of Sin, Part 1",
+   "kind": "main",
+   "section": "main",
+   "number": "308"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #309, Consequence of Sin, Part 2",
+   "kind": "main",
+   "section": "main",
+   "number": "309"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #310, The Storm Begins (The Inferno Fallout)",
+   "kind": "main",
+   "section": "main",
+   "number": "310"
+  },
+  {
+   "series": "Monolith",
+   "label": "Monolith #1",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "1"
+  },
+  {
+   "series": "Monolith",
+   "label": "Monolith #2",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "2"
+  },
+  {
+   "series": "Monolith",
+   "label": "Monolith #3",
+   "kind": "spinoff",
+   "section": "main",
+   "number": "3"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #311, Cult of Omega, Part 1",
+   "kind": "main",
+   "section": "main",
+   "number": "311"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #312, Cult of Omega, Part 2",
+   "kind": "main",
+   "section": "main",
+   "number": "312"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #313, Cult of Omega, Part 3",
+   "kind": "main",
+   "section": "main",
+   "number": "313"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #314, Cult of Omega, Part 4",
+   "kind": "main",
+   "section": "main",
+   "number": "314"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #315, Cult of Omega, Finale",
+   "kind": "main",
+   "section": "main",
+   "number": "315"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #316, Shadows, Part 1",
+   "kind": "main",
+   "section": "main",
+   "number": "316"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #317, Shadows, Part 2",
+   "kind": "main",
+   "section": "main",
+   "number": "317"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #318, Shadows, Part 3",
+   "kind": "main",
+   "section": "main",
+   "number": "318"
+  },
+  {
+   "series": "Spawn's Universe",
+   "label": "Spawn's Universe (One-Shot)",
+   "kind": "oneshot",
+   "section": "main"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #319, Shadows, Part 4",
+   "kind": "main",
+   "section": "universe",
+   "number": "319"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #320, Shadows, Part 5",
+   "kind": "main",
+   "section": "universe",
+   "number": "320"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #321, Shadows, Part 6",
+   "kind": "main",
+   "section": "universe",
+   "number": "321"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #322, Shadows, Part 7",
+   "kind": "main",
+   "section": "universe",
+   "number": "322"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #323, Shadows, Part 8",
+   "kind": "main",
+   "section": "universe",
+   "number": "323"
+  },
+  {
+   "series": "Gunslinger Spawn",
+   "label": "Gunslinger Spawn #01 , Lost in the Future, Part 1",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "01"
+  },
+  {
+   "series": "Gunslinger Spawn",
+   "label": "Gunslinger Spawn #02, Lost in the Future, Part 2",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "02"
+  },
+  {
+   "series": "Gunslinger Spawn",
+   "label": "Gunslinger Spawn #03, Lost in the Future, Part 3",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "03"
+  },
+  {
+   "series": "Gunslinger Spawn",
+   "label": "Gunslinger Spawn #04, Lost in the Future, Part 4",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "04"
+  },
+  {
+   "series": "Gunslinger Spawn",
+   "label": "Gunslinger Spawn #05, Lost in the Future, Part 5",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "05"
+  },
+  {
+   "series": "Gunslinger Spawn",
+   "label": "Gunslinger Spawn #06, Lost in the Future, Part 6",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "06"
+  },
+  {
+   "series": "King Spawn",
+   "label": "King Spawn #01 , King of Swords, Part 1",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "01"
+  },
+  {
+   "series": "King Spawn",
+   "label": "King Spawn #02, King of Swords, Part 2",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "02"
+  },
+  {
+   "series": "King Spawn",
+   "label": "King Spawn #03, King of Swords, Part 3",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "03"
+  },
+  {
+   "series": "King Spawn",
+   "label": "King Spawn #04, King of Swords, Part 4",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "04"
+  },
+  {
+   "series": "King Spawn",
+   "label": "King Spawn #05, King of Swords, Part 5",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "05"
+  },
+  {
+   "series": "King Spawn",
+   "label": "King Spawn #06, King of Swords, Part 6",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "06"
+  },
+  {
+   "series": "Gunslinger Spawn",
+   "label": "Gunslinger Spawn #07, The Two Faces of Revenge, Part 1",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "07"
+  },
+  {
+   "series": "Gunslinger Spawn",
+   "label": "Gunslinger Spawn #08, The Two Faces of Revenge, Part 2",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "08"
+  },
+  {
+   "series": "Gunslinger Spawn",
+   "label": "Gunslinger Spawn #09, The Two Faces of Revenge, Part 3",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "09"
+  },
+  {
+   "series": "Gunslinger Spawn",
+   "label": "Gunslinger Spawn #10, The Two Faces of Revenge, Part 4",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "10"
+  },
+  {
+   "series": "The Scorched",
+   "label": "The Scorched #01",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "01"
+  },
+  {
+   "series": "The Scorched",
+   "label": "The Scorched #02",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "02"
+  },
+  {
+   "series": "The Scorched",
+   "label": "The Scorched #03",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "03"
+  },
+  {
+   "series": "The Scorched",
+   "label": "The Scorched #04",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "04"
+  },
+  {
+   "series": "The Scorched",
+   "label": "The Scorched #05",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "05"
+  },
+  {
+   "series": "The Scorched",
+   "label": "The Scorched #06",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "06"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #324, Bad Business, Part 1",
+   "kind": "main",
+   "section": "universe",
+   "number": "324"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #325, Bad Business, Part 2",
+   "kind": "main",
+   "section": "universe",
+   "number": "325"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #326, Bad Business, Part 3",
+   "kind": "main",
+   "section": "universe",
+   "number": "326"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #327, Bad Business, Part 4",
+   "kind": "main",
+   "section": "universe",
+   "number": "327"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #328, Bad Business, Part 5",
+   "kind": "main",
+   "section": "universe",
+   "number": "328"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #329, Bad Business, Part 6",
+   "kind": "main",
+   "section": "universe",
+   "number": "329"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #330, Bad Business, Part 7",
+   "kind": "main",
+   "section": "universe",
+   "number": "330"
+  },
+  {
+   "series": "King Spawn",
+   "label": "King Spawn #07",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "07"
+  },
+  {
+   "series": "King Spawn",
+   "label": "King Spawn #08",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "08"
+  },
+  {
+   "series": "King Spawn",
+   "label": "King Spawn #09",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "09"
+  },
+  {
+   "series": "King Spawn",
+   "label": "King Spawn #10",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "10"
+  },
+  {
+   "series": "King Spawn",
+   "label": "King Spawn #11",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "11"
+  },
+  {
+   "series": "King Spawn",
+   "label": "King Spawn #12",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "12"
+  },
+  {
+   "series": "Gunslinger Spawn",
+   "label": "Gunslinger Spawn #11, The Two Faces of Revenge, Part 5",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "11"
+  },
+  {
+   "series": "Gunslinger Spawn",
+   "label": "Gunslinger Spawn #12, The Two Faces of Revenge, Part 6",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "12"
+  },
+  {
+   "series": "The Scorched",
+   "label": "The Scorched #07",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "07"
+  },
+  {
+   "series": "The Scorched",
+   "label": "The Scorched #08",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "08"
+  },
+  {
+   "series": "The Scorched",
+   "label": "The Scorched #09",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "09"
+  },
+  {
+   "series": "The Scorched",
+   "label": "The Scorched #10",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "10"
+  },
+  {
+   "series": "The Scorched",
+   "label": "The Scorched #11",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "11"
+  },
+  {
+   "series": "The Scorched",
+   "label": "The Scorched #12",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "12"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #331, Sinn’s War, Part 1",
+   "kind": "main",
+   "section": "universe",
+   "number": "331"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #332, Sinn’s War, Part 2",
+   "kind": "main",
+   "section": "universe",
+   "number": "332"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #333, Sinn’s War, Part 3",
+   "kind": "main",
+   "section": "universe",
+   "number": "333"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #334, Sinn’s War, Part 4",
+   "kind": "main",
+   "section": "universe",
+   "number": "334"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #335, Sinn’s War, Part 5",
+   "kind": "main",
+   "section": "universe",
+   "number": "335"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #336, Sinn’s War, Part 6",
+   "kind": "main",
+   "section": "universe",
+   "number": "336"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #337, Sinn’s War, Part 7",
+   "kind": "main",
+   "section": "universe",
+   "number": "337"
+  },
+  {
+   "series": "Spawn: Unwanted Violence",
+   "label": "Spawn: Unwanted Violence #1",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "1"
+  },
+  {
+   "series": "Spawn: Unwanted Violence",
+   "label": "Spawn: Unwanted Violence #2",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "2"
+  },
+  {
+   "series": "King Spawn",
+   "label": "King Spawn #13",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "13"
+  },
+  {
+   "series": "King Spawn",
+   "label": "King Spawn #14",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "14"
+  },
+  {
+   "series": "King Spawn",
+   "label": "King Spawn #15",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "15"
+  },
+  {
+   "series": "King Spawn",
+   "label": "King Spawn #16",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "16"
+  },
+  {
+   "series": "King Spawn",
+   "label": "King Spawn #17",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "17"
+  },
+  {
+   "series": "King Spawn",
+   "label": "King Spawn #18",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "18"
+  },
+  {
+   "series": "Gunslinger Spawn",
+   "label": "Gunslinger Spawn #13",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "13"
+  },
+  {
+   "series": "Gunslinger Spawn",
+   "label": "Gunslinger Spawn #14",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "14"
+  },
+  {
+   "series": "Gunslinger Spawn",
+   "label": "Gunslinger Spawn #15",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "15"
+  },
+  {
+   "series": "Gunslinger Spawn",
+   "label": "Gunslinger Spawn #16",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "16"
+  },
+  {
+   "series": "Gunslinger Spawn",
+   "label": "Gunslinger Spawn #17",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "17"
+  },
+  {
+   "series": "Gunslinger Spawn",
+   "label": "Gunslinger Spawn #18",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "18"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #338, Battle for the Throne I, Part 1",
+   "kind": "main",
+   "section": "universe",
+   "number": "338"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #339, Battle for the Throne I, Part 2",
+   "kind": "main",
+   "section": "universe",
+   "number": "339"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #340, Battle for the Throne I, Part 3",
+   "kind": "main",
+   "section": "universe",
+   "number": "340"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #341, Battle for the Throne I, Part 4",
+   "kind": "main",
+   "section": "universe",
+   "number": "341"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #342, Battle for the Throne I, Part 5",
+   "kind": "main",
+   "section": "universe",
+   "number": "342"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #343, Battle for the Throne I, Part 6",
+   "kind": "main",
+   "section": "universe",
+   "number": "343"
+  },
+  {
+   "series": "The Scorched",
+   "label": "The Scorched #13",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "13"
+  },
+  {
+   "series": "The Scorched",
+   "label": "The Scorched #14",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "14"
+  },
+  {
+   "series": "The Scorched",
+   "label": "The Scorched #15",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "15"
+  },
+  {
+   "series": "The Scorched",
+   "label": "The Scorched #16",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "16"
+  },
+  {
+   "series": "The Scorched",
+   "label": "The Scorched #17",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "17"
+  },
+  {
+   "series": "The Scorched",
+   "label": "The Scorched #18",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "18"
+  },
+  {
+   "series": "King Spawn",
+   "label": "King Spawn #19",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "19"
+  },
+  {
+   "series": "King Spawn",
+   "label": "King Spawn #20",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "20"
+  },
+  {
+   "series": "King Spawn",
+   "label": "King Spawn #21",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "21"
+  },
+  {
+   "series": "King Spawn",
+   "label": "King Spawn #22",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "22"
+  },
+  {
+   "series": "King Spawn",
+   "label": "King Spawn #23",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "23"
+  },
+  {
+   "series": "King Spawn",
+   "label": "King Spawn #24",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "24"
+  },
+  {
+   "series": "Gunslinger Spawn",
+   "label": "Gunslinger Spawn #19",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "19"
+  },
+  {
+   "series": "Gunslinger Spawn",
+   "label": "Gunslinger Spawn #20",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "20"
+  },
+  {
+   "series": "Gunslinger Spawn",
+   "label": "Gunslinger Spawn #21",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "21"
+  },
+  {
+   "series": "Gunslinger Spawn",
+   "label": "Gunslinger Spawn #22",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "22"
+  },
+  {
+   "series": "Gunslinger Spawn",
+   "label": "Gunslinger Spawn #23",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "23"
+  },
+  {
+   "series": "Gunslinger Spawn",
+   "label": "Gunslinger Spawn #24",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "24"
+  },
+  {
+   "series": "The Scorched",
+   "label": "The Scorched #19",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "19"
+  },
+  {
+   "series": "The Scorched",
+   "label": "The Scorched #20",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "20"
+  },
+  {
+   "series": "The Scorched",
+   "label": "The Scorched #21",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "21"
+  },
+  {
+   "series": "The Scorched",
+   "label": "The Scorched #22",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "22"
+  },
+  {
+   "series": "The Scorched",
+   "label": "The Scorched #23",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "23"
+  },
+  {
+   "series": "The Scorched",
+   "label": "The Scorched #24",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "24"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #344, Battle for the Throne II, Part 1",
+   "kind": "main",
+   "section": "universe",
+   "number": "344"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #345, Battle for the Throne II, Part 2",
+   "kind": "main",
+   "section": "universe",
+   "number": "345"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #346, Battle for the Throne II, Part 3",
+   "kind": "main",
+   "section": "universe",
+   "number": "346"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #347, Battle for the Throne II, Part 4",
+   "kind": "main",
+   "section": "universe",
+   "number": "347"
+  },
+  {
+   "series": "King Spawn",
+   "label": "King Spawn #25",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "25"
+  },
+  {
+   "series": "King Spawn",
+   "label": "King Spawn #26",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "26"
+  },
+  {
+   "series": "King Spawn",
+   "label": "King Spawn #27",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "27"
+  },
+  {
+   "series": "King Spawn",
+   "label": "King Spawn #28",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "28"
+  },
+  {
+   "series": "Gunslinger Spawn",
+   "label": "Gunslinger Spawn #25",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "25"
+  },
+  {
+   "series": "Gunslinger Spawn",
+   "label": "Gunslinger Spawn #26",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "26"
+  },
+  {
+   "series": "Gunslinger Spawn",
+   "label": "Gunslinger Spawn #27",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "27"
+  },
+  {
+   "series": "Gunslinger Spawn",
+   "label": "Gunslinger Spawn #28",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "28"
+  },
+  {
+   "series": "The Scorched",
+   "label": "The Scorched #25",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "25"
+  },
+  {
+   "series": "The Scorched",
+   "label": "The Scorched #26",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "26"
+  },
+  {
+   "series": "King Spawn",
+   "label": "King Spawn #29",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "29"
+  },
+  {
+   "series": "King Spawn",
+   "label": "King Spawn #30",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "30"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #348, Battle for the Throne II, Part 5",
+   "kind": "main",
+   "section": "universe",
+   "number": "348"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #349, Battle for the Throne II, Part 6",
+   "kind": "main",
+   "section": "universe",
+   "number": "349"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #350 , Battle for the Throne II, Part 7",
+   "kind": "main",
+   "section": "universe",
+   "number": "350"
+  },
+  {
+   "series": "King Spawn",
+   "label": "King Spawn #31",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "31"
+  },
+  {
+   "series": "King Spawn",
+   "label": "King Spawn #32",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "32"
+  },
+  {
+   "series": "King Spawn",
+   "label": "King Spawn #33",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "33"
+  },
+  {
+   "series": "King Spawn",
+   "label": "King Spawn #34",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "34"
+  },
+  {
+   "series": "King Spawn",
+   "label": "King Spawn #35",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "35"
+  },
+  {
+   "series": "King Spawn",
+   "label": "King Spawn #36",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "36"
+  },
+  {
+   "series": "Gunslinger Spawn",
+   "label": "Gunslinger Spawn #29",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "29"
+  },
+  {
+   "series": "Gunslinger Spawn",
+   "label": "Gunslinger Spawn #30",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "30"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #351",
+   "kind": "main",
+   "section": "universe",
+   "number": "351"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #352",
+   "kind": "main",
+   "section": "universe",
+   "number": "352"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #353",
+   "kind": "main",
+   "section": "universe",
+   "number": "353"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #354",
+   "kind": "main",
+   "section": "universe",
+   "number": "354"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #355",
+   "kind": "main",
+   "section": "universe",
+   "number": "355"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #356",
+   "kind": "main",
+   "section": "universe",
+   "number": "356"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #357",
+   "kind": "main",
+   "section": "universe",
+   "number": "357"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #358",
+   "kind": "main",
+   "section": "universe",
+   "number": "358"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #359",
+   "kind": "main",
+   "section": "universe",
+   "number": "359"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #360",
+   "kind": "main",
+   "section": "universe",
+   "number": "360"
+  },
+  {
+   "series": "The Scorched",
+   "label": "The Scorched #27",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "27"
+  },
+  {
+   "series": "The Scorched",
+   "label": "The Scorched #28",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "28"
+  },
+  {
+   "series": "The Scorched",
+   "label": "The Scorched #29",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "29"
+  },
+  {
+   "series": "The Scorched",
+   "label": "The Scorched #30",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "30"
+  },
+  {
+   "series": "The Scorched",
+   "label": "The Scorched #31",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "31"
+  },
+  {
+   "series": "The Scorched",
+   "label": "The Scorched #32",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "32"
+  },
+  {
+   "series": "Gunslinger Spawn",
+   "label": "Gunslinger Spawn #31",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "31"
+  },
+  {
+   "series": "Gunslinger Spawn",
+   "label": "Gunslinger Spawn #32",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "32"
+  },
+  {
+   "series": "Gunslinger Spawn",
+   "label": "Gunslinger Spawn #33",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "33"
+  },
+  {
+   "series": "Gunslinger Spawn",
+   "label": "Gunslinger Spawn #34",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "34"
+  },
+  {
+   "series": "Gunslinger Spawn",
+   "label": "Gunslinger Spawn #35",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "35"
+  },
+  {
+   "series": "Gunslinger Spawn",
+   "label": "Gunslinger Spawn #36",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "36"
+  },
+  {
+   "series": "Misery",
+   "label": "Misery #1",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "1"
+  },
+  {
+   "series": "Misery",
+   "label": "Misery #2",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "2"
+  },
+  {
+   "series": "Misery",
+   "label": "Misery #3",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "3"
+  },
+  {
+   "series": "Misery",
+   "label": "Misery #4",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "4"
+  },
+  {
+   "series": "The Scorched",
+   "label": "The Scorched #33",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "33"
+  },
+  {
+   "series": "The Scorched",
+   "label": "The Scorched #34",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "34"
+  },
+  {
+   "series": "The Scorched",
+   "label": "The Scorched #35",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "35"
+  },
+  {
+   "series": "The Scorched",
+   "label": "The Scorched #36",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "36"
+  },
+  {
+   "series": "The Scorched",
+   "label": "The Scorched #37",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "37"
+  },
+  {
+   "series": "The Scorched",
+   "label": "The Scorched #38",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "38"
+  },
+  {
+   "series": "Sam & Twitch: Case Files",
+   "label": "Sam & Twitch: Case Files #1, No Good Deed Goes Unpunished, Part 1",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "1"
+  },
+  {
+   "series": "Sam & Twitch: Case Files",
+   "label": "Sam & Twitch: Case Files #2, No Good Deed Goes Unpunished, Part 2",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "2"
+  },
+  {
+   "series": "Sam & Twitch: Case Files",
+   "label": "Sam & Twitch: Case Files #3, No Good Deed Goes Unpunished, Part 3",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "3"
+  },
+  {
+   "series": "Sam & Twitch: Case Files",
+   "label": "Sam & Twitch: Case Files #4, No Good Deed Goes Unpunished, Part 4",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "4"
+  },
+  {
+   "series": "Sam & Twitch: Case Files",
+   "label": "Sam & Twitch: Case Files #5, No Good Deed Goes Unpunished, Part 5",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "5"
+  },
+  {
+   "series": "Sam & Twitch: Case Files",
+   "label": "Sam & Twitch: Case Files #6, No Good Deed Goes Unpunished, Part 6",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "6"
+  },
+  {
+   "series": "Sam & Twitch: Case Files",
+   "label": "Sam & Twitch: Case Files #7, No Good Deed Goes Unpunished, Part 7",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "7"
+  },
+  {
+   "series": "Sam & Twitch: Case Files",
+   "label": "Sam & Twitch: Case Files #8, No Good Deed Goes Unpunished, Part 8",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "8"
+  },
+  {
+   "series": "Rat City",
+   "label": "Rat City #1",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "1"
+  },
+  {
+   "series": "Rat City",
+   "label": "Rat City #2",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "2"
+  },
+  {
+   "series": "Rat City",
+   "label": "Rat City #3",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "3"
+  },
+  {
+   "series": "Rat City",
+   "label": "Rat City #4",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "4"
+  },
+  {
+   "series": "Rat City",
+   "label": "Rat City #5",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "5"
+  },
+  {
+   "series": "Rat City",
+   "label": "Rat City #6",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "6"
+  },
+  {
+   "series": "King Spawn",
+   "label": "King Spawn #37",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "37"
+  },
+  {
+   "series": "King Spawn",
+   "label": "King Spawn #38",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "38"
+  },
+  {
+   "series": "King Spawn",
+   "label": "King Spawn #39",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "39"
+  },
+  {
+   "series": "King Spawn",
+   "label": "King Spawn #40",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "40"
+  },
+  {
+   "series": "King Spawn",
+   "label": "King Spawn #41",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "41"
+  },
+  {
+   "series": "King Spawn",
+   "label": "King Spawn #42",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "42"
+  },
+  {
+   "series": "Gunslinger Spawn",
+   "label": "Gunslinger Spawn #37",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "37"
+  },
+  {
+   "series": "Gunslinger Spawn",
+   "label": "Gunslinger Spawn #38",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "38"
+  },
+  {
+   "series": "Gunslinger Spawn",
+   "label": "Gunslinger Spawn #39",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "39"
+  },
+  {
+   "series": "Gunslinger Spawn",
+   "label": "Gunslinger Spawn #40",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "40"
+  },
+  {
+   "series": "Gunslinger Spawn",
+   "label": "Gunslinger Spawn #41",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "41"
+  },
+  {
+   "series": "Gunslinger Spawn",
+   "label": "Gunslinger Spawn #42",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "42"
+  },
+  {
+   "series": "The Scorched",
+   "label": "The Scorched #39",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "39"
+  },
+  {
+   "series": "The Scorched",
+   "label": "The Scorched #40",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "40"
+  },
+  {
+   "series": "The Scorched",
+   "label": "The Scorched #41",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "41"
+  },
+  {
+   "series": "The Scorched",
+   "label": "The Scorched #42 (Most Recent Issue)",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "42"
+  },
+  {
+   "series": "The Scorched",
+   "label": "The Scorched #43",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "43"
+  },
+  {
+   "series": "The Scorched",
+   "label": "The Scorched #44",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "44"
+  },
+  {
+   "series": "Violator",
+   "label": "Violator #1",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "1"
+  },
+  {
+   "series": "Violator",
+   "label": "Violator #2",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "2"
+  },
+  {
+   "series": "Violator",
+   "label": "Violator #3",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "3"
+  },
+  {
+   "series": "Violator",
+   "label": "Violator #4",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "4"
+  },
+  {
+   "series": "Violator",
+   "label": "Violator #5",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "5"
+  },
+  {
+   "series": "Violator",
+   "label": "Violator #6",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "6"
+  },
+  {
+   "series": "Rat City",
+   "label": "Rat City #7",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "7"
+  },
+  {
+   "series": "Rat City",
+   "label": "Rat City #8",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "8"
+  },
+  {
+   "series": "Rat City",
+   "label": "Rat City #9",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "9"
+  },
+  {
+   "series": "Rat City",
+   "label": "Rat City #10",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "10"
+  },
+  {
+   "series": "Rat City",
+   "label": "Rat City #11",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "11"
+  },
+  {
+   "series": "Rat City",
+   "label": "Rat City #12",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "12"
+  },
+  {
+   "series": "Sam & Twitch: Case Files",
+   "label": "Sam & Twitch: Case Files #9",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "9"
+  },
+  {
+   "series": "Sam & Twitch: Case Files",
+   "label": "Sam & Twitch: Case Files #10",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "10"
+  },
+  {
+   "series": "Sam & Twitch: Case Files",
+   "label": "Sam & Twitch: Case Files #11",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "11"
+  },
+  {
+   "series": "Sam & Twitch: Case Files",
+   "label": "Sam & Twitch: Case Files #12",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "12"
+  },
+  {
+   "series": "Sam & Twitch: Case Files",
+   "label": "Sam & Twitch: Case Files #13",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "13"
+  },
+  {
+   "series": "Sam & Twitch: Case Files",
+   "label": "Sam & Twitch: Case Files #14",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "14"
+  },
+  {
+   "series": "Sam & Twitch: Case Files",
+   "label": "Sam & Twitch: Case Files #15",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "15"
+  },
+  {
+   "series": "Sam & Twitch: Case Files",
+   "label": "Sam & Twitch: Case Files #16",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "16"
+  },
+  {
+   "series": "Deadly Tales of the Gunslinger",
+   "label": "Deadly Tales of the Gunslinger #1",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "1"
+  },
+  {
+   "series": "Deadly Tales of the Gunslinger",
+   "label": "Deadly Tales of the Gunslinger #2",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "2"
+  },
+  {
+   "series": "Deadly Tales of the Gunslinger",
+   "label": "Deadly Tales of the Gunslinger #3",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "3"
+  },
+  {
+   "series": "Deadly Tales of the Gunslinger",
+   "label": "Deadly Tales of the Gunslinger #4",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "4"
+  },
+  {
+   "series": "Deadly Tales of the Gunslinger",
+   "label": "Deadly Tales of the Gunslinger #5",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "5"
+  },
+  {
+   "series": "Deadly Tales of the Gunslinger",
+   "label": "Deadly Tales of the Gunslinger #6",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "6"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #361",
+   "kind": "main",
+   "section": "universe",
+   "number": "361"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #362",
+   "kind": "main",
+   "section": "universe",
+   "number": "362"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #363",
+   "kind": "main",
+   "section": "universe",
+   "number": "363"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #364",
+   "kind": "main",
+   "section": "universe",
+   "number": "364"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #365 (Most Recent Issue)",
+   "kind": "main",
+   "section": "universe",
+   "number": "365"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #366",
+   "kind": "main",
+   "section": "universe",
+   "number": "366"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #367",
+   "kind": "main",
+   "section": "universe",
+   "number": "367"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #368",
+   "kind": "main",
+   "section": "universe",
+   "number": "368"
+  },
+  {
+   "series": "King Spawn",
+   "label": "King Spawn #43",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "43"
+  },
+  {
+   "series": "King Spawn",
+   "label": "King Spawn #44",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "44"
+  },
+  {
+   "series": "King Spawn",
+   "label": "King Spawn #45",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "45"
+  },
+  {
+   "series": "King Spawn",
+   "label": "King Spawn #46 (Most Recent Issue)",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "46"
+  },
+  {
+   "series": "King Spawn",
+   "label": "King Spawn #47",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "47"
+  },
+  {
+   "series": "King Spawn",
+   "label": "King Spawn #48",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "48"
+  },
+  {
+   "series": "Gunslinger Spawn",
+   "label": "Gunslinger Spawn #43 (Most Recent Issue)",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "43"
+  },
+  {
+   "series": "Gunslinger Spawn",
+   "label": "Gunslinger Spawn #44",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "44"
+  },
+  {
+   "series": "Gunslinger Spawn",
+   "label": "Gunslinger Spawn #45",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "45"
+  },
+  {
+   "series": "Gunslinger Spawn",
+   "label": "Gunslinger Spawn #46",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "46"
+  },
+  {
+   "series": "Gunslinger Spawn",
+   "label": "Gunslinger Spawn #47",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "47"
+  },
+  {
+   "series": "Gunslinger Spawn",
+   "label": "Gunslinger Spawn #48",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "48"
+  },
+  {
+   "series": "The Scorched",
+   "label": "The Scorched #45",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "45"
+  },
+  {
+   "series": "The Scorched",
+   "label": "The Scorched #46",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "46"
+  },
+  {
+   "series": "The Scorched",
+   "label": "The Scorched #47",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "47"
+  },
+  {
+   "series": "The Scorched",
+   "label": "The Scorched #48",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "48"
+  },
+  {
+   "series": "The Scorched",
+   "label": "The Scorched #49",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "49"
+  },
+  {
+   "series": "The Scorched",
+   "label": "The Scorched #50",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "50"
+  },
+  {
+   "series": "Rat City",
+   "label": "Rat City #13",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "13"
+  },
+  {
+   "series": "Rat City",
+   "label": "Rat City #14",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "14"
+  },
+  {
+   "series": "Rat City",
+   "label": "Rat City #15",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "15"
+  },
+  {
+   "series": "Rat City",
+   "label": "Rat City #16",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "16"
+  },
+  {
+   "series": "Rat City",
+   "label": "Rat City #17",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "17"
+  },
+  {
+   "series": "Rat City",
+   "label": "Rat City #18",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "18"
+  },
+  {
+   "series": "Deadly Tales of the Gunslinger",
+   "label": "Deadly Tales of the Gunslinger #7",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "7"
+  },
+  {
+   "series": "Deadly Tales of the Gunslinger",
+   "label": "Deadly Tales of the Gunslinger #8",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "8"
+  },
+  {
+   "series": "Deadly Tales of the Gunslinger",
+   "label": "Deadly Tales of the Gunslinger #9",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "9"
+  },
+  {
+   "series": "Deadly Tales of the Gunslinger",
+   "label": "Deadly Tales of the Gunslinger #10",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "10"
+  },
+  {
+   "series": "Deadly Tales of the Gunslinger",
+   "label": "Deadly Tales of the Gunslinger #11",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "11"
+  },
+  {
+   "series": "Deadly Tales of the Gunslinger",
+   "label": "Deadly Tales of the Gunslinger #12",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "12"
+  },
+  {
+   "series": "Medieval Spawn",
+   "label": "Medieval Spawn #1",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "1"
+  },
+  {
+   "series": "Medieval Spawn",
+   "label": "Medieval Spawn #2",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "2"
+  },
+  {
+   "series": "Medieval Spawn",
+   "label": "Medieval Spawn #3",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "3"
+  },
+  {
+   "series": "Medieval Spawn",
+   "label": "Medieval Spawn #4",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "4"
+  },
+  {
+   "series": "Black Ritual: The Book of Nyx",
+   "label": "Black Ritual: The Book of Nyx #1",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "1"
+  },
+  {
+   "series": "Black Ritual: The Book of Nyx",
+   "label": "Black Ritual: The Book of Nyx #2",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "2"
+  },
+  {
+   "series": "Black Ritual: The Book of Nyx",
+   "label": "Black Ritual: The Book of Nyx #3",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "3"
+  },
+  {
+   "series": "Black Ritual: The Book of Nyx",
+   "label": "Black Ritual: The Book of Nyx #4",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "4"
+  },
+  {
+   "series": "Black Ritual: The Book of Nyx",
+   "label": "Black Ritual: The Book of Nyx #5",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "5"
+  },
+  {
+   "series": "Black Ritual: The Book of Nyx",
+   "label": "Black Ritual: The Book of Nyx #6",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "6"
+  },
+  {
+   "series": "Black Ritual: The Book of Nyx",
+   "label": "Black Ritual: The Book of Nyx #7",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "7"
+  },
+  {
+   "series": "Bloodletter",
+   "label": "Bloodletter #1",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "1"
+  },
+  {
+   "series": "Bloodletter",
+   "label": "Bloodletter #2",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "2"
+  },
+  {
+   "series": "Bloodletter",
+   "label": "Bloodletter #3",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "3"
+  },
+  {
+   "series": "Bloodletter",
+   "label": "Bloodletter #4",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "4"
+  },
+  {
+   "series": "Bloodletter",
+   "label": "Bloodletter #5",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "5"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #369",
+   "kind": "main",
+   "section": "universe",
+   "number": "369"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #370",
+   "kind": "main",
+   "section": "universe",
+   "number": "370"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #371",
+   "kind": "main",
+   "section": "universe",
+   "number": "371"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #372",
+   "kind": "main",
+   "section": "universe",
+   "number": "372"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #373",
+   "kind": "main",
+   "section": "universe",
+   "number": "373"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #374",
+   "kind": "main",
+   "section": "universe",
+   "number": "374"
+  },
+  {
+   "series": "Spawn",
+   "label": "Spawn #375",
+   "kind": "main",
+   "section": "universe",
+   "number": "375"
+  },
+  {
+   "series": "King Spawn",
+   "label": "King Spawn #49",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "49"
+  },
+  {
+   "series": "King Spawn",
+   "label": "King Spawn #50",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "50"
+  },
+  {
+   "series": "King Spawn",
+   "label": "King Spawn #51",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "51"
+  },
+  {
+   "series": "King Spawn",
+   "label": "King Spawn #52",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "52"
+  },
+  {
+   "series": "King Spawn",
+   "label": "King Spawn #53",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "53"
+  },
+  {
+   "series": "King Spawn",
+   "label": "King Spawn #54",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "54"
+  },
+  {
+   "series": "Gunslinger Spawn",
+   "label": "Gunslinger Spawn #49",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "49"
+  },
+  {
+   "series": "Gunslinger Spawn",
+   "label": "Gunslinger Spawn #50",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "50"
+  },
+  {
+   "series": "Gunslinger Spawn",
+   "label": "Gunslinger Spawn #51",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "51"
+  },
+  {
+   "series": "Gunslinger Spawn",
+   "label": "Gunslinger Spawn #52",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "52"
+  },
+  {
+   "series": "Gunslinger Spawn",
+   "label": "Gunslinger Spawn #53",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "53"
+  },
+  {
+   "series": "Gunslinger Spawn",
+   "label": "Gunslinger Spawn #54",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "54"
+  },
+  {
+   "series": "The Scorched",
+   "label": "The Scorched #51",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "51"
+  },
+  {
+   "series": "The Scorched",
+   "label": "The Scorched #52",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "52"
+  },
+  {
+   "series": "The Scorched",
+   "label": "The Scorched #53",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "53"
+  },
+  {
+   "series": "The Scorched",
+   "label": "The Scorched #54",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "54"
+  },
+  {
+   "series": "The Scorched",
+   "label": "The Scorched #55",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "55"
+  },
+  {
+   "series": "The Scorched",
+   "label": "The Scorched #56",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "56"
+  },
+  {
+   "series": "The Curse of Sherlee Johnson",
+   "label": "The Curse of Sherlee Johnson #1-5 (arc 1)",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "1"
+  },
+  {
+   "series": "Spawn, The Dark Ages",
+   "label": "Spawn: The Dark Ages #1-6",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "1"
+  },
+  {
+   "series": "She-Spawn",
+   "label": "She-Spawn #1-5",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "1"
+  },
+  {
+   "series": "Spawn 77",
+   "label": "Spawn 77 #1-3",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "1"
+  },
+  {
+   "series": "The Curse of Sherlee Johnson",
+   "label": "The Curse of Sherlee Johnson #6-ongoing",
+   "kind": "spinoff",
+   "section": "universe",
+   "number": "6"
+  }
+ ],
+ "years": {
+  "Spawn": 1992,
+  "Curse of the Spawn": 1996,
+  "Sam and Twitch": 1999,
+  "Hellspawn": 2000,
+  "Case Files, Sam and Twitch": 2003,
+  "Sam & Twitch: Case Files": 2024,
+  "Spawn, The Undead": 1999,
+  "Spawn, The Dark Ages": 1999,
+  "Haunt": 2009,
+  "Violator|main": 1994,
+  "Violator|universe": 2024,
+  "King Spawn": 2021,
+  "Gunslinger Spawn": 2021,
+  "The Scorched": 2022,
+  "Rat City": 2024,
+  "Medieval Spawn": 2024,
+  "Angela": 1994,
+  "Savage Dragon": 1993,
+  "Spawn/Batman": 1994
+ }
+}

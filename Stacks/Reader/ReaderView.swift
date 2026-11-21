@@ -40,6 +40,8 @@ struct ReaderView: View {
     let client: KavitaClient
     /// When set, next and previous follow this reading list instead of the series.
     var readingListId: Int? = nil
+    /// When set, next and previous follow this order of chapter ids (a bundled reading order like Spawn's).
+    var order: [Int]? = nil
     @EnvironmentObject private var downloads: Downloads
     @Environment(\.dismiss) private var dismiss
 
@@ -55,9 +57,11 @@ struct ReaderView: View {
     /// Open the first chapter at this page instead of the saved spot (used by bookmarks).
     @State private var pageOverride: Int?
 
-    init(client: KavitaClient, startChapterId: Int, readingListId: Int? = nil, startPage: Int? = nil) {
+    init(client: KavitaClient, startChapterId: Int, readingListId: Int? = nil, startPage: Int? = nil,
+         order: [Int]? = nil) {
         self.client = client
         self.readingListId = readingListId
+        self.order = order
         _chapterId = State(initialValue: startChapterId)
         _pageOverride = State(initialValue: startPage)
     }
@@ -152,7 +156,11 @@ struct ReaderView: View {
         QuickActions.setContinue(chapterId: chapterId, readingListId: readingListId,
                                  seriesName: info.seriesName ?? "", chapterTitle: context?.chapterTitle ?? "")
 
-        if !offline {
+        if let order, let i = order.firstIndex(of: chapterId) {
+            // Works offline too: the order is already known.
+            nextChapterId = i + 1 < order.count ? order[i + 1] : nil
+            previousChapterId = i > 0 ? order[i - 1] : nil
+        } else if !offline {
             nextChapterId = await next(after: chapterId, info: info)
             if let listId = readingListId {
                 previousChapterId = (try? await client.previousInList(chapterId: chapterId, listId: listId)) ?? nil
@@ -165,6 +173,9 @@ struct ReaderView: View {
 
     /// The chapter after this one: next in the reading list, or next in the series.
     private func next(after id: Int, info: ChapterInfo) async -> Int? {
+        if let order, let i = order.firstIndex(of: id) {
+            return i + 1 < order.count ? order[i + 1] : nil
+        }
         if let listId = readingListId {
             return (try? await client.nextInList(chapterId: id, listId: listId)) ?? nil
         }
