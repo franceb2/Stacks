@@ -20,6 +20,21 @@ jobs:
       - name: Generate Xcode project
         run: xcodegen generate
 
+      # Runs the app's reading-order importer on sample Excel, Word, CSV, web page and text files.
+      - name: Test reading order importer
+        run: |
+          python3 -m pip install --quiet --break-system-packages openpyxl python-docx \
+            || python3 -m pip install --quiet --user openpyxl python-docx
+          python3 ci/import_test/make_fixtures.py "$RUNNER_TEMP/fixtures"
+          swiftc -o "$RUNNER_TEMP/importtest" \
+            Stacks/ReadingOrderImport/ZipReader.swift \
+            Stacks/ReadingOrderImport/ImportParsers.swift \
+            Stacks/ReadingOrderImport/OrderExtractor.swift \
+            Stacks/ReadingOrderImport/TitleKey.swift \
+            Stacks/ReadingOrderImport/ReadingOrderModel.swift \
+            ci/import_test/main.swift
+          "$RUNNER_TEMP/importtest" "$RUNNER_TEMP/fixtures"
+
       - name: Build (unsigned)
         run: |
           set -o pipefail

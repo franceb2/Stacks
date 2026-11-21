@@ -45,6 +45,7 @@ struct SeriesDetailView: View {
     @ObservedObject private var orderStore = ReadingOrderStore.shared
     @State private var showBookmarks = false
     @State private var showCollections = false
+    @State private var showImportOrder = false
     @State private var selected: Set<Int> = []
     @State private var error: String?
 
@@ -106,6 +107,12 @@ struct SeriesDetailView: View {
         }
         .sheet(isPresented: $showCollections) {
             AddToCollectionSheet(client: client, seriesId: route.id, title: series?.name ?? route.name)
+        }
+        .sheet(isPresented: $showImportOrder) {
+            ImportReadingOrderView(client: client, seriesName: seriesName) { order in
+                ReadingOrderSection.show(order.id, on: seriesName)
+                tab = .order
+            }
         }
         .safeAreaInset(edge: .bottom) {
             if selecting { selectionBar.transition(.move(edge: .bottom).combined(with: .opacity)) }
@@ -254,7 +261,7 @@ struct SeriesDetailView: View {
         if !d.volumes.isEmpty { tabs.append(.volumes) }
         if !d.looseChapters.isEmpty { tabs.append(.chapters) }
         if !d.specials.isEmpty { tabs.append(d.volumes.isEmpty && d.looseChapters.isEmpty ? .books : .specials) }
-        if let order = readingOrder {
+        if let order = readingOrders.first {
             // First (and open by default) on the main series, e.g. Spawn; last on its side series.
             if orderStore.isHost(order, seriesName: seriesName) { tabs.insert(.order, at: 0) } else { tabs.append(.order) }
         }
@@ -262,7 +269,7 @@ struct SeriesDetailView: View {
     }
 
     private var seriesName: String { series?.name ?? route.name }
-    private var readingOrder: ReadingOrder? { orderStore.orders(for: seriesName).first }
+    private var readingOrders: [ReadingOrder] { orderStore.orders(for: seriesName) }
 
     private func tabLabel(_ t: DetailTab, _ d: SeriesDetail) -> String {
         t == .chapters ? d.chapterNoun : t.rawValue
@@ -311,10 +318,10 @@ struct SeriesDetailView: View {
     private func cards(_ d: SeriesDetail) -> some View {
         let tabs = availableTabs(d)
         let selected = tab.flatMap { tabs.contains($0) ? $0 : nil } ?? tabs.first
-        if selected == .order, let order = readingOrder {
-            ReadingOrderSection(order: order, client: client, hideRead: hideRead) { chapterId, ids in
-                reader = ReaderLaunch(chapterId: chapterId, order: ids)
-            }
+        if selected == .order, !readingOrders.isEmpty {
+            ReadingOrderSection(orders: readingOrders, seriesName: seriesName, client: client, hideRead: hideRead,
+                                open: { chapterId, ids in reader = ReaderLaunch(chapterId: chapterId, order: ids) },
+                                addOrder: { showImportOrder = true })
         } else {
         CardGrid {
             switch selected {
@@ -436,6 +443,7 @@ struct SeriesDetailView: View {
             }
             Button("Add to collection…", systemImage: "square.stack.3d.up") { showCollections = true }
             Button("Bookmarks", systemImage: "bookmark") { showBookmarks = true }
+            Button("Add reading order…", systemImage: "list.number") { showImportOrder = true }
             Divider()
             Menu {
                 ForEach(Self.nextCounts, id: \.self) { n in
