@@ -29,6 +29,8 @@ struct HomeView: View {
                     heroCard(hero)
                 }
 
+                ShelvesRow(client: client)
+
                 if !onDeck.isEmpty {
                     carousel("On Deck") {
                         ForEach(onDeck) { series in

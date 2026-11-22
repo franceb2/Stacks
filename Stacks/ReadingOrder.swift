@@ -72,6 +72,20 @@ final class ReadingOrderStore: ObservableObject {
         return matching.filter { isHost($0, seriesName: seriesName) } + matching.filter { !isHost($0, seriesName: seriesName) }
     }
 
+    /// Orders added to a shelf, plus orders hosted by any series on it (like Spawn's on a Spawn shelf).
+    func orders(forShelf shelfId: String, seriesNames: [String]) -> [ReadingOrder] {
+        let keys = Set(seriesNames.map(TitleKey.make))
+        let own = orders.filter { $0.hosts.contains("shelf:\(shelfId)") }
+        let hosted = orders.filter { o in !own.contains { $0.id == o.id } && o.hosts.contains { keys.contains(TitleKey.make($0)) } }
+        return own + hosted
+    }
+
+    /// Every series in your library (cached for a few minutes).
+    func allSeries(client: KavitaClient, force: Bool = false) async -> [Series] {
+        _ = await libraryIndex(client: client, force: force)
+        return library
+    }
+
     /// True when this series is the main one for the order (the tab opens first there).
     func isHost(_ order: ReadingOrder, seriesName: String) -> Bool {
         let key = TitleKey.make(seriesName)

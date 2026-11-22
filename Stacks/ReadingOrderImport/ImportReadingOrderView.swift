@@ -26,6 +26,8 @@ extension ReadingOrderBuilder {
 struct ImportReadingOrderView: View {
     let client: KavitaClient
     let seriesName: String
+    /// Attach the order to this instead of the series (a shelf uses "shelf:<id>").
+    var hostId: String? = nil
     let onSaved: (ReadingOrder) -> Void
 
     private enum Source: String, CaseIterable, Identifiable {
@@ -350,7 +352,7 @@ struct ImportReadingOrderView: View {
             title: title.trimmingCharacters(in: .whitespaces),
             credit: credit,
             note: nil,
-            hosts: [seriesName],
+            hosts: [hostId ?? seriesName],
             entries: list,
             years: nil,
             source: ReadingOrder.Source(link: origin.link, fileName: origin.fileName, colors: Array(keptColors),
