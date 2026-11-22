@@ -244,6 +244,19 @@ final class Downloads: ObservableObject {
         jobs = [:]
     }
 
+    /// When a file was changed on the PC (pages added or removed), the copy on the phone no longer lines up
+    /// with Kavita's page numbers. Throws it away and downloads the new version.
+    func replaceIfChanged(client: KavitaClient, chapterId: Int, serverPages: Int) {
+        guard serverPages > 0, jobs[chapterId] == nil, let item = items[chapterId],
+              item.info.pages != serverPages else { return }
+        let wasWhole = item.requested.map { $0.count >= item.info.pages } ?? (item.pages.count >= item.info.pages)
+        delete(chapterId)
+        if wasWhole {
+            start(client: client, chapterId: chapterId, seriesId: item.seriesId, seriesName: item.seriesName,
+                  title: item.title, range: .all)
+        }
+    }
+
     func delete(_ chapterId: Int) {
         cancel(chapterId)
         try? FileManager.default.removeItem(at: folder(chapterId))

@@ -122,6 +122,7 @@ struct ReaderView: View {
         let info: ChapterInfo
         do {
             info = try await client.chapterInfo(chapterId: chapterId)
+            downloads.replaceIfChanged(client: client, chapterId: chapterId, serverPages: info.pages)
         } catch {
             if let item = downloads.items[chapterId] {
                 info = item.info

@@ -74,6 +74,10 @@ final class ConnectionStatus: ObservableObject {
 extension Notification.Name {
     /// Posted when the phone's network connection comes back.
     static let networkReturned = Notification.Name("networkReturned")
+    /// Saved covers were cleared or marked old, so shown covers should load again.
+    static let coversReset = Notification.Name("coversReset")
+    /// One cover changed on the server; the object is its cache key.
+    static let coverChanged = Notification.Name("coverChanged")
 }
 
 /// Saved copies of what the server last sent (libraries, series lists, series pages, lists...),
@@ -116,8 +120,14 @@ final class ImageCache: @unchecked Sendable {
         try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
     }
 
+    /// Covers saved before this moment are checked again with the server (set by a scan or a pull to refresh).
+    private var staleBefore: Date {
+        get { UserDefaults.standard.object(forKey: "coversStaleBefore") as? Date ?? .distantPast }
+        set { UserDefaults.standard.set(newValue, forKey: "coversStaleBefore") }
+    }
+
     /// Same picture regardless of which Auth Key is in the address.
-    private func key(_ url: URL) -> String {
+    func key(_ url: URL) -> String {
         var comps = URLComponents(url: url, resolvingAgainstBaseURL: false)
         let items = comps?.queryItems?.filter { $0.name != "apiKey" }.sorted { $0.name < $1.name }
         comps?.queryItems = items
@@ -129,7 +139,12 @@ final class ImageCache: @unchecked Sendable {
         memory.object(forKey: key(url) as NSString)
     }
 
-    /// Shows the saved copy right away; refreshes it from the server when it's a few days old.
+    private func savedAt(_ file: URL) -> Date? {
+        try? file.resourceValues(forKeys: [.contentModificationDateKey]).contentModificationDate
+    }
+
+    /// Shows the saved copy right away, then checks the server in the background when the copy is
+    /// more than a few hours old (or older than the last scan). A changed cover replaces itself on screen.
     func image(for url: URL) async -> UIImage? {
         let k = key(url)
         if let hit = memory.object(forKey: k as NSString) { return hit }
@@ -137,20 +152,47 @@ final class ImageCache: @unchecked Sendable {
         if let data = try? Data(contentsOf: file), let img = UIImage(data: data) {
             let decoded = img.preparingForDisplay() ?? img
             memory.setObject(decoded, forKey: k as NSString)
-            let age = (try? file.resourceValues(forKeys: [.contentModificationDateKey]).contentModificationDate)
-                .map { Date().timeIntervalSince($0) } ?? 0
-            if age > 3 * 86_400 { Task.detached { await self.refresh(url, key: k, file: file) } }
+            let saved = savedAt(file) ?? .distantPast
+            if Date().timeIntervalSince(saved) > 6 * 3600 || saved < staleBefore {
+                Task.detached { await self.refresh(url, key: k, file: file, previous: data) }
+            }
             return decoded
         }
-        return await refresh(url, key: k, file: file)
+        return await refresh(url, key: k, file: file, previous: nil)
+    }
+
+    /// Marks every saved cover as old, so each one checks the server the next time it's shown.
+    func markAllStale() {
+        staleBefore = Date()
+        memory.removeAllObjects()
+        NotificationCenter.default.post(name: .coversReset, object: nil)
+    }
+
+    /// Forgets these covers and loads them again.
+    func reload(_ urls: [URL?]) {
+        for url in urls.compactMap({ $0 }) {
+            let k = key(url)
+            memory.removeObject(forKey: k as NSString)
+            try? FileManager.default.removeItem(at: dir.appendingPathComponent(k))
+        }
+        NotificationCenter.default.post(name: .coversReset, object: nil)
+    }
+
+    /// Deletes every saved cover. Shown covers load again from the server.
+    func clearAll() {
+        memory.removeAllObjects()
+        try? FileManager.default.removeItem(at: dir)
+        try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        URLCache.shared.removeAllCachedResponses()
+        NotificationCenter.default.post(name: .coversReset, object: nil)
     }
 
     /// Saves a cover to disk if it isn't there yet (no decoding, used for background saving).
     func warm(_ url: URL?) async {
         guard let url else { return }
         let file = dir.appendingPathComponent(key(url))
-        if FileManager.default.fileExists(atPath: file.path) { return }
-        var req = URLRequest(url: url)
+        if let saved = savedAt(file), saved >= staleBefore { return }
+        var req = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData)
         req.setValue(KavitaClient.clientHeader, forHTTPHeaderField: "X-Kavita-Client")
         guard let (data, response) = try? await URLSession.shared.data(for: req),
               (response as? HTTPURLResponse)?.statusCode == 200, data.count > 64 else { return }
@@ -158,15 +200,18 @@ final class ImageCache: @unchecked Sendable {
     }
 
     @discardableResult
-    private func refresh(_ url: URL, key k: String, file: URL) async -> UIImage? {
-        var req = URLRequest(url: url)
+    private func refresh(_ url: URL, key k: String, file: URL, previous: Data?) async -> UIImage? {
+        var req = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData)
         req.setValue(KavitaClient.clientHeader, forHTTPHeaderField: "X-Kavita-Client")
         guard let (data, response) = try? await URLSession.shared.data(for: req),
               (response as? HTTPURLResponse)?.statusCode == 200,
               let img = UIImage(data: data) else { return nil }
-        try? data.write(to: file, options: .atomic)
+        try? data.write(to: file, options: .atomic)   // also marks it as checked just now
         let decoded = img.preparingForDisplay() ?? img
         memory.setObject(decoded, forKey: k as NSString)
+        if let previous, previous != data {
+            await MainActor.run { NotificationCenter.default.post(name: .coverChanged, object: k) }
+        }
         return decoded
     }
 }
@@ -176,6 +221,7 @@ struct CachedImage<Placeholder: View>: View {
     let url: URL?
     @ViewBuilder let placeholder: () -> Placeholder
     @State private var image: UIImage?
+    @State private var generation = 0
 
     init(url: URL?, @ViewBuilder placeholder: @escaping () -> Placeholder) {
         self.url = url
@@ -191,11 +237,15 @@ struct CachedImage<Placeholder: View>: View {
                 placeholder()
             }
         }
-        .task(id: url) {
+        .task(id: "\(url?.absoluteString ?? "")#\(generation)") {
             guard let url else { return }
             if let loaded = await ImageCache.shared.image(for: url) {
                 withAnimation(.easeOut(duration: 0.2)) { image = loaded }
             }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .coversReset)) { _ in generation += 1 }
+        .onReceive(NotificationCenter.default.publisher(for: .coverChanged)) { note in
+            if let url, note.object as? String == ImageCache.shared.key(url) { generation += 1 }
         }
     }
 }

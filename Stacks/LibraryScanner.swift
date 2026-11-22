@@ -35,6 +35,7 @@ final class LibraryScanner: ObservableObject {
                 try? await Task.sleep(nanoseconds: delay * 1_000_000_000)
                 if Task.isCancelled { return }
                 ReadingOrderStore.shared.invalidateLibrary()
+                ImageCache.shared.markAllStale()   // covers Kavita regenerated get picked up
                 NotificationCenter.default.post(name: .readingProgressChanged, object: nil)
             }
             scanning = false

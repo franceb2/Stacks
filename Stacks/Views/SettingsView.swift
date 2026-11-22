@@ -10,6 +10,7 @@ struct SettingsView: View {
     @State private var confirmDelete = false
     @State private var confirmSignOut = false
     @State private var resetDone = false
+    @State private var coversReloaded = false
     @State private var autoCount = AutoDownload.count
     @State private var autoWifiOnly = AutoDownload.wifiOnly
     @State private var mangaRTL = ReaderPrefsStore.mangaRightToLeft
@@ -189,11 +190,18 @@ struct SettingsView: View {
                     Button("Save library now") {
                         Task { await offlineLibrary.refresh(client: client, force: true) }
                     }
+                    Button("Reload all covers") {
+                        ImageCache.shared.clearAll()
+                        coversReloaded = true
+                        Task { await offlineLibrary.refresh(client: client, force: true) }
+                    }
                 }
             } header: {
                 Text("Offline library")
             } footer: {
-                Text("Your libraries, series pages, lists and covers (including issue and volume covers) are saved in the background so you can browse with no connection. No pages are downloaded. Series pages and covers save on Wi-Fi.")
+                Text(coversReloaded
+                     ? "Saved covers cleared. They'll load fresh from Kavita as you browse."
+                     : "Your libraries, series pages, lists and covers are saved in the background so you can browse with no connection. No pages are downloaded. Covers check Kavita for changes every few hours; \"Reload all covers\" does it now.")
             }
             .listRowBackground(Theme.card)
 

@@ -85,7 +85,15 @@ struct SeriesDetailView: View {
             }
         }
         .task { await load() }
-        .refreshable { await load() }
+        .refreshable {
+            await load()
+            // Pulling down also re-fetches this series' covers, in case they changed on the PC.
+            if let detail {
+                ImageCache.shared.reload([client.seriesCoverURL(route.id)]
+                                         + detail.volumes.map { client.volumeCoverURL($0.id) }
+                                         + detail.allChapters.map { client.chapterCoverURL($0.id) })
+            }
+        }
         .fullScreenCover(item: $reader, onDismiss: {
             Task { await load() }
             NotificationCenter.default.post(name: .readingProgressChanged, object: nil)
@@ -601,6 +609,9 @@ struct SeriesDetailView: View {
             async let c = client.continuePoint(seriesId: route.id)
             series = try await s
             detail = try await d
+            for c in detail?.allChapters ?? [] where downloads.items[c.id] != nil {
+                downloads.replaceIfChanged(client: client, chapterId: c.id, serverPages: c.pages)
+            }
             metadata = try? await m
             continueChapter = try? await c
             wantToRead = try? await client.isWantToRead(route.id)

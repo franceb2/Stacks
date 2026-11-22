@@ -176,7 +176,10 @@ struct SeriesGridView: View {
             guard !Task.isCancelled else { return }
             await reload()
         }
-        .refreshable { await reload() }
+        .refreshable {
+            ImageCache.shared.markAllStale()
+            await reload()
+        }
         .onReceive(NotificationCenter.default.publisher(for: .readingProgressChanged)) { _ in
             Task { await reload() }
         }

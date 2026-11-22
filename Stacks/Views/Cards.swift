@@ -6,17 +6,16 @@ struct CoverImage: View {
     var localFile: URL? = nil
 
     var body: some View {
-        Group {
+        // The server's cover (kept up to date) first; the downloaded copy only when that can't load.
+        CachedImage(url: url) {
             if let localFile, let image = UIImage(contentsOfFile: localFile.path) {
-                Image(uiImage: image).resizable().aspectRatio(contentMode: .fill)
+                Image(uiImage: image).resizable()
             } else {
-                CachedImage(url: url) {
-                    Rectangle().fill(Theme.card)
-                        .overlay(Image(systemName: "book.closed").foregroundStyle(Theme.muted))
-                }
-                .aspectRatio(contentMode: .fill)
+                Rectangle().fill(Theme.card)
+                    .overlay(Image(systemName: "book.closed").foregroundStyle(Theme.muted))
             }
         }
+        .aspectRatio(contentMode: .fill)
         .frame(minWidth: 0, maxWidth: .infinity)
         .aspectRatio(2.0 / 3.0, contentMode: .fit)
         .clipped()
