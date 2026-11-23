@@ -32,6 +32,8 @@ struct ReaderActions {
     let goToNext: () -> Void
     let goToPrevious: () -> Void
     let close: () -> Void
+    /// Reading-order issues between this one and the next that aren't in your library.
+    var missingBeforeNext: [String] = []
 }
 
 /// Full-screen reader shell: loads chapter info and saved progress (from the server, or from the phone
@@ -53,6 +55,8 @@ struct ReaderView: View {
     @State private var lastSaved: Int?
     @State private var moved = false
     @State private var autoDownloaded: Set<Int> = []
+    @State private var missingBeforeNext: [String] = []
+    @State private var confirmSkip = false
 
     /// Open the first chapter at this page instead of the saved spot (used by bookmarks).
     @State private var pageOverride: Int?
@@ -93,6 +97,14 @@ struct ReaderView: View {
         .task(id: chapterId) { await load() }
         .onAppear { UIApplication.shared.isIdleTimerDisabled = true }   // keep the screen on while reading
         .onDisappear { UIApplication.shared.isIdleTimerDisabled = false }
+        .alert(missingBeforeNext.count == 1 ? "You don't have the next issue yet"
+                                            : "You don't have the next \(missingBeforeNext.count) issues yet",
+               isPresented: $confirmSkip) {
+            Button("Skip to the next one I have") { if let next = nextChapterId { chapterId = next } }
+            Button("Stay here", role: .cancel) {}
+        } message: {
+            Text(missingMessage)
+        }
         .onReceive(NotificationCenter.default.publisher(for: .tourCloseReader)) { _ in
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) { dismiss() }
         }
@@ -104,9 +116,14 @@ struct ReaderView: View {
             finished: { markFinished() },
             nextChapterId: nextChapterId,
             previousChapterId: previousChapterId,
-            goToNext: { if let next = nextChapterId { chapterId = next } },
+            goToNext: {
+                guard let next = nextChapterId else { return }
+                // Warn before jumping over reading-order issues you don't have yet.
+                if missingBeforeNext.isEmpty { chapterId = next } else { confirmSkip = true }
+            },
             goToPrevious: { if let prev = previousChapterId { chapterId = prev } },
-            close: { dismiss() }
+            close: { dismiss() },
+            missingBeforeNext: missingBeforeNext
         )
     }
 
@@ -115,6 +132,7 @@ struct ReaderView: View {
         error = nil
         nextChapterId = nil
         previousChapterId = nil
+        missingBeforeNext = []
         lastSaved = nil
         moved = false
 
@@ -161,6 +179,7 @@ struct ReaderView: View {
             // Works offline too: the order is already known.
             nextChapterId = i + 1 < order.count ? order[i + 1] : nil
             previousChapterId = i > 0 ? order[i - 1] : nil
+            missingBeforeNext = ReadingOrderStore.shared.missingAfter(chapterId, orderIds: order)
         } else if !offline {
             nextChapterId = await next(after: chapterId, info: info)
             if let listId = readingListId {
@@ -170,6 +189,12 @@ struct ReaderView: View {
                                                                        chapterId: chapterId)) ?? nil
             }
         }
+    }
+
+    private var missingMessage: String {
+        let shown = missingBeforeNext.prefix(6).joined(separator: "\n")
+        let more = missingBeforeNext.count > 6 ? "\nand \(missingBeforeNext.count - 6) more" : ""
+        return "Next in the reading order:\n\(shown)\(more)\n\nThey aren't in your library. Add them on your PC, then scan."
     }
 
     /// The chapter after this one: next in the reading list, or next in the series.
@@ -269,6 +294,20 @@ struct EndOfChapterView: View {
                 .font(.system(size: 48))
                 .foregroundStyle(Theme.primary)
             Text("Finished").font(.title2.bold()).foregroundStyle(.white)
+            if !actions.missingBeforeNext.isEmpty {
+                VStack(spacing: 4) {
+                    Label(actions.missingBeforeNext.count == 1 ? "Next issue isn't in your library"
+                                                                : "Next \(actions.missingBeforeNext.count) issues aren't in your library",
+                          systemImage: "exclamationmark.triangle.fill")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(Theme.primary)
+                    Text(actions.missingBeforeNext.prefix(3).joined(separator: " · ")
+                         + (actions.missingBeforeNext.count > 3 ? " · …" : ""))
+                        .font(.caption).foregroundStyle(.white.opacity(0.7))
+                        .multilineTextAlignment(.center)
+                }
+                .padding(.horizontal, 30)
+            }
             if actions.nextChapterId != nil {
                 Button {
                     actions.goToNext()

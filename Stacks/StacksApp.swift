@@ -61,7 +61,7 @@ struct StacksApp: App {
             .tint(Theme.primary)
             .preferredColorScheme(.dark)
             .onChange(of: themeRaw) { _, raw in
-                AppTheme.current = AppTheme(rawValue: raw) ?? .kavita
+                AppTheme.current = AppTheme.named(raw)
                 Self.applyBarAppearance()
             }
         }

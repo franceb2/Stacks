@@ -92,6 +92,20 @@ final class ReadingOrderStore: ObservableObject {
         return nil
     }
 
+    /// Entries between this chapter and the next one you have, in the order these ids came from:
+    /// the issues the reader is about to skip because they aren't in your library.
+    func missingAfter(_ chapterId: Int, orderIds ids: [Int]) -> [String] {
+        guard let order = orders.first(where: { chapterIds($0) == ids }) ?? orders.first(where: { chapterIds($0).contains(chapterId) }),
+              let entries = resolved[order.id],
+              let i = entries.firstIndex(where: { $0.chapter?.id == chapterId }) else { return [] }
+        var labels: [String] = []
+        for e in entries[(i + 1)...] {
+            if e.chapter != nil { break }
+            labels.append(e.entry.label)
+        }
+        return labels
+    }
+
     /// Every series in your library (cached for a few minutes).
     func allSeries(client: KavitaClient, force: Bool = false) async -> [Series] {
         _ = await libraryIndex(client: client, force: force)

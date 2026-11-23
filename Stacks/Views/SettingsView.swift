@@ -35,11 +35,11 @@ struct SettingsView: View {
                                 AppTheme.select(theme)
                             } label: {
                                 VStack(spacing: 6) {
-                                    ThemeSwatch(theme: theme, selected: themeRaw == theme.rawValue)
+                                    ThemeSwatch(theme: theme, selected: AppTheme.named(themeRaw) == theme)
                                         .frame(width: 46, height: 46)
                                     Text(theme.name)
                                         .font(.caption2)
-                                        .foregroundStyle(themeRaw == theme.rawValue ? Theme.text : Theme.muted)
+                                        .foregroundStyle(AppTheme.named(themeRaw) == theme ? Theme.text : Theme.muted)
                                         .lineLimit(1)
                                         .minimumScaleFactor(0.7)
                                 }
@@ -50,10 +50,10 @@ struct SettingsView: View {
                     .padding(.vertical, 6)
                 } label: {
                     HStack(spacing: 12) {
-                        ThemeSwatch(theme: AppTheme(rawValue: themeRaw) ?? .kavita, selected: false)
+                        ThemeSwatch(theme: AppTheme.named(themeRaw), selected: false)
                             .frame(width: 28, height: 28)
                         VStack(alignment: .leading, spacing: 2) {
-                            Text((AppTheme(rawValue: themeRaw) ?? .kavita).name).foregroundStyle(Theme.text)
+                            Text((AppTheme.named(themeRaw)).name).foregroundStyle(Theme.text)
                             Text("\(AppTheme.allCases.count) themes").font(.caption).foregroundStyle(Theme.muted)
                         }
                     }
