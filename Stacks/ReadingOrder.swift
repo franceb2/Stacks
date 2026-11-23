@@ -197,11 +197,24 @@ final class ReadingOrderStore: ObservableObject {
                     let have = Set(d.allChapters.compactMap { TitleKey.number($0.number) ?? TitleKey.number($0.range) })
                     return need.intersection(have).count
                 }
-                // Most matches wins; ties go to the oldest run.
+                func size(_ s: Series) -> Int { details[s.id]?.allChapters.count ?? 0 }
+                // Most matching issues wins. On a tie, the bigger run (a one-shot also counts as "#1", so
+                // "Brit #1" should land on the ongoing series, not the one-shot), then the oldest.
                 chosen[k] = byYear.max { a, b in
                     let ha = hits(a.0), hb = hits(b.0)
-                    return ha != hb ? ha < hb : (a.1 ?? 0) > (b.1 ?? 0)
+                    if ha != hb { return ha < hb }
+                    let sa = size(a.0), sb = size(b.0)
+                    if sa != sb { return sa < sb }
+                    return (a.1 ?? 0) > (b.1 ?? 0)
                 }?.0
+            } else if e.number == nil {
+                // A one-shot: prefer a series that is just one issue, or is named as a one-shot.
+                await fetch(candidates.map(\.id))
+                let single = byYear.first { details[$0.0.id]?.allChapters.count == 1 }?.0
+                let named = candidates.first {
+                    $0.name.range(of: "one[- ]?shot", options: [.regularExpression, .caseInsensitive]) != nil
+                }
+                chosen[k] = named ?? single ?? byYear.first?.0
             } else {
                 chosen[k] = byYear.first?.0
             }
@@ -210,26 +223,47 @@ final class ReadingOrderStore: ObservableObject {
         // 3. Each chosen series' issues, by number.
         await fetch(chosen.values.map(\.id))
 
-        // 4. Line them up.
+        // 4. Line them up. Numbered issues first, so a one-shot never takes an issue the order lists by number.
+        var picked: [Int: Chapter] = [:]
+        var used: Set<Int> = []
+        for (index, e) in order.entries.enumerated() {
+            guard let s = chosen[groupKey(e)], let d = details[s.id] else { continue }
+            let chapters = d.allChapters.filter { !$0.isWholeVolume }
+            var chapter: Chapter?
+            if let n = TitleKey.number(e.number) {
+                chapter = chapters.first { TitleKey.number($0.number) == n || TitleKey.number($0.range) == n }
+            } else if let v = e.volume,
+                      let volume = d.volumes.first(where: { $0.number == v || $0.minNumber == Double(v) }),
+                      let first = volume.chapters?.first {
+                chapter = first
+            }
+            if let chapter {
+                picked[index] = chapter
+                used.insert(chapter.id)
+            }
+        }
+        for (index, e) in order.entries.enumerated() where picked[index] == nil && e.number == nil {
+            guard let s = chosen[groupKey(e)], let d = details[s.id] else { continue }
+            let all = d.allChapters
+            let free = all.filter { !used.contains($0.id) }
+            // Something marked as a one-shot or special, or with no real issue number, before any issue.
+            let oneShotLike = free.first { c in
+                let text = "\(c.title ?? "") \(c.titleName ?? "") \(c.range ?? "")"
+                if text.range(of: "one[- ]?shot", options: [.regularExpression, .caseInsensitive]) != nil { return true }
+                if c.isSpecial { return true }
+                guard let n = TitleKey.number(c.number) ?? TitleKey.number(c.range) else { return true }
+                return n <= 0
+            }
+            // Otherwise leave it as "not in your library" rather than guess an unrelated issue.
+            if let chapter = oneShotLike ?? (all.count == 1 ? free.first : nil) {
+                picked[index] = chapter
+                used.insert(chapter.id)
+            }
+        }
         var out: [ResolvedEntry] = []
         for (index, e) in order.entries.enumerated() {
             let s = chosen[groupKey(e)]
-            var chapter: Chapter?
-            if let s, let d = details[s.id] {
-                let chapters = d.allChapters.filter { !$0.isWholeVolume }
-                if let n = TitleKey.number(e.number) {
-                    chapter = chapters.first {
-                        TitleKey.number($0.number) == n || TitleKey.number($0.range) == n
-                    }
-                } else if let v = e.volume,
-                          let volume = d.volumes.first(where: { $0.number == v || $0.minNumber == Double(v) }),
-                          let first = volume.chapters?.first {
-                    chapter = first
-                } else {
-                    chapter = chapters.first ?? d.allChapters.first  // one-shot
-                }
-            }
-            out.append(ResolvedEntry(index: index, entry: e, seriesId: s?.id, seriesName: s?.name, chapter: chapter))
+            out.append(ResolvedEntry(index: index, entry: e, seriesId: s?.id, seriesName: s?.name, chapter: picked[index]))
         }
         resolved[order.id] = out
         lastResolved[order.id] = Date()
