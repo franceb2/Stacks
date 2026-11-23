@@ -95,8 +95,14 @@ struct ReaderView: View {
         }
         .preferredColorScheme(.dark)
         .task(id: chapterId) { await load() }
-        .onAppear { UIApplication.shared.isIdleTimerDisabled = true }   // keep the screen on while reading
-        .onDisappear { UIApplication.shared.isIdleTimerDisabled = false }
+        .onAppear {
+            UIApplication.shared.isIdleTimerDisabled = true   // keep the screen on while reading
+            ThemeRotation.readerOpen = true                   // and don't switch themes mid-read
+        }
+        .onDisappear {
+            UIApplication.shared.isIdleTimerDisabled = false
+            ThemeRotation.readerOpen = false
+        }
         .alert(missingBeforeNext.count == 1 ? "You don't have the next issue yet"
                                             : "You don't have the next \(missingBeforeNext.count) issues yet",
                isPresented: $confirmSkip) {

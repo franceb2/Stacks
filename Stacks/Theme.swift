@@ -216,6 +216,61 @@ enum AppTheme: String, CaseIterable, Identifiable {
     }
 }
 
+/// Switches to a different theme on its own: each time you open the app, every hour, or every day.
+/// It only switches when you open or come back to the app, never while you're reading, because changing
+/// the theme redraws everything.
+enum ThemeRotation: String, CaseIterable, Identifiable {
+    case off, onOpen, hourly, daily
+
+    var id: String { rawValue }
+
+    var label: String {
+        switch self {
+        case .off: return "Off"
+        case .onOpen: return "Each time you open the app"
+        case .hourly: return "Every hour"
+        case .daily: return "Every day"
+        }
+    }
+
+    static var current: ThemeRotation {
+        get { ThemeRotation(rawValue: UserDefaults.standard.string(forKey: "themeRotation") ?? "") ?? .off }
+        set {
+            UserDefaults.standard.set(newValue.rawValue, forKey: "themeRotation")
+            lastChange = Date()
+        }
+    }
+
+    static var lastChange: Date {
+        get { UserDefaults.standard.object(forKey: "themeRotatedAt") as? Date ?? .distantPast }
+        set { UserDefaults.standard.set(newValue, forKey: "themeRotatedAt") }
+    }
+
+    /// When the app last went to the background.
+    static var leftAt: Date?
+
+    /// True while a comic or book is open, so the theme never changes mid-read.
+    nonisolated(unsafe) static var readerOpen = false
+
+    /// Picks the theme to switch to, or nil when it isn't time. `launch` is a fresh start of the app.
+    static func due(launch: Bool, now: Date = Date()) -> AppTheme? {
+        guard !readerOpen else { return nil }
+        switch current {
+        case .off:
+            return nil
+        case .onOpen:
+            // A fresh start, or coming back after at least 15 minutes away.
+            guard launch || (leftAt.map { now.timeIntervalSince($0) >= 15 * 60 } ?? false) else { return nil }
+        case .hourly:
+            guard now.timeIntervalSince(lastChange) >= 3600 else { return nil }
+        case .daily:
+            guard !Calendar.current.isDate(lastChange, inSameDayAs: now) else { return nil }
+        }
+        lastChange = now
+        return AppTheme.allCases.filter { $0 != AppTheme.current }.randomElement()
+    }
+}
+
 /// Colors for the current theme (Kavita's dark theme by default).
 enum Theme {
     static var primary: Color { Color(hex: AppTheme.current.accent) }

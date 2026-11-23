@@ -18,6 +18,10 @@ struct StacksApp: App {
 
         // Bigger image cache so covers still show when the server is unreachable.
         URLCache.shared = URLCache(memoryCapacity: 40_000_000, diskCapacity: 300_000_000)
+        // Theme rotation: pick the new theme before anything is drawn.
+        if let next = ThemeRotation.due(launch: true) {
+            AppTheme.select(next)
+        }
         Self.applyBarAppearance()
     }
 
@@ -54,7 +58,12 @@ struct StacksApp: App {
                 if lock.locked { LockScreen(lock: lock) }
             }
             .onChange(of: phase) { _, newPhase in
-                if newPhase == .background { lock.lockIfEnabled() }
+                if newPhase == .background {
+                    lock.lockIfEnabled()
+                    ThemeRotation.leftAt = Date()
+                } else if newPhase == .active, let next = ThemeRotation.due(launch: false) {
+                    AppTheme.select(next)
+                }
             }
             .environmentObject(session)
             .environmentObject(downloads)

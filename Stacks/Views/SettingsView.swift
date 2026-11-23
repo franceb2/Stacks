@@ -11,6 +11,7 @@ struct SettingsView: View {
     @State private var confirmSignOut = false
     @State private var resetDone = false
     @State private var linkCopied = false
+    @State private var rotation = ThemeRotation.current
     @AppStorage("themesOpen") private var themesOpen = false
     @State private var coversReloaded = false
     @State private var autoCount = AutoDownload.count
@@ -28,7 +29,7 @@ struct SettingsView: View {
 
     var body: some View {
         Form {
-            Section("Theme") {
+            Section {
                 DisclosureGroup(isExpanded: $themesOpen) {
                     LazyVGrid(columns: [GridItem(.adaptive(minimum: 62), spacing: 12)], spacing: 14) {
                         ForEach(AppTheme.allCases) { theme in
@@ -60,8 +61,19 @@ struct SettingsView: View {
                     }
                 }
                 .tint(Theme.primary)
+
+                Picker("Change theme", selection: $rotation) {
+                    ForEach(ThemeRotation.allCases) { Text($0.label).tag($0) }
+                }
+            } header: {
+                Text("Theme")
+            } footer: {
+                if rotation != .off {
+                    Text("Switches to a random different theme when you open or come back to the app, never while you're reading.")
+                }
             }
             .listRowBackground(Theme.card)
+            .onChange(of: rotation) { _, value in ThemeRotation.current = value }
 
             Section("Updates") {
                 LabeledContent("Installed", value: "\(updates.installedVersion) (build \(updates.installedBuild))")
