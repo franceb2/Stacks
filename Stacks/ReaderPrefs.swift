@@ -55,6 +55,8 @@ struct ComicPrefs: Codable, Equatable {
     var doublePage = false
     /// Tap the left or right side to turn pages. When off, taps only show the menu.
     var tapToTurn = true
+    /// Panel by panel: zoom to one panel at a time. Off by default.
+    var panelView = false
 
     init() {}
 
@@ -66,6 +68,7 @@ struct ComicPrefs: Codable, Equatable {
         background = try c.decodeIfPresent(ReaderBackground.self, forKey: .background) ?? .black
         doublePage = try c.decodeIfPresent(Bool.self, forKey: .doublePage) ?? false
         tapToTurn = try c.decodeIfPresent(Bool.self, forKey: .tapToTurn) ?? true
+        panelView = try c.decodeIfPresent(Bool.self, forKey: .panelView) ?? false
     }
 }
 

@@ -153,6 +153,8 @@ struct SettingsView: View {
                     .disabled(comic.mode != .leftRight)
                 Toggle("Tap sides to turn pages", isOn: $comic.tapToTurn)
                     .disabled(comic.mode == .webtoon)
+                Toggle("Panel by panel", isOn: $comic.panelView)
+                    .disabled(comic.mode == .webtoon)
                 Toggle("Manga reads right to left", isOn: $mangaRTL)
                 Picker("Image scaling", selection: $comic.scaling) {
                     ForEach(ScalingMode.allCases) { Text($0.label).tag($0) }

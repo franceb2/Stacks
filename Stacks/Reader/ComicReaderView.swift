@@ -43,10 +43,17 @@ struct ComicReaderView: View {
         ZStack {
             prefs.background.color.ignoresSafeArea()
 
-            switch prefs.mode {
-            case .leftRight: horizontalPager
-            case .upDown: verticalPager
-            case .webtoon: webtoon
+            if prefs.panelView && prefs.mode != .webtoon {
+                PanelPager(store: store, chapterId: context.chapterId, pageCount: pageCount, page: $page,
+                           rightToLeft: prefs.rightToLeft, offline: context.offline, tapToTurn: prefs.tapToTurn,
+                           background: prefs.background.color, actions: actions,
+                           toggleChrome: { withAnimation(.easeOut(duration: 0.15)) { showChrome.toggle() } })
+            } else {
+                switch prefs.mode {
+                case .leftRight: horizontalPager
+                case .upDown: verticalPager
+                case .webtoon: webtoon
+                }
             }
 
             if showChrome { chrome.transition(.opacity) }
@@ -260,6 +267,17 @@ struct ComicReaderView: View {
                 if context.offline {
                     Image(systemName: "wifi.slash").foregroundStyle(Theme.muted)
                 }
+                if prefs.mode != .webtoon {
+                    // Panel by panel on/off.
+                    Button {
+                        withAnimation(.easeInOut(duration: 0.25)) { prefs.panelView.toggle() }
+                    } label: {
+                        Image(systemName: prefs.panelView ? "rectangle.split.2x2.fill" : "rectangle.split.2x2")
+                            .font(.headline).frame(width: 36, height: 36)
+                            .foregroundStyle(prefs.panelView ? Theme.primary : .white)
+                    }
+                    .accessibilityLabel(prefs.panelView ? "Turn off panel by panel" : "Read panel by panel")
+                }
                 if !context.offline {
                     Button { toggleBookmark() } label: {
                         Image(systemName: bookmarks.contains(shownPage) ? "bookmark.fill" : "bookmark")
@@ -341,6 +359,8 @@ struct ComicSettingsSheet: View {
                         .disabled(prefs.mode != .leftRight)
                     Toggle("Two pages when sideways", isOn: $prefs.doublePage)
                         .disabled(prefs.mode != .leftRight)
+                    Toggle("Panel by panel", isOn: $prefs.panelView)
+                        .disabled(prefs.mode == .webtoon)
                     Toggle("Tap sides to turn pages", isOn: $prefs.tapToTurn)
                         .disabled(prefs.mode == .webtoon)
                     Picker("Image scaling", selection: $prefs.scaling) {
@@ -474,7 +494,7 @@ private struct WebtoonPage: View {
     }
 }
 
-private struct PageProblem: View {
+struct PageProblem: View {
     let index: Int
     let offline: Bool
     let retry: () -> Void
