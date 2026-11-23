@@ -174,7 +174,8 @@ final class ReadingOrderStore: ObservableObject {
             return nil
         }
         func groupKey(_ e: ReadingOrder.Entry) -> String {
-            "\(e.series)|\(e.section)|\(order.yearHint(e) ?? 0)|\(e.volume ?? 0)"
+            // One-shots get their own group, so "Brit (One-Shot)" and "Brit #1" can point at different series.
+            "\(e.series)|\(e.section)|\(order.yearHint(e) ?? 0)|\(e.volume ?? 0)|\(e.number == nil ? "oneshot" : "issues")"
         }
         var wanted: [String: Set<Double>] = [:]
         for e in order.entries {
