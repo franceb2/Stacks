@@ -169,10 +169,25 @@ final class ReadingOrderStore: ObservableObject {
             if let n = TitleKey.number(e.number) { wanted[groupKey(e), default: []].insert(n) }
         }
 
+        // Series named "X One-Shot" / "X (One Shot)", keyed by the title without those words.
+        var oneShotSeries: [String: [Series]] = [:]
+        for list in byKey.values {
+            for series in list where series.name.range(of: "one[- ]?shot", options: [.regularExpression, .caseInsensitive]) != nil {
+                let base = series.name.replacingOccurrences(of: "[(\\[]?\\s*one[- ]?shot\\s*[)\\]]?", with: " ",
+                                                            options: [.regularExpression, .caseInsensitive])
+                oneShotSeries[TitleKey.make(base), default: []].append(series)
+            }
+        }
+
         var chosen: [String: Series] = [:]
         for e in order.entries {
             let k = groupKey(e)
             if chosen[k] != nil { continue }
+            // A one-shot can also live in its own series named like "Brit One-Shot"; prefer that.
+            if e.number == nil, e.volume == nil, let own = oneShotSeries[TitleKey.make(e.series)]?.first {
+                chosen[k] = own
+                continue
+            }
             guard let candidates = byKey[TitleKey.make(e.series)], !candidates.isEmpty else { continue }
             if candidates.count == 1 { chosen[k] = candidates[0]; continue }
 
