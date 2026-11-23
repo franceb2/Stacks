@@ -10,6 +10,7 @@ struct SettingsView: View {
     @State private var confirmDelete = false
     @State private var confirmSignOut = false
     @State private var resetDone = false
+    @AppStorage("themesOpen") private var themesOpen = false
     @State private var coversReloaded = false
     @State private var autoCount = AutoDownload.count
     @State private var autoWifiOnly = AutoDownload.wifiOnly
@@ -27,32 +28,37 @@ struct SettingsView: View {
     var body: some View {
         Form {
             Section("Theme") {
-                LazyVGrid(columns: [GridItem(.adaptive(minimum: 62), spacing: 12)], spacing: 14) {
-                    ForEach(AppTheme.allCases) { theme in
-                        Button {
-                            AppTheme.select(theme)
-                        } label: {
-                            VStack(spacing: 6) {
-                                ZStack {
-                                    Circle().fill(Color(hex: theme.background))
-                                    Circle().trim(from: 0, to: 0.5)
-                                        .fill(Color(hex: theme.accent))
-                                        .rotationEffect(.degrees(-45))
-                                    Circle().stroke(themeRaw == theme.rawValue ? Color.white : Color.white.opacity(0.15),
-                                                    lineWidth: themeRaw == theme.rawValue ? 3 : 1)
+                DisclosureGroup(isExpanded: $themesOpen) {
+                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 62), spacing: 12)], spacing: 14) {
+                        ForEach(AppTheme.allCases) { theme in
+                            Button {
+                                AppTheme.select(theme)
+                            } label: {
+                                VStack(spacing: 6) {
+                                    ThemeSwatch(theme: theme, selected: themeRaw == theme.rawValue)
+                                        .frame(width: 46, height: 46)
+                                    Text(theme.name)
+                                        .font(.caption2)
+                                        .foregroundStyle(themeRaw == theme.rawValue ? Theme.text : Theme.muted)
+                                        .lineLimit(1)
+                                        .minimumScaleFactor(0.7)
                                 }
-                                .frame(width: 46, height: 46)
-                                Text(theme.name)
-                                    .font(.caption2)
-                                    .foregroundStyle(themeRaw == theme.rawValue ? Theme.text : Theme.muted)
-                                    .lineLimit(1)
-                                    .minimumScaleFactor(0.8)
                             }
+                            .buttonStyle(.plain)
                         }
-                        .buttonStyle(.plain)
+                    }
+                    .padding(.vertical, 6)
+                } label: {
+                    HStack(spacing: 12) {
+                        ThemeSwatch(theme: AppTheme(rawValue: themeRaw) ?? .kavita, selected: false)
+                            .frame(width: 28, height: 28)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text((AppTheme(rawValue: themeRaw) ?? .kavita).name).foregroundStyle(Theme.text)
+                            Text("\(AppTheme.allCases.count) themes").font(.caption).foregroundStyle(Theme.muted)
+                        }
                     }
                 }
-                .padding(.vertical, 6)
+                .tint(Theme.primary)
             }
             .listRowBackground(Theme.card)
 
@@ -164,16 +170,14 @@ struct SettingsView: View {
             Section {
                 Picker("Download next", selection: $autoCount) {
                     Text("Off").tag(0)
-                    Text("1 issue").tag(1)
-                    Text("2 issues").tag(2)
-                    Text("3 issues").tag(3)
+                    ForEach(AutoDownload.choices, id: \.self) { Text("\($0) issues").tag($0) }
                 }
                 Toggle("Only on Wi-Fi", isOn: $autoWifiOnly)
                     .disabled(autoCount == 0)
             } header: {
                 Text("Auto-download")
             } footer: {
-                Text("When you finish an issue or chapter, the next ones download quietly so they're ready offline. Follows your reading list when you're reading from one.")
+                Text("When you finish an issue or chapter, the next ones download quietly so they're ready offline. They follow the reading order the issue is in (or the reading list you're reading from); otherwise the next issues of that series.")
             }
             .listRowBackground(Theme.card)
 
@@ -265,6 +269,24 @@ struct SettingsView: View {
             Button("Sign out", role: .destructive) { session.signOut() }
         } message: {
             Text("Your downloads stay on the phone.")
+        }
+    }
+}
+
+/// A theme's preview: its background with its trim color, and a ring when it's the one in use.
+struct ThemeSwatch: View {
+    let theme: AppTheme
+    let selected: Bool
+
+    var body: some View {
+        ZStack {
+            Circle().fill(Color(hex: theme.background))
+            Circle().inset(by: 7).fill(Color(hex: theme.card))
+            Circle().trim(from: 0, to: 0.5)
+                .fill(Color(hex: theme.accent))
+                .rotationEffect(.degrees(-45))
+                .padding(10)
+            Circle().stroke(selected ? Color.white : Color.white.opacity(0.15), lineWidth: selected ? 3 : 1)
         }
     }
 }

@@ -80,6 +80,18 @@ final class ReadingOrderStore: ObservableObject {
         return own + hosted
     }
 
+    /// The chapter ids of a reading order that includes this chapter (already-matched orders first, then
+    /// orders that mention this series), or nil when it isn't in any.
+    func orderIds(containing chapterId: Int, seriesName: String, client: KavitaClient) async -> [Int]? {
+        for o in orders(for: seriesName) + orders where chapterIds(o).contains(chapterId) { return chapterIds(o) }
+        for o in orders(for: seriesName) {
+            await resolve(o, client: client)
+            let ids = chapterIds(o)
+            if ids.contains(chapterId) { return ids }
+        }
+        return nil
+    }
+
     /// Every series in your library (cached for a few minutes).
     func allSeries(client: KavitaClient, force: Bool = false) async -> [Series] {
         _ = await libraryIndex(client: client, force: force)

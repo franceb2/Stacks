@@ -29,8 +29,15 @@ final class NetworkMonitor: @unchecked Sendable {
 
 /// Settings for downloading upcoming issues automatically.
 enum AutoDownload {
+    static let choices = [3, 5, 10, 15]
+
+    /// 0 is off. Older settings (1 or 2) round up to 3.
     static var count: Int {
-        get { UserDefaults.standard.object(forKey: "autoDownloadCount") as? Int ?? 2 }
+        get {
+            let saved = UserDefaults.standard.object(forKey: "autoDownloadCount") as? Int ?? 3
+            if saved <= 0 { return 0 }
+            return choices.first { $0 >= saved } ?? choices.last!
+        }
         set { UserDefaults.standard.set(newValue, forKey: "autoDownloadCount") }
     }
     static var wifiOnly: Bool {

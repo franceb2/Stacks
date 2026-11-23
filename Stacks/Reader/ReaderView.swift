@@ -190,6 +190,22 @@ struct ReaderView: View {
         let count = AutoDownload.count
         let client = client
         Task {
+            // Follow a reading order when this issue is in one (even if opened from the series page),
+            // or the reading list you're reading from; otherwise the next issues of this series.
+            var ids = order
+            if ids == nil, readingListId == nil {
+                ids = await ReadingOrderStore.shared.orderIds(containing: context.chapterId,
+                                                              seriesName: context.seriesName, client: client)
+            }
+            if let ids, let i = ids.firstIndex(of: context.chapterId) {
+                for nextId in ids.dropFirst(i + 1).prefix(count) {
+                    guard downloads.items[nextId]?.isComplete != true,
+                          let nextInfo = try? await client.chapterInfo(chapterId: nextId) else { continue }
+                    downloads.start(client: client, chapterId: nextId, seriesId: nextInfo.seriesId,
+                                    seriesName: nextInfo.seriesName ?? "", title: "", range: .all)
+                }
+                return
+            }
             var current = context.chapterId
             var info = context.info
             for _ in 0..<count {
