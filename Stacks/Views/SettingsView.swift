@@ -10,6 +10,7 @@ struct SettingsView: View {
     @State private var confirmDelete = false
     @State private var confirmSignOut = false
     @State private var resetDone = false
+    @State private var linkCopied = false
     @AppStorage("themesOpen") private var themesOpen = false
     @State private var coversReloaded = false
     @State private var autoCount = AutoDownload.count
@@ -65,10 +66,15 @@ struct SettingsView: View {
             Section("Updates") {
                 LabeledContent("Installed", value: "\(updates.installedVersion) (build \(updates.installedBuild))")
                 if let release = updates.available {
-                    Button {
-                        openURL(UpdateChecker.downloadURL)
+                    Menu {
+                        Button("Download IPA", systemImage: "arrow.down.circle") { openURL(UpdateChecker.downloadURL) }
+                        Button("Copy download link", systemImage: "doc.on.doc") {
+                            UIPasteboard.general.string = UpdateChecker.downloadURL.absoluteString
+                            linkCopied = true
+                        }
                     } label: {
-                        Label("Download \(release.name)", systemImage: "arrow.down.circle.fill")
+                        Label(linkCopied ? "Link copied" : "Download \(release.name)",
+                              systemImage: linkCopied ? "checkmark.circle.fill" : "arrow.down.circle.fill")
                     }
                     if !release.notes.isEmpty {
                         Text(release.notes).font(.footnote).foregroundStyle(Theme.muted)

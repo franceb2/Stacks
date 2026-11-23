@@ -128,12 +128,12 @@ struct RootView: View {
 
     var body: some View {
         TabView(selection: $tab) {
-            NavigationStack(path: $homePath) {
-                HomeView(client: client, openDownloads: { tab = .downloads })
+            NavigationStack(path: $listsPath) {
+                ReadingListsView(client: client)
                     .stacksDestinations(client: client)
             }
-            .tabItem { Label("Home", systemImage: "house.fill") }
-            .tag(AppTab.home)
+            .tabItem { Label("Lists", systemImage: "list.bullet.rectangle.fill") }
+            .tag(AppTab.lists)
 
             NavigationStack(path: $libraryPath) {
                 LibrariesView(client: client)
@@ -142,12 +142,12 @@ struct RootView: View {
             .tabItem { Label("Library", systemImage: "books.vertical.fill") }
             .tag(AppTab.library)
 
-            NavigationStack(path: $listsPath) {
-                ReadingListsView(client: client)
+            NavigationStack(path: $homePath) {
+                HomeView(client: client, openDownloads: { tab = .downloads })
                     .stacksDestinations(client: client)
             }
-            .tabItem { Label("Lists", systemImage: "list.bullet.rectangle.fill") }
-            .tag(AppTab.lists)
+            .tabItem { Label("Home", systemImage: "house.fill") }
+            .tag(AppTab.home)
 
             NavigationStack {
                 DownloadsView(client: client)
@@ -166,14 +166,18 @@ struct RootView: View {
         .alert(updates.available.map { "\($0.name) is available" } ?? "Update available",
                isPresented: Binding(get: { updates.shouldAlert },
                                     set: { if !$0 { updates.dismissAlert() } })) {
-            Button("Download") {
+            Button("Download IPA") {
                 openURL(UpdateChecker.downloadURL)
+                updates.dismissAlert()
+            }
+            Button("Copy download link") {
+                UIPasteboard.general.string = UpdateChecker.downloadURL.absoluteString
                 updates.dismissAlert()
             }
             Button("Later", role: .cancel) { updates.dismissAlert() }
         } message: {
             Text("A new version of Stacks is ready." + ((updates.available?.notes).map { $0.isEmpty ? "" : "\n\n\($0)" } ?? "")
-                 + "\n\nDownload it, then install it with Signulous like before.")
+                 + "\n\nDownload the IPA, or copy its link to paste into Signulous.")
         }
         .onReceive(NotificationCenter.default.publisher(for: .openFromShortcut)) { _ in
             shortcutLaunch = QuickActions.pending
