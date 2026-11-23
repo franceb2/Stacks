@@ -1,8 +1,10 @@
 import SwiftUI
 
-/// App color themes. Kavita green is the default; the rest are dark backgrounds with a colored trim.
+/// App color themes. Kavita green is the default. The first set are dark backgrounds with a colored trim;
+/// the second set tint the background and cards too, so each one looks clearly different.
 enum AppTheme: String, CaseIterable, Identifiable {
     case kavita, crimson, cobalt, rose, violet, tangerine, teal, midnight, oled, gold
+    case synthwave, ocean, ember, forest, mocha, arctic, sakura, matrix, hellsKitchen
 
     var id: String { rawValue }
 
@@ -18,6 +20,15 @@ enum AppTheme: String, CaseIterable, Identifiable {
         case .midnight: return "Midnight"
         case .oled: return "OLED Black"
         case .gold: return "Gold"
+        case .synthwave: return "Synthwave"
+        case .ocean: return "Ocean"
+        case .ember: return "Ember"
+        case .forest: return "Forest"
+        case .mocha: return "Mocha"
+        case .arctic: return "Arctic"
+        case .sakura: return "Sakura"
+        case .matrix: return "Matrix"
+        case .hellsKitchen: return "Hell's Kitchen"
         }
     }
 
@@ -34,6 +45,15 @@ enum AppTheme: String, CaseIterable, Identifiable {
         case .midnight: return 0x5B9BF0
         case .oled: return 0x4AC694
         case .gold: return 0xE3AA3B
+        case .synthwave: return 0xFF4FD8
+        case .ocean: return 0x4FD1E8
+        case .ember: return 0xFF6A3D
+        case .forest: return 0xA3D977
+        case .mocha: return 0xD9A774
+        case .arctic: return 0xBFE3FF
+        case .sakura: return 0xF7A8C4
+        case .matrix: return 0x00FF66
+        case .hellsKitchen: return 0xFF3B30
         }
     }
 
@@ -44,6 +64,15 @@ enum AppTheme: String, CaseIterable, Identifiable {
         case .midnight: return 0x0B1322
         case .oled: return 0x000000
         case .gold: return 0x1A1918
+        case .synthwave: return 0x170A2B
+        case .ocean: return 0x061C26
+        case .ember: return 0x1A0D08
+        case .forest: return 0x0D1810
+        case .mocha: return 0x1B1411
+        case .arctic: return 0x111827
+        case .sakura: return 0x1D1317
+        case .matrix: return 0x000A04
+        case .hellsKitchen: return 0x1A0607
         }
     }
 
@@ -54,6 +83,15 @@ enum AppTheme: String, CaseIterable, Identifiable {
         case .midnight: return 0x16233A
         case .oled: return 0x121212
         case .gold: return 0x282624
+        case .synthwave: return 0x271543
+        case .ocean: return 0x0D2E3B
+        case .ember: return 0x2B1810
+        case .forest: return 0x17271B
+        case .mocha: return 0x2A201B
+        case .arctic: return 0x1F2937
+        case .sakura: return 0x2D1F25
+        case .matrix: return 0x07170D
+        case .hellsKitchen: return 0x2B0D0E
         }
     }
 
@@ -61,6 +99,15 @@ enum AppTheme: String, CaseIterable, Identifiable {
         switch self {
         case .midnight: return 0x070D18
         case .oled: return 0x000000
+        case .synthwave: return 0x10061F
+        case .ocean: return 0x03141B
+        case .ember: return 0x120804
+        case .forest: return 0x08110A
+        case .mocha: return 0x130E0B
+        case .arctic: return 0x0B111C
+        case .sakura: return 0x150D10
+        case .matrix: return 0x000502
+        case .hellsKitchen: return 0x120304
         default: return 0x0A0A0A
         }
     }
@@ -69,6 +116,7 @@ enum AppTheme: String, CaseIterable, Identifiable {
     var onAccentIsDark: Bool {
         switch self {
         case .kavita, .teal, .gold, .oled, .tangerine: return true
+        case .synthwave, .ocean, .ember, .forest, .mocha, .arctic, .sakura, .matrix: return true
         default: return false
         }
     }
