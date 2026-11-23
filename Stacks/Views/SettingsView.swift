@@ -113,11 +113,15 @@ struct SettingsView: View {
                     }
                 }
                 .disabled(scanner.scanning)
+                Button("Force scan all (re-read every folder)") {
+                    scanner.scan(client: client, library: nil, force: true)
+                }
+                .disabled(scanner.scanning)
                 Button("Sign out", role: .destructive) { confirmSignOut = true }
             } header: {
                 Text("Server")
             } footer: {
-                Text(scanner.message ?? "Added comics or books on your PC? Scan so Kavita finds them. Needs an admin account. Turning on Folder Watching in Kavita does this automatically.")
+                Text(scanner.message ?? "Added comics or books on your PC? Scan so Kavita finds them. If something still doesn't show up (like after renaming folders), Force scan re-reads everything. Needs an admin account.")
             }
             .listRowBackground(Theme.card)
 

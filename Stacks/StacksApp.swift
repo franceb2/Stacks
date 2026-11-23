@@ -121,7 +121,6 @@ struct RootView: View {
     @State private var shortcutLaunch: ReaderLaunch?
     @State private var homePath = NavigationPath()
     @State private var libraryPath = NavigationPath()
-    @State private var tourStarted = false
     @State private var listsPath = NavigationPath()
     @Namespace private var hero
     @StateObject private var updates = UpdateChecker.shared
@@ -165,7 +164,7 @@ struct RootView: View {
         }
         .environment(\.heroNamespace, hero)
         .alert(updates.available.map { "\($0.name) is available" } ?? "Update available",
-               isPresented: Binding(get: { updates.shouldAlert && !DemoTour.enabled },
+               isPresented: Binding(get: { updates.shouldAlert },
                                     set: { if !$0 { updates.dismissAlert() } })) {
             Button("Download") {
                 openURL(UpdateChecker.downloadURL)
@@ -204,10 +203,6 @@ struct RootView: View {
             if !ConnectionStatus.shared.offline { downloads.resumeIncomplete(client: client) }
             await updates.check()
             await OfflineLibrary.shared.refresh(client: client)
-            if DemoTour.enabled && !tourStarted {
-                tourStarted = true
-                await runTour()
-            }
         }
         .onChange(of: scenePhase) { _, phase in
             if phase == .active {
@@ -220,92 +215,5 @@ struct RootView: View {
                 }
             }
         }
-    }
-
-    /// Preview-build only: steps through the main screens, saving a screenshot of each.
-    private func runTour() async {
-        await DemoTour.pause(5)
-        DemoTour.snap("01-home")
-
-        let libraries = (try? await client.libraries()) ?? []
-        let comics = libraries.first(where: \.isComic)
-        let manga = libraries.first(where: { $0.type == 0 })
-        let books = libraries.first(where: { $0.type == 2 || $0.type == 4 })
-
-        tab = .library
-        await DemoTour.pause(1.5)
-        if let comics, let first = try? await client.series(libraryId: comics.id, search: nil, page: 1).first {
-            libraryPath.append(LibraryRoute(library: comics))
-            await DemoTour.pause(4)
-            DemoTour.snap("02-library")
-
-            libraryPath.append(SeriesRoute(id: first.id, name: first.name))
-            await DemoTour.pause(4)
-            DemoTour.snap("03-series")
-
-            NotificationCenter.default.post(name: .tourOpenReader, object: nil)
-            await DemoTour.pause(5)
-            DemoTour.snap("04-comic-reader")
-            NotificationCenter.default.post(name: .tourShowMenu, object: nil)
-            await DemoTour.pause(1.5)
-            DemoTour.snap("05-reader-menu")
-            NotificationCenter.default.post(name: .tourReaderSettings, object: nil)
-            await DemoTour.pause(2)
-            DemoTour.snap("06-reader-settings")
-            NotificationCenter.default.post(name: .tourCloseReader, object: nil)
-            await DemoTour.pause(2.5)
-
-            NotificationCenter.default.post(name: .tourDownloadSheet, object: nil)
-            await DemoTour.pause(2.5)
-            DemoTour.snap("07-download-sheet")
-            NotificationCenter.default.post(name: .tourCloseReader, object: nil)
-            await DemoTour.pause(1.5)
-
-            if let detail = try? await client.seriesDetail(id: first.id), let chapter = detail.allChapters.first {
-                downloads.start(client: client, chapter: chapter, seriesId: first.id, seriesName: first.name,
-                                title: chapter.displayName, range: .pages(0...5))
-            }
-        }
-
-        if let manga, let series = try? await client.series(libraryId: manga.id, search: nil, page: 1).first {
-            libraryPath = NavigationPath()
-            await DemoTour.pause(1)
-            libraryPath.append(LibraryRoute(library: manga))
-            await DemoTour.pause(1.5)
-            libraryPath.append(SeriesRoute(id: series.id, name: series.name))
-            await DemoTour.pause(4)
-            DemoTour.snap("08-manga-volumes")
-        }
-
-        if let books, let list = try? await client.series(libraryId: books.id, search: nil, page: 1),
-           let novel = list.first(where: { $0.format == MangaFormat.epub.rawValue }) ?? list.first {
-            libraryPath = NavigationPath()
-            await DemoTour.pause(1)
-            libraryPath.append(LibraryRoute(library: books))
-            await DemoTour.pause(1.5)
-            libraryPath.append(SeriesRoute(id: novel.id, name: novel.name))
-            await DemoTour.pause(3)
-            NotificationCenter.default.post(name: .tourOpenReader, object: nil)
-            await DemoTour.pause(5)
-            DemoTour.snap("09-book-reader")
-            NotificationCenter.default.post(name: .tourShowMenu, object: nil)
-            await DemoTour.pause(1.5)
-            DemoTour.snap("10-book-menu")
-            NotificationCenter.default.post(name: .tourCloseReader, object: nil)
-            await DemoTour.pause(2.5)
-        }
-
-        tab = .downloads
-        await DemoTour.pause(4)
-        DemoTour.snap("11-downloads")
-
-        tab = .settings
-        await DemoTour.pause(2)
-        DemoTour.snap("12-settings")
-
-        tab = .home
-        libraryPath = NavigationPath()
-        await DemoTour.pause(2)
-        DemoTour.finish()
     }
 }

@@ -12,17 +12,21 @@ final class LibraryScanner: ObservableObject {
 
     private var job: Task<Void, Never>?
 
-    /// nil scans every library.
-    func scan(client: KavitaClient, library: Library?) {
+    /// nil scans every library. A forced scan re-reads every folder, for files Kavita missed.
+    func scan(client: KavitaClient, library: Library?, force: Bool = false) {
         guard !scanning else { return }
         job?.cancel()
         scanning = true
         failed = false
         let name = library?.name ?? "all libraries"
-        message = "Asking Kavita to scan \(name)…"
+        message = force ? "Asking Kavita to re-read every folder in \(name)…" : "Asking Kavita to scan \(name)…"
         job = Task {
             do {
-                if let library { try await client.scanLibrary(library.id) } else { try await client.scanAllLibraries() }
+                if let library {
+                    try await client.scanLibrary(library.id, force: force)
+                } else {
+                    try await client.scanAllLibraries(force: force)
+                }
             } catch {
                 failed = true
                 scanning = false
@@ -31,7 +35,8 @@ final class LibraryScanner: ObservableObject {
             }
             message = "Kavita is scanning \(name). New comics will show up here in a moment."
             // Kavita scans in the background and doesn't say when it's done, so refresh a few times.
-            for delay in [6, 15, 30] as [UInt64] {
+            // A forced scan takes longer, so keep checking a bit longer.
+            for delay in (force ? [8, 20, 40, 60] : [6, 15, 30]) as [UInt64] {
                 try? await Task.sleep(nanoseconds: delay * 1_000_000_000)
                 if Task.isCancelled { return }
                 ReadingOrderStore.shared.invalidateLibrary()

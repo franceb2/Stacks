@@ -127,15 +127,6 @@ struct SeriesDetailView: View {
         }
         .sensoryFeedback(.selection, trigger: wantToRead)
         .sensoryFeedback(.success, trigger: downloadsQueued)
-        .onReceive(NotificationCenter.default.publisher(for: .tourOpenReader)) { _ in
-            if let chapter = continueChapter { reader = ReaderLaunch(chapterId: chapter.id) }
-        }
-        .onReceive(NotificationCenter.default.publisher(for: .tourDownloadSheet)) { _ in
-            if let chapter = continueChapter ?? detail?.allChapters.first { askDownload(chapter) }
-        }
-        .onReceive(NotificationCenter.default.publisher(for: .tourCloseReader)) { _ in
-            downloadTarget = nil
-        }
     }
 
     // MARK: Header
@@ -328,7 +319,7 @@ struct SeriesDetailView: View {
         let selected = tab.flatMap { tabs.contains($0) ? $0 : nil } ?? tabs.first
         if selected == .order, !readingOrders.isEmpty {
             ReadingOrderSection(orders: readingOrders, seriesName: seriesName, client: client, hideRead: hideRead,
-                                open: { chapterId, ids in reader = ReaderLaunch(chapterId: chapterId, order: ids) },
+                                open: { chapterId, ids, page in reader = ReaderLaunch(chapterId: chapterId, page: page, order: ids) },
                                 addOrder: { showImportOrder = true })
         } else {
         CardGrid {

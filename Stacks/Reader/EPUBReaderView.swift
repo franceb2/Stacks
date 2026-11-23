@@ -71,11 +71,6 @@ struct EPUBReaderView: View {
             BookSettingsSheet(prefs: $prefs).presentationDetents([.medium, .large])
         }
         .sheet(isPresented: $showTOC) { tocSheet }
-        .onReceive(NotificationCenter.default.publisher(for: .tourShowMenu)) { _ in showChrome = true }
-        .onReceive(NotificationCenter.default.publisher(for: .tourCloseReader)) { _ in
-            showSettings = false
-            showTOC = false
-        }
     }
 
     // MARK: Menu

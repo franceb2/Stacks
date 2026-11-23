@@ -34,6 +34,9 @@ struct LibrariesView: View {
                         Button("Scan library", systemImage: "arrow.triangle.2.circlepath") {
                             scanner.scan(client: client, library: library)
                         }
+                        Button("Force scan (re-read every folder)", systemImage: "arrow.clockwise.circle") {
+                            scanner.scan(client: client, library: library, force: true)
+                        }
                     }
                     .swipeActions(edge: .trailing) {
                         Button("Scan", systemImage: "arrow.triangle.2.circlepath") {
@@ -56,6 +59,9 @@ struct LibrariesView: View {
                 Menu {
                     Button("Scan all libraries", systemImage: "arrow.triangle.2.circlepath") {
                         scanner.scan(client: client, library: nil)
+                    }
+                    Button("Force scan all (re-read every folder)", systemImage: "arrow.clockwise.circle") {
+                        scanner.scan(client: client, library: nil, force: true)
                     }
                     if !libraries.isEmpty {
                         Section("Scan one library") {
@@ -164,6 +170,10 @@ struct SeriesGridView: View {
                     Button(route.library == nil ? "Scan all libraries" : "Scan this library",
                            systemImage: "arrow.triangle.2.circlepath") {
                         scanner.scan(client: client, library: route.library)
+                    }
+                    .disabled(scanner.scanning)
+                    Button("Force scan (re-read every folder)", systemImage: "arrow.clockwise.circle") {
+                        scanner.scan(client: client, library: route.library, force: true)
                     }
                     .disabled(scanner.scanning)
                 } label: {

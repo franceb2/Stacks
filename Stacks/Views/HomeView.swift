@@ -133,7 +133,10 @@ struct HomeView: View {
                              : heroChapter.displayName)
                             .font(.caption).foregroundStyle(Theme.muted).lineLimit(1)
                     }
-                    ProgressView(value: series.progress).tint(Theme.primary)
+                    // Follows the book you're in (page 413 of 826 = halfway), not the whole series.
+                    ProgressView(value: heroChapter.map { $0.pages > 0 ? min(1, Double($0.pagesRead + 1) / Double($0.pages)) : 0 }
+                                 ?? series.progress)
+                        .tint(Theme.primary)
                     Button {
                         if let heroChapter { reader = ReaderLaunch(chapterId: heroChapter.id) }
                     } label: {

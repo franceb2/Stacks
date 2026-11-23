@@ -272,13 +272,14 @@ struct KavitaClient {
     }
 
     /// Asks Kavita to look for new or changed files in one library (admin accounts only).
-    func scanLibrary(_ libraryId: Int) async throws {
-        _ = try await raw("POST", "/api/Library/scan", query: ["libraryId": "\(libraryId)", "force": "false"])
+    /// `force` re-reads every folder, even ones Kavita thinks haven't changed.
+    func scanLibrary(_ libraryId: Int, force: Bool = false) async throws {
+        _ = try await raw("POST", "/api/Library/scan", query: ["libraryId": "\(libraryId)", "force": force ? "true" : "false"])
     }
 
     /// Asks Kavita to look for new or changed files in every library (admin accounts only).
-    func scanAllLibraries() async throws {
-        _ = try await raw("POST", "/api/Library/scan-all", query: ["force": "false"])
+    func scanAllLibraries(force: Bool = false) async throws {
+        _ = try await raw("POST", "/api/Library/scan-all", query: ["force": force ? "true" : "false"])
     }
 
     func deleteReadingList(_ listId: Int) async throws {

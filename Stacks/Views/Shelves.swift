@@ -399,7 +399,7 @@ struct ShelfView: View {
             .padding(.top, 20)
         } else {
             ReadingOrderSection(orders: orders, seriesName: shelf.host, client: client, hideRead: hideRead,
-                                open: { chapterId, ids in reader = ReaderLaunch(chapterId: chapterId, order: ids) },
+                                open: { chapterId, ids, page in reader = ReaderLaunch(chapterId: chapterId, page: page, order: ids) },
                                 addOrder: { showImport = true })
         }
     }

@@ -105,9 +105,6 @@ struct ReaderView: View {
         } message: {
             Text(missingMessage)
         }
-        .onReceive(NotificationCenter.default.publisher(for: .tourCloseReader)) { _ in
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) { dismiss() }
-        }
     }
 
     private var actions: ReaderActions {

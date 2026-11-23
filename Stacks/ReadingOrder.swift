@@ -7,8 +7,47 @@ struct ResolvedEntry: Identifiable {
     let seriesId: Int?
     let seriesName: String?
     let chapter: Chapter?
+    /// For an issue inside a bigger book (an omnibus): its first page (0-based) and the page after its last.
+    var startPage: Int? = nil
+    var endPage: Int? = nil
+    /// You matched this one by hand.
+    var fixed = false
+
     var id: Int { index }
     var inLibrary: Bool { chapter != nil }
+    var inBook: Bool { startPage != nil }
+
+    var isRead: Bool {
+        guard let chapter else { return false }
+        if let end = endPage { return chapter.pagesRead >= end }
+        return chapter.isRead
+    }
+
+    /// Started but not finished: the page you're on, counted within this issue's pages.
+    var currentPage: (page: Int, of: Int)? {
+        guard let chapter else { return nil }
+        if let start = startPage, let end = endPage {
+            guard chapter.pagesRead > start, chapter.pagesRead < end else { return nil }
+            return (chapter.pagesRead - start + 1, end - start)
+        }
+        return chapter.isStarted ? (chapter.pagesRead + 1, chapter.pages) : nil
+    }
+
+    /// Where to open: your spot if you're partway through this issue, else its first page.
+    var openPage: Int? {
+        guard let chapter, let start = startPage else { return nil }
+        if let end = endPage, chapter.pagesRead > start, chapter.pagesRead < end { return chapter.pagesRead }
+        return start
+    }
+}
+
+/// A match you set by hand for one entry of a reading order: a series, an issue or book, and optionally
+/// the page it starts on inside that book.
+struct OrderFix: Codable, Equatable {
+    var seriesId: Int
+    var seriesName: String
+    var chapterId: Int
+    var page: Int?
 }
 
 @MainActor
@@ -33,6 +72,7 @@ final class ReadingOrderStore: ObservableObject {
         let urls = Bundle.main.urls(forResourcesWithExtension: "json", subdirectory: nil) ?? []
         bundled = urls.compactMap { try? JSONDecoder().decode(ReadingOrder.self, from: Data(contentsOf: $0)) }
         reload()
+        loadFixes()
     }
 
     private func reload() {
@@ -101,6 +141,7 @@ final class ReadingOrderStore: ObservableObject {
         var labels: [String] = []
         for e in entries[(i + 1)...] {
             if e.chapter != nil { break }
+            if isMarkedRead(order, e) { continue }   // you read it somewhere else
             labels.append(e.entry.label)
         }
         return labels
@@ -120,7 +161,64 @@ final class ReadingOrderStore: ObservableObject {
 
     /// Chapter ids in reading order, for the reader's next/previous.
     func chapterIds(_ order: ReadingOrder) -> [Int] {
-        (resolved[order.id] ?? []).compactMap { $0.chapter?.id }
+        // Several issues inside one omnibus become one stop, so next/previous moves between books.
+        var out: [Int] = []
+        for id in (resolved[order.id] ?? []).compactMap({ $0.chapter?.id }) where out.last != id { out.append(id) }
+        return out
+    }
+
+    // MARK: Fixes you set by hand
+
+    @Published private(set) var fixes: [String: [String: OrderFix]] = [:]
+
+    private static var fixesFile: URL { folder.appendingPathComponent("fixes.json") }
+
+    /// Fixes are keyed by position and label, so a fix stays put if the order is updated from its link.
+    static func fixKey(_ index: Int, _ entry: ReadingOrder.Entry) -> String { "\(index)|\(entry.label)" }
+
+    func fix(_ order: ReadingOrder, index: Int, entry: ReadingOrder.Entry) -> OrderFix? {
+        fixes[order.id]?[Self.fixKey(index, entry)]
+    }
+
+    func setFixes(_ order: ReadingOrder, _ changes: [(index: Int, entry: ReadingOrder.Entry, fix: OrderFix?)]) {
+        var forOrder = fixes[order.id] ?? [:]
+        for c in changes { forOrder[Self.fixKey(c.index, c.entry)] = c.fix }
+        fixes[order.id] = forOrder.isEmpty ? nil : forOrder
+        try? FileManager.default.createDirectory(at: Self.folder, withIntermediateDirectories: true)
+        try? JSONEncoder().encode(fixes).write(to: Self.fixesFile, options: .atomic)
+        lastResolved[order.id] = nil
+    }
+
+    // MARK: Issues you read elsewhere (not in your library), saved on this phone
+
+    @Published private(set) var readElsewhere: [String: Set<String>] = [:]
+
+    private static var readElsewhereFile: URL { folder.appendingPathComponent("read-elsewhere.json") }
+
+    func isMarkedRead(_ order: ReadingOrder, _ e: ResolvedEntry) -> Bool {
+        e.chapter == nil && (readElsewhere[order.id]?.contains(Self.fixKey(e.index, e.entry)) ?? false)
+    }
+
+    func markElsewhere(_ order: ReadingOrder, _ list: [ResolvedEntry], read: Bool) {
+        var set = readElsewhere[order.id] ?? []
+        for e in list where e.chapter == nil {
+            let key = Self.fixKey(e.index, e.entry)
+            if read { set.insert(key) } else { set.remove(key) }
+        }
+        readElsewhere[order.id] = set.isEmpty ? nil : set
+        try? FileManager.default.createDirectory(at: Self.folder, withIntermediateDirectories: true)
+        try? JSONEncoder().encode(readElsewhere).write(to: Self.readElsewhereFile, options: .atomic)
+    }
+
+    private func loadFixes() {
+        if let data = try? Data(contentsOf: Self.readElsewhereFile),
+           let saved = try? JSONDecoder().decode([String: Set<String>].self, from: data) {
+            readElsewhere = saved
+        }
+        if let data = try? Data(contentsOf: Self.fixesFile),
+           let saved = try? JSONDecoder().decode([String: [String: OrderFix]].self, from: data) {
+            fixes = saved
+        }
     }
 
     /// After a library scan, the next lookup reloads the series list.
@@ -265,10 +363,22 @@ final class ReadingOrderStore: ObservableObject {
         // 3. Each chosen series' issues, by number.
         await fetch(chosen.values.map(\.id))
 
-        // 4. Line them up. Numbered issues first, so a one-shot never takes an issue the order lists by number.
+        // 4. Line them up. Your fixes first, then numbered issues, so a one-shot never takes an issue the
+        //    order lists by number.
         var picked: [Int: Chapter] = [:]
         var used: Set<Int> = []
+        var startPages: [Int: Int] = [:]
+        var fixedSeries: [Int: (Int, String)] = [:]
+        let orderFixes = fixes[order.id] ?? [:]
+        await fetch(orderFixes.values.map(\.seriesId))
         for (index, e) in order.entries.enumerated() {
+            guard let f = orderFixes[Self.fixKey(index, e)],
+                  let chapter = details[f.seriesId]?.allChapters.first(where: { $0.id == f.chapterId }) else { continue }
+            picked[index] = chapter
+            fixedSeries[index] = (f.seriesId, f.seriesName)
+            if let page = f.page { startPages[index] = page } else { used.insert(chapter.id) }
+        }
+        for (index, e) in order.entries.enumerated() where fixedSeries[index] == nil {
             guard let s = chosen[groupKey(e)], let d = details[s.id] else { continue }
             let chapters = d.allChapters.filter { !$0.isWholeVolume }
             var chapter: Chapter?
@@ -284,7 +394,7 @@ final class ReadingOrderStore: ObservableObject {
                 used.insert(chapter.id)
             }
         }
-        for (index, e) in order.entries.enumerated() where picked[index] == nil && e.number == nil {
+        for (index, e) in order.entries.enumerated() where picked[index] == nil && e.number == nil && fixedSeries[index] == nil {
             guard let s = chosen[groupKey(e)], let d = details[s.id] else { continue }
             let all = d.allChapters
             let free = all.filter { !used.contains($0.id) }
@@ -302,10 +412,28 @@ final class ReadingOrderStore: ObservableObject {
                 used.insert(chapter.id)
             }
         }
+        // Issues inside one book end where the next one in that book starts.
+        var endPages: [Int: Int] = [:]
+        var byBook: [Int: [(index: Int, start: Int)]] = [:]
+        for (index, start) in startPages { if let c = picked[index] { byBook[c.id, default: []].append((index, start)) } }
+        for (bookId, list) in byBook {
+            let sorted = list.sorted { $0.start < $1.start }
+            let pages = picked[sorted[0].index]?.pages ?? 0
+            for (i, item) in sorted.enumerated() {
+                endPages[item.index] = i + 1 < sorted.count ? max(sorted[i + 1].start, item.start + 1) : pages
+            }
+            _ = bookId
+        }
+
         var out: [ResolvedEntry] = []
         for (index, e) in order.entries.enumerated() {
-            let s = chosen[groupKey(e)]
-            out.append(ResolvedEntry(index: index, entry: e, seriesId: s?.id, seriesName: s?.name, chapter: picked[index]))
+            if let fixedTo = fixedSeries[index] {
+                out.append(ResolvedEntry(index: index, entry: e, seriesId: fixedTo.0, seriesName: fixedTo.1, chapter: picked[index],
+                                         startPage: startPages[index], endPage: endPages[index], fixed: true))
+            } else {
+                let s = chosen[groupKey(e)]
+                out.append(ResolvedEntry(index: index, entry: e, seriesId: s?.id, seriesName: s?.name, chapter: picked[index]))
+            }
         }
         resolved[order.id] = out
         lastResolved[order.id] = Date()
@@ -320,21 +448,23 @@ struct ReadingOrderSection: View {
     let orders: [ReadingOrder]
     let client: KavitaClient
     let hideRead: Bool
-    let open: (Int, [Int]) -> Void   // chapter id, the order's chapter ids
+    let open: (Int, [Int], Int?) -> Void   // chapter id, the order's chapter ids, page to open at
     let addOrder: () -> Void
 
     @ObservedObject private var store = ReadingOrderStore.shared
     @EnvironmentObject private var downloads: Downloads
-    @AppStorage("orderShowMissing") private var showMissing = false
+    @AppStorage("orderShowMissing") private var showMissingRows = false
     @AppStorage("selectedReadingOrders") private var selectedRaw = ""
     @State private var confirmRemove = false
     @State private var refreshing = false
     @State private var refreshError: String?
+    @State private var fixing: ResolvedEntry?
+    @State private var showMissing = false
 
     let seriesKey: String
 
     init(orders: [ReadingOrder], seriesName: String, client: KavitaClient, hideRead: Bool,
-         open: @escaping (Int, [Int]) -> Void, addOrder: @escaping () -> Void) {
+         open: @escaping (Int, [Int], Int?) -> Void, addOrder: @escaping () -> Void) {
         self.orders = orders
         self.client = client
         self.hideRead = hideRead
@@ -370,13 +500,17 @@ struct ReadingOrderSection: View {
 
     private var entries: [ResolvedEntry] { store.resolved[order.id] ?? [] }
     private var matched: [ResolvedEntry] { entries.filter(\.inLibrary) }
-    private var readCount: Int { matched.filter { $0.chapter?.isRead == true }.count }
-    private var nextUp: ResolvedEntry? { matched.first { $0.chapter?.isRead != true } }
+    /// Read in Kavita, or (for issues not in your library) marked as read elsewhere on this phone.
+    private func read(_ e: ResolvedEntry) -> Bool { e.inLibrary ? e.isRead : store.isMarkedRead(order, e) }
+    private var elsewhere: [ResolvedEntry] { entries.filter { !$0.inLibrary && store.isMarkedRead(order, $0) } }
+    private var readCount: Int { matched.filter(\.isRead).count + elsewhere.count }
+    private var nextUp: ResolvedEntry? { matched.first { !$0.isRead } }
+    private var missing: [ResolvedEntry] { entries.filter { !$0.inLibrary && !store.isMarkedRead(order, $0) } }
 
     private var visible: [ResolvedEntry] {
         entries.filter { e in
-            if !e.inLibrary { return showMissing }
-            if hideRead, e.chapter?.isRead == true { return false }
+            if hideRead, read(e) { return false }
+            if !e.inLibrary { return showMissingRows }
             return true
         }
     }
@@ -402,6 +536,12 @@ struct ReadingOrderSection: View {
         .task(id: order.id) { await store.resolve(order, client: client) }
         .onReceive(NotificationCenter.default.publisher(for: .readingProgressChanged)) { _ in
             Task { await store.resolve(order, client: client, force: true) }
+        }
+        .sheet(item: $fixing) { e in
+            OrderFixSheet(order: order, target: e, entries: entries, client: client)
+        }
+        .sheet(isPresented: $showMissing) {
+            MissingIssuesSheet(order: order, missing: missing)
         }
         .confirmationDialog("Remove \"\(order.title)\"?", isPresented: $confirmRemove, titleVisibility: .visible) {
             Button("Remove reading order", role: .destructive) { store.remove(order) }
@@ -434,7 +574,10 @@ struct ReadingOrderSection: View {
                 Spacer()
                 if refreshing { ProgressView().controlSize(.small) }
                 Menu {
-                    Toggle("Show issues not in my library", isOn: $showMissing)
+                    Toggle("Show issues not in my library", isOn: $showMissingRows)
+                    if !missing.isEmpty {
+                        Button("Missing issues (\(missing.count))", systemImage: "list.bullet.clipboard") { showMissing = true }
+                    }
                     Button("Refresh", systemImage: "arrow.clockwise") {
                         Task { await store.resolve(order, client: client, force: true) }
                     }
@@ -455,14 +598,16 @@ struct ReadingOrderSection: View {
                 Text(refreshError).font(.caption).foregroundStyle(Theme.danger)
             }
             if !entries.isEmpty {
-                Text("\(matched.count) of \(entries.count) in your library · \(readCount) read")
+                Text("\(matched.count) of \(entries.count) in your library · \(readCount) read"
+                     + (elsewhere.isEmpty ? "" : " (\(elsewhere.count) elsewhere)"))
                     .font(.caption).foregroundStyle(Theme.muted)
-                ProgressView(value: matched.isEmpty ? 0 : Double(readCount) / Double(matched.count))
+                ProgressView(value: matched.count + elsewhere.count == 0 ? 0
+                             : Double(readCount) / Double(matched.count + elsewhere.count))
                     .tint(Theme.primary)
             }
             if let next = nextUp, let chapter = next.chapter {
                 Button {
-                    open(chapter.id, store.chapterIds(order))
+                    open(chapter.id, store.chapterIds(order), next.openPage)
                 } label: {
                     Label(readCount == 0 ? "Start: \(shortLabel(next))" : "Continue: \(shortLabel(next))",
                           systemImage: "play.fill")
@@ -501,7 +646,7 @@ struct ReadingOrderSection: View {
     private func row(_ e: ResolvedEntry) -> some View {
         let chapter = e.chapter
         return Button {
-            if let chapter { open(chapter.id, store.chapterIds(order)) }
+            if let chapter { open(chapter.id, store.chapterIds(order), e.openPage) } else { fixing = e }
         } label: {
             HStack(spacing: 12) {
                 Text("\(e.index + 1)")
@@ -520,12 +665,12 @@ struct ReadingOrderSection: View {
                 }
                 .clipShape(RoundedRectangle(cornerRadius: 3))
                 .frame(width: 34)
-                .opacity(chapter?.isRead == true ? 0.5 : 1)
+                .opacity(read(e) ? 0.5 : 1)
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(e.entry.label)
                         .font(.subheadline)
-                        .foregroundStyle(e.inLibrary ? (chapter?.isRead == true ? Theme.muted : Theme.text) : Theme.muted)
+                        .foregroundStyle(e.inLibrary && !read(e) ? Theme.text : Theme.muted)
                         .lineLimit(2)
                     HStack(spacing: 6) {
                         if e.entry.kind == "oneshot" {
@@ -533,16 +678,22 @@ struct ReadingOrderSection: View {
                         } else if e.entry.kind == "spinoff" {
                             tag(e.entry.series)
                         }
-                        if !e.inLibrary {
-                            Text("Not in your library").font(.caption2).foregroundStyle(Theme.muted)
-                        } else if let chapter, chapter.isStarted {
-                            Text("Page \(chapter.pagesRead + 1) of \(chapter.pages)")
-                                .font(.caption2).foregroundStyle(Theme.primary)
+                        if !e.inLibrary && read(e) {
+                            Text("Read elsewhere").font(.caption2).foregroundStyle(Theme.muted)
+                        } else if !e.inLibrary {
+                            Text("Not in your library · tap to match").font(.caption2).foregroundStyle(Theme.muted)
+                        } else if let now = e.currentPage {
+                            Text("Page \(now.page) of \(now.of)").font(.caption2).foregroundStyle(Theme.primary)
+                        } else if let start = e.startPage, let name = e.seriesName {
+                            Text("In \(name), page \(start + 1)").font(.caption2).foregroundStyle(Theme.muted).lineLimit(1)
+                        }
+                        if e.fixed {
+                            Image(systemName: "pin.fill").font(.system(size: 9)).foregroundStyle(Theme.muted)
                         }
                     }
                 }
                 Spacer(minLength: 0)
-                if chapter?.isRead == true {
+                if read(e) {
                     Image(systemName: "eye.fill").font(.caption).foregroundStyle(Theme.muted)
                 } else if let chapter, downloads.items[chapter.id]?.isComplete == true {
                     Image(systemName: "arrow.down.circle.fill").font(.caption).foregroundStyle(Theme.primary)
@@ -553,18 +704,40 @@ struct ReadingOrderSection: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .disabled(chapter == nil)
         .contextMenu {
             if let chapter, let seriesId = e.seriesId {
-                Button("Read", systemImage: "book") { open(chapter.id, store.chapterIds(order)) }
-                Button("Mark as read", systemImage: "checkmark.circle") { mark(chapter, seriesId: seriesId, read: true) }
-                Button("Mark as unread", systemImage: "circle") { mark(chapter, seriesId: seriesId, read: false) }
+                Button("Read", systemImage: "book") { open(chapter.id, store.chapterIds(order), e.openPage) }
+                Button("Mark as read", systemImage: "checkmark.circle") { mark(e, chapter, seriesId: seriesId, read: true) }
+                Button("Mark as unread", systemImage: "circle") { mark(e, chapter, seriesId: seriesId, read: false) }
                 Button("Mark everything before this as read", systemImage: "checkmark.circle.badge.questionmark") {
                     markBefore(e)
                 }
                 Button("Download", systemImage: "arrow.down.circle") {
                     downloads.start(client: client, chapterId: chapter.id, seriesId: seriesId,
                                     seriesName: e.seriesName ?? e.entry.series, title: e.entry.label, range: .all)
+                }
+                Divider()
+            } else {
+                // Not in your library: you can still say you've read it somewhere else.
+                if read(e) {
+                    Button("Mark as unread", systemImage: "circle") { store.markElsewhere(order, [e], read: false) }
+                } else {
+                    Button("Mark as read (read elsewhere)", systemImage: "checkmark.circle") {
+                        store.markElsewhere(order, [e], read: true)
+                    }
+                }
+                Button("Mark everything before this as read", systemImage: "checkmark.circle.badge.questionmark") {
+                    markBefore(e)
+                }
+                Divider()
+            }
+            Button(e.inLibrary ? "Fix match…" : "Match to something in my library…", systemImage: "wrench.adjustable") {
+                fixing = e
+            }
+            if e.fixed {
+                Button("Undo my fix", systemImage: "arrow.uturn.backward") {
+                    store.setFixes(order, [(e.index, e.entry, nil)])
+                    Task { await store.resolve(order, client: client, force: true) }
                 }
             }
         }
@@ -579,23 +752,49 @@ struct ReadingOrderSection: View {
             .lineLimit(1)
     }
 
-    private func mark(_ chapter: Chapter, seriesId: Int, read: Bool) {
+    private func mark(_ e: ResolvedEntry, _ chapter: Chapter, seriesId: Int, read: Bool) {
         Task {
-            downloads.markFinished([chapter.id], finished: read)
-            try? await client.markChapter(seriesId: seriesId, chapter: chapter, read: read)
+            if let start = e.startPage, let end = e.endPage {
+                // An issue inside a book: move your spot in the book past it (or back to its start).
+                try? await setPage(read ? end : start, chapter: chapter, seriesId: seriesId)
+            } else {
+                downloads.markFinished([chapter.id], finished: read)
+                try? await client.markChapter(seriesId: seriesId, chapter: chapter, read: read)
+            }
             NotificationCenter.default.post(name: .readingProgressChanged, object: nil)
         }
     }
 
+    private func setPage(_ page: Int, chapter: Chapter, seriesId: Int) async throws {
+        guard let info = try? await client.chapterInfo(chapterId: chapter.id) else { return }
+        let pageNum = min(max(page, 0), info.pages)
+        try await client.saveProgress(ProgressBody(volumeId: info.volumeId, chapterId: chapter.id, pageNum: pageNum,
+                                                   seriesId: seriesId, libraryId: info.libraryId, bookScrollId: nil))
+        if pageNum >= info.pages { downloads.markFinished([chapter.id]) }
+    }
+
     /// Marks every matched entry earlier in the order as read, series by series.
     private func markBefore(_ target: ResolvedEntry) {
-        let earlier = entries.prefix(target.index).filter { $0.chapter != nil && $0.chapter?.isRead != true }
+        store.markElsewhere(order, entries.prefix(target.index).filter { !$0.inLibrary }, read: true)
+        let earlier = entries.prefix(target.index).filter { $0.chapter != nil && !$0.isRead }
         var bySeries: [Int: [Int]] = [:]
-        for e in earlier { if let s = e.seriesId, let c = e.chapter { bySeries[s, default: []].append(c.id) } }
+        var bookPages: [Int: (page: Int, chapter: Chapter, seriesId: Int)] = [:]
+        for e in earlier {
+            guard let s = e.seriesId, let c = e.chapter else { continue }
+            if let end = e.endPage {
+                // Inside a book: move your spot to the end of the furthest earlier issue.
+                if (bookPages[c.id]?.page ?? -1) < end { bookPages[c.id] = (end, c, s) }
+            } else {
+                bySeries[s, default: []].append(c.id)
+            }
+        }
         Task {
             for (seriesId, ids) in bySeries {
                 downloads.markFinished(ids)
                 try? await client.markMultiple(seriesId: seriesId, volumeIds: [], chapterIds: ids, read: true)
+            }
+            for item in bookPages.values where item.chapter.pagesRead < item.page {
+                try? await setPage(item.page, chapter: item.chapter, seriesId: item.seriesId)
             }
             NotificationCenter.default.post(name: .readingProgressChanged, object: nil)
         }

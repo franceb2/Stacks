@@ -76,9 +76,6 @@ struct ComicReaderView: View {
             ComicSettingsSheet(prefs: $prefs)
                 .presentationDetents([.medium, .large])
         }
-        .onReceive(NotificationCenter.default.publisher(for: .tourShowMenu)) { _ in showChrome = true }
-        .onReceive(NotificationCenter.default.publisher(for: .tourReaderSettings)) { _ in showSettings = true }
-        .onReceive(NotificationCenter.default.publisher(for: .tourCloseReader)) { _ in showSettings = false }
     }
 
     // MARK: Modes
@@ -505,13 +502,45 @@ final class PageImageStore: ObservableObject {
     private let chapterId: Int
     private let offline: Bool
     private var inFlight: Set<Int> = []
+    private var fetching: Set<Int> = []
     private var sizes: [Int: CGSize] = [:]
+    private var current = 0
+    nonisolated(unsafe) private var memoryObserver: NSObjectProtocol?
+
+    /// Pages ahead kept as their downloaded files (small) so they open instantly. Images are never
+    /// shrunk: a page is decoded at full quality just before you reach it.
+    nonisolated(unsafe) private static let compressed: NSCache<NSString, NSData> = {   // NSCache is thread-safe
+        let cache = NSCache<NSString, NSData>()
+        cache.totalCostLimit = 120 * 1024 * 1024
+        return cache
+    }()
+
+    /// How many pages stay decoded around the one you're on (decoded pages are the big ones in memory).
+    private let decodedAhead = 2
+    private let decodedBehind = 1
+    /// How many further pages are fetched ahead as compressed files.
+    private let fileAhead = 8
 
     init(client: KavitaClient, chapterId: Int, offline: Bool) {
         self.client = client
         self.chapterId = chapterId
         self.offline = offline
+        // If iPhone runs low on memory, keep only the page on screen.
+        memoryObserver = NotificationCenter.default.addObserver(
+            forName: UIApplication.didReceiveMemoryWarningNotification, object: nil, queue: .main) { [weak self] _ in
+            MainActor.assumeIsolated {
+                guard let self else { return }
+                for key in self.images.keys where key != self.current { self.images[key] = nil }
+                PageImageStore.compressed.removeAllObjects()
+            }
+        }
     }
+
+    deinit {
+        if let memoryObserver { NotificationCenter.default.removeObserver(memoryObserver) }
+    }
+
+    private func cacheKey(_ index: Int) -> NSString { "\(chapterId)-\(index)" as NSString }
 
     /// Width / height of a page, once known; used to size placeholders in webtoon mode.
     func aspect(_ index: Int) -> CGFloat {
@@ -526,6 +555,7 @@ final class PageImageStore: ObservableObject {
         let chapterId = chapterId
         let client = client
         let offline = offline
+        let key = cacheKey(index)
         let local = Downloads.shared.imageURL(chapterId: chapterId, page: index)
         Task {
             defer { inFlight.remove(index) }
@@ -533,11 +563,17 @@ final class PageImageStore: ObservableObject {
                 if let local, let data = try? Data(contentsOf: local), let img = UIImage(data: data) {
                     return img.preparingForDisplay() ?? img
                 }
+                if let cached = PageImageStore.compressed.object(forKey: key), let img = UIImage(data: cached as Data) {
+                    return img.preparingForDisplay() ?? img
+                }
                 if offline { return nil }
                 guard let data = try? await client.pageImageData(chapterId: chapterId, page: index),
                       let img = UIImage(data: data) else { return nil }
+                PageImageStore.compressed.setObject(data as NSData, forKey: key, cost: data.count)
                 return img.preparingForDisplay() ?? img
             }.value
+            // Dropped while loading because you moved far away: don't hold it.
+            guard abs(index - current) <= decodedAhead + 2 else { return }
             if let image {
                 images[index] = image
                 sizes[index] = image.size
@@ -547,12 +583,35 @@ final class PageImageStore: ObservableObject {
         }
     }
 
-    /// Keeps nearby pages ready and drops far-away pages to save memory.
+    /// Downloads a page's file ahead of time without decoding it.
+    private func fetchFile(_ index: Int) {
+        guard !offline, images[index] == nil, !fetching.contains(index),
+              Self.compressed.object(forKey: cacheKey(index)) == nil,
+              Downloads.shared.imageURL(chapterId: chapterId, page: index) == nil else { return }
+        fetching.insert(index)
+        let chapterId = chapterId
+        let client = client
+        let key = cacheKey(index)
+        Task {
+            defer { fetching.remove(index) }
+            if let data = try? await client.pageImageData(chapterId: chapterId, page: index) {
+                Self.compressed.setObject(data as NSData, forKey: key, cost: data.count)
+            }
+        }
+    }
+
+    /// Keeps the nearby pages decoded, the next several ready as files, and frees the rest.
     func prefetch(around page: Int, count: Int) {
         let start = min(max(page, 0), count)
-        for i in start..<min(start + 4, count) { load(i) }
-        if start > 0 { load(start - 1) }
-        for key in images.keys where abs(key - page) > 8 { images[key] = nil }
+        current = start
+        for i in start..<min(start + decodedAhead + 1, count) { load(i) }
+        for i in max(start - decodedBehind, 0)..<start { load(i) }
+        if start + decodedAhead + 1 < count {
+            for i in (start + decodedAhead + 1)..<min(start + decodedAhead + 1 + fileAhead, count) { fetchFile(i) }
+        }
+        for key in images.keys where key < start - decodedBehind - 1 || key > start + decodedAhead + 1 {
+            images[key] = nil
+        }
     }
 }
 
