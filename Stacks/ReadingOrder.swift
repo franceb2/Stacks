@@ -112,41 +112,6 @@ final class ReadingOrderStore: ObservableObject {
         return matching.filter { isHost($0, seriesName: seriesName) } + matching.filter { !isHost($0, seriesName: seriesName) }
     }
 
-    /// Orders added to a shelf, plus orders hosted by any series on it (like Spawn's on a Spawn shelf).
-    func orders(forShelf shelfId: String, seriesNames: [String]) -> [ReadingOrder] {
-        let keys = Set(seriesNames.map(TitleKey.make))
-        let own = orders.filter { $0.hosts.contains("shelf:\(shelfId)") }
-        let hosted = orders.filter { o in !own.contains { $0.id == o.id } && o.hosts.contains { keys.contains(TitleKey.make($0)) } }
-        return own + hosted
-    }
-
-    /// The chapter ids of a reading order that includes this chapter (already-matched orders first, then
-    /// orders that mention this series), or nil when it isn't in any.
-    func orderIds(containing chapterId: Int, seriesName: String, client: KavitaClient) async -> [Int]? {
-        for o in orders(for: seriesName) + orders where chapterIds(o).contains(chapterId) { return chapterIds(o) }
-        for o in orders(for: seriesName) {
-            await resolve(o, client: client)
-            let ids = chapterIds(o)
-            if ids.contains(chapterId) { return ids }
-        }
-        return nil
-    }
-
-    /// Entries between this chapter and the next one you have, in the order these ids came from:
-    /// the issues the reader is about to skip because they aren't in your library.
-    func missingAfter(_ chapterId: Int, orderIds ids: [Int]) -> [String] {
-        guard let order = orders.first(where: { chapterIds($0) == ids }) ?? orders.first(where: { chapterIds($0).contains(chapterId) }),
-              let entries = resolved[order.id],
-              let i = entries.firstIndex(where: { $0.chapter?.id == chapterId }) else { return [] }
-        var labels: [String] = []
-        for e in entries[(i + 1)...] {
-            if e.chapter != nil { break }
-            if isMarkedRead(order, e) { continue }   // you read it somewhere else
-            labels.append(e.entry.label)
-        }
-        return labels
-    }
-
     /// Every series in your library (cached for a few minutes).
     func allSeries(client: KavitaClient, force: Bool = false) async -> [Series] {
         _ = await libraryIndex(client: client, force: force)

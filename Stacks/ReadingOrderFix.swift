@@ -44,14 +44,18 @@ struct OrderFixSheet: View {
     private var suggestions: [Series] {
         let q = search.trimmingCharacters(in: .whitespaces)
         if !q.isEmpty {
-            let n = Shelf.normalized(q)
-            return Array(all.filter { Shelf.normalized($0.name).contains(n) }.prefix(40))
+            let n = Self.normalized(q)
+            return Array(all.filter { Self.normalized($0.name).contains(n) }.prefix(40))
         }
         // Nothing typed: series that share words with the entry's title.
         let words = Set(TitleKey.make(target.entry.series).split(separator: " ").map(String.init)).subtracting(["and", "of"])
         return Array(all.filter { s in
             !words.isDisjoint(with: TitleKey.make(s.name).split(separator: " ").map(String.init))
         }.prefix(25))
+    }
+
+    private static func normalized(_ s: String) -> String {
+        s.lowercased().filter { $0.isLetter || $0.isNumber }
     }
 
     var body: some View {

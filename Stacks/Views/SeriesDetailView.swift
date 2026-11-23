@@ -46,6 +46,7 @@ struct SeriesDetailView: View {
     @State private var showBookmarks = false
     @State private var showCollections = false
     @State private var showImportOrder = false
+    @ObservedObject private var favorites = Favorites.shared
     @State private var selected: Set<Int> = []
     @State private var error: String?
 
@@ -194,6 +195,18 @@ struct SeriesDetailView: View {
             }
             .buttonStyle(SecondaryButtonStyle())
             .accessibilityLabel(wantToRead == true ? "Remove from Want to Read" : "Add to Want to Read")
+            Button {
+                Task {
+                    do { try await favorites.toggle(seriesId: route.id, client: client) }
+                    catch { self.error = "Couldn't update Favorites: \(error.localizedDescription)" }
+                }
+            } label: {
+                Image(systemName: favorites.contains(route.id) ? "star.fill" : "star")
+                    .foregroundStyle(favorites.contains(route.id) ? Theme.primary : Theme.text)
+                    .frame(width: 22)
+            }
+            .buttonStyle(SecondaryButtonStyle())
+            .accessibilityLabel(favorites.contains(route.id) ? "Remove from Favorites" : "Add to Favorites")
             Button {
                 listTarget = ListSheetTarget(target: .series(route.id), title: series?.name ?? route.name)
             } label: {

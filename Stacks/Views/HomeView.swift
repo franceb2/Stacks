@@ -29,7 +29,7 @@ struct HomeView: View {
                     heroCard(hero)
                 }
 
-                ShelvesRow(client: client)
+                FavoritesRow(client: client)
 
                 if !onDeck.isEmpty {
                     carousel("On Deck") {

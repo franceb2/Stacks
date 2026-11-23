@@ -112,7 +112,6 @@ extension View {
             .navigationDestination(for: SearchRoute.self) { _ in SearchView(client: client) }
             .navigationDestination(for: StatsRoute.self) { _ in StatsView(client: client) }
             .navigationDestination(for: BookmarksRoute.self) { _ in AllBookmarksView(client: client) }
-            .navigationDestination(for: ShelfRoute.self) { ShelfView(route: $0, client: client) }
     }
 }
 

@@ -353,6 +353,14 @@ struct KavitaClient {
                                                           seriesIds: [seriesId]))
     }
 
+    /// Takes series out of a collection (Kavita deletes the collection if it ends up empty).
+    func removeFromCollection(_ collection: KavitaCollection, seriesIds: [Int]) async throws {
+        try await sendNoContent("POST", "/api/Collection/update-series",
+                                body: RemoveFromCollectionBody(tag: .init(id: collection.id, title: collection.title,
+                                                                          summary: collection.summary ?? "", promoted: false),
+                                                               seriesIdsToRemove: seriesIds))
+    }
+
     func collectionCoverURL(_ id: Int) -> URL? {
         makeURL("/api/Image/collection-cover", ["collectionTagId": "\(id)", "apiKey": apiKey])
     }

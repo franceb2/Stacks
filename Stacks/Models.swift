@@ -332,6 +332,17 @@ struct KavitaCollection: Decodable, Identifiable, Hashable {
     let owner: String?
 }
 
+struct RemoveFromCollectionBody: Encodable {
+    struct Tag: Encodable {
+        let id: Int
+        let title: String
+        let summary: String
+        let promoted: Bool
+    }
+    let tag: Tag
+    let seriesIdsToRemove: [Int]
+}
+
 struct AddToCollectionBody: Encodable {
     let collectionTagId: Int
     let collectionTagTitle: String
