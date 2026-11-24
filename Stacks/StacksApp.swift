@@ -10,6 +10,8 @@ struct StacksApp: App {
     @StateObject private var downloads = Downloads.shared
 
     @AppStorage("appTheme") private var themeRaw = AppTheme.kavita.rawValue
+    /// Bumped when the Custom theme's colors change, so the app redraws even though the theme name didn't.
+    @AppStorage("themeRevision") private var themeRevision = 0
 
     init() {
         // Tell Kavita what kind of device this is (shows in its device list and reading history).
@@ -53,7 +55,7 @@ struct StacksApp: App {
                     LoginView()
                 }
             }
-            .id(themeRaw) // rebuild with the new colors when the theme changes
+            .id("\(themeRaw)-\(themeRevision)") // rebuild with the new colors when the theme changes
             .overlay {
                 if lock.locked { LockScreen(lock: lock) }
             }

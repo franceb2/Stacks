@@ -11,6 +11,7 @@ struct SettingsView: View {
     @State private var confirmSignOut = false
     @State private var resetDone = false
     @State private var linkCopied = false
+    @State private var editingCustom = false
     @State private var rotation = ThemeRotation.current
     @AppStorage("themesOpen") private var themesOpen = false
     @State private var coversReloaded = false
@@ -33,11 +34,22 @@ struct SettingsView: View {
                     LazyVGrid(columns: [GridItem(.adaptive(minimum: 62), spacing: 12)], spacing: 14) {
                         ForEach(AppTheme.allCases) { theme in
                             Button {
-                                AppTheme.select(theme)
+                                // Custom opens the editor; the others switch right away.
+                                if theme == .custom { editingCustom = true } else { AppTheme.select(theme) }
                             } label: {
                                 VStack(spacing: 6) {
                                     ThemeSwatch(theme: theme, selected: AppTheme.named(themeRaw) == theme)
                                         .frame(width: 46, height: 46)
+                                        .overlay(alignment: .bottomTrailing) {
+                                            if theme == .custom {
+                                                Image(systemName: "paintpalette.fill")
+                                                    .font(.system(size: 11))
+                                                    .padding(4)
+                                                    .background(Circle().fill(Theme.card))
+                                                    .foregroundStyle(Theme.text)
+                                                    .offset(x: 4, y: 4)
+                                            }
+                                        }
                                     Text(theme.name)
                                         .font(.caption2)
                                         .foregroundStyle(AppTheme.named(themeRaw) == theme ? Theme.text : Theme.muted)
@@ -267,6 +279,7 @@ struct SettingsView: View {
             downloads.removeOldFinished()
         }
         .task { await updates.check() }
+        .sheet(isPresented: $editingCustom) { CustomThemeEditor() }
         .confirmationDialog("Delete all downloads?", isPresented: $confirmDelete, titleVisibility: .visible) {
             Button("Delete all", role: .destructive) { downloads.deleteAll() }
         }

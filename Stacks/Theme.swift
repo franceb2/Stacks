@@ -4,6 +4,8 @@ import SwiftUI
 /// not just the trim color. Raw values stay the same when a theme is restyled, so your choice carries over.
 enum AppTheme: String, CaseIterable, Identifiable {
     case kavita, rose, violet, crimson, cobalt, tangerine, teal, midnight, oled, gold, synthwave, ocean, ember, forest, mocha, arctic, sakura, matrix, hellsKitchen, dracula, nord, retro, tokyoNight, cyberpunk, mono
+    /// Your own colors, made in Settings (see CustomTheme).
+    case custom
 
     var id: String { rawValue }
 
@@ -34,6 +36,7 @@ enum AppTheme: String, CaseIterable, Identifiable {
         case .tokyoNight: return "Tokyo Night"
         case .cyberpunk: return "Cyberpunk"
         case .mono: return "Mono"
+        case .custom: return "Custom"
         }
     }
 
@@ -65,6 +68,7 @@ enum AppTheme: String, CaseIterable, Identifiable {
         case .tokyoNight: return 0x7AA2F7
         case .cyberpunk: return 0xFCEE0A
         case .mono: return 0xF2F2F2
+        case .custom: return CustomTheme.accent
         }
     }
 
@@ -95,6 +99,7 @@ enum AppTheme: String, CaseIterable, Identifiable {
         case .tokyoNight: return 0x1A1B26
         case .cyberpunk: return 0x0D0221
         case .mono: return 0x1C1C1E
+        case .custom: return CustomTheme.background
         }
     }
 
@@ -125,6 +130,7 @@ enum AppTheme: String, CaseIterable, Identifiable {
         case .tokyoNight: return 0x24283B
         case .cyberpunk: return 0x1B0B3B
         case .mono: return 0x2C2C2E
+        case .custom: return CustomTheme.card
         }
     }
 
@@ -155,6 +161,7 @@ enum AppTheme: String, CaseIterable, Identifiable {
         case .tokyoNight: return 0x16161E
         case .cyberpunk: return 0x07011A
         case .mono: return 0x141416
+        case .custom: return CustomTheme.bar
         }
     }
 
@@ -186,6 +193,7 @@ enum AppTheme: String, CaseIterable, Identifiable {
         case .tokyoNight: return true
         case .cyberpunk: return true
         case .mono: return true
+        case .custom: return CustomTheme.onAccentIsDark
         }
     }
 
@@ -267,11 +275,69 @@ enum ThemeRotation: String, CaseIterable, Identifiable {
             guard !Calendar.current.isDate(lastChange, inSameDayAs: now) else { return nil }
         }
         lastChange = now
-        return AppTheme.allCases.filter { $0 != AppTheme.current }.randomElement()
+        return AppTheme.allCases.filter { $0 != AppTheme.current && $0 != .custom }.randomElement()
     }
 }
 
 /// Colors for the current theme (Kavita's dark theme by default).
+/// The Custom theme: an accent color from the color wheel and a dark background (presets or the wheel).
+/// Cards and bars are worked out from the background. Backgrounds are kept dark so text stays readable.
+enum CustomTheme {
+    static var accent: UInt32 {
+        (UserDefaults.standard.object(forKey: "customThemeAccent") as? Int).map { UInt32($0) } ?? 0xFF7A59
+    }
+    static var background: UInt32 {
+        (UserDefaults.standard.object(forKey: "customThemeBackground") as? Int).map { UInt32($0) } ?? 0x161A22
+    }
+    static var card: UInt32 { blend(background, 0xFFFFFF, 0.08) }
+    static var bar: UInt32 { blend(background, 0x000000, 0.4) }
+    static var onAccentIsDark: Bool { luminance(accent) > 0.55 }
+
+    /// Saves the colors and switches to the Custom theme (redrawing the app with them).
+    @MainActor
+    static func save(accent: UInt32, background: UInt32) {
+        UserDefaults.standard.set(Int(accent), forKey: "customThemeAccent")
+        UserDefaults.standard.set(Int(darkened(background)), forKey: "customThemeBackground")
+        let revision = UserDefaults.standard.integer(forKey: "themeRevision")
+        UserDefaults.standard.set(revision + 1, forKey: "themeRevision")
+        AppTheme.select(.custom)
+    }
+
+    static let backgroundPresets: [(name: String, hex: UInt32)] = [
+        ("Charcoal", 0x1C1C1E), ("Black", 0x000000), ("Slate", 0x1A2028), ("Midnight", 0x0D1426),
+        ("Navy", 0x0B1A33), ("Teal", 0x06201F), ("Forest", 0x0C1A12), ("Olive", 0x1A1C0E),
+        ("Coffee", 0x1E1612), ("Wine", 0x240A10), ("Plum", 0x1E1026), ("Indigo", 0x161233)
+    ]
+    static let accentPresets: [UInt32] = [
+        0xFF7A59, 0xFF3B30, 0xF0509A, 0xA35BF5, 0x5B7CFF, 0x3D8BFF, 0x4FD1E8,
+        0x2FD6A4, 0x4AC694, 0xA3D977, 0xFCEE0A, 0xE3AA3B, 0xD9A774, 0xF2F2F2
+    ]
+
+    static func rgb(_ hex: UInt32) -> (Double, Double, Double) {
+        (Double((hex >> 16) & 0xFF) / 255, Double((hex >> 8) & 0xFF) / 255, Double(hex & 0xFF) / 255)
+    }
+    static func hex(_ r: Double, _ g: Double, _ b: Double) -> UInt32 {
+        func c(_ v: Double) -> UInt32 { UInt32(max(0, min(255, (v * 255).rounded()))) }
+        return c(r) << 16 | c(g) << 8 | c(b)
+    }
+    static func blend(_ a: UInt32, _ b: UInt32, _ t: Double) -> UInt32 {
+        let x = rgb(a), y = rgb(b)
+        return hex(x.0 + (y.0 - x.0) * t, x.1 + (y.1 - x.1) * t, x.2 + (y.2 - x.2) * t)
+    }
+    static func luminance(_ hex: UInt32) -> Double {
+        let c = rgb(hex)
+        return 0.299 * c.0 + 0.587 * c.1 + 0.114 * c.2
+    }
+    /// Keeps a background dark enough for light text, keeping its hue.
+    static func darkened(_ hex: UInt32) -> UInt32 {
+        let c = rgb(hex)
+        let brightest = max(c.0, c.1, c.2)
+        guard brightest > 0.22 else { return hex }
+        let k = 0.22 / brightest
+        return Self.hex(c.0 * k, c.1 * k, c.2 * k)
+    }
+}
+
 enum Theme {
     static var primary: Color { Color(hex: AppTheme.current.accent) }
     static var onPrimary: Color { AppTheme.current.onAccentIsDark ? .black : .white }
