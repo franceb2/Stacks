@@ -8,6 +8,8 @@ struct ReaderContext: Equatable {
     let startPage: Int
     /// True when the server couldn't be reached and only downloaded pages are available.
     let offline: Bool
+    /// Whether this series reads as manga (right to left by default).
+    var manga: Bool = false
 
     static func == (a: ReaderContext, b: ReaderContext) -> Bool { a.chapterId == b.chapterId }
 
@@ -174,7 +176,10 @@ struct ReaderView: View {
             pageOverride = nil
         }
         lastSaved = saved
-        context = ReaderContext(chapterId: chapterId, info: info, startPage: start, offline: offline)
+        let manga = offline
+            ? (MangaDetector.cached(info.seriesId) ?? (info.libraryType == 0))
+            : await MangaDetector.isManga(seriesId: info.seriesId, libraryType: info.libraryType, client: client)
+        context = ReaderContext(chapterId: chapterId, info: info, startPage: start, offline: offline, manga: manga)
         QuickActions.setContinue(chapterId: chapterId, readingListId: readingListId,
                                  seriesName: info.seriesName ?? "", chapterTitle: context?.chapterTitle ?? "")
 

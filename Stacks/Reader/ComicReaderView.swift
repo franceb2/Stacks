@@ -24,7 +24,8 @@ struct ComicReaderView: View {
         self.client = client
         self.actions = actions
         _prefs = State(initialValue: ReaderPrefsStore.comic(seriesId: context.info.seriesId,
-                                                             libraryType: context.info.libraryType))
+                                                             libraryType: context.info.libraryType,
+                                                             manga: context.manga))
         _page = State(initialValue: context.startPage)
         _scrubPage = State(initialValue: Double(context.startPage))
         _store = StateObject(wrappedValue: PageImageStore(client: client, chapterId: context.chapterId,

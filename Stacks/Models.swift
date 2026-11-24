@@ -34,6 +34,8 @@ struct Series: Decodable, Identifiable, Hashable {
     let format: Int
     let libraryId: Int
     let libraryName: String?
+    /// The series' folder on the PC (used to tell comics from manga).
+    let folderPath: String?
 
     var progress: Double { pages > 0 ? min(1, Double(pagesRead) / Double(pages)) : 0 }
     var isRead: Bool { pages > 0 && pagesRead >= pages }
@@ -144,6 +146,7 @@ struct SeriesMetadata: Decodable {
     let tags: [Tag]?
     let writers: [Person]?
     let publishers: [Person]?
+    let language: String?
     let releaseYear: Int?
     let publicationStatus: Int?
 

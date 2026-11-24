@@ -155,11 +155,12 @@ enum ReaderPrefsStore {
     }
 
     /// Settings for a series: what you chose for it, or the defaults (right to left for Manga libraries).
-    static func comic(seriesId: Int, libraryType: Int? = nil) -> ComicPrefs {
+    /// `manga` is the per-series answer from MangaDetector; without it, Kavita's library type decides.
+    static func comic(seriesId: Int, libraryType: Int? = nil, manga: Bool? = nil) -> ComicPrefs {
         let all: [String: ComicPrefs] = decode(UserDefaults.standard.data(forKey: seriesKey)) ?? [:]
         if let saved = all[String(seriesId)] { return saved }
         var prefs = defaultComic
-        if libraryType == 0 && mangaRightToLeft {
+        if (manga ?? (libraryType == 0)) && mangaRightToLeft {
             prefs.mode = .leftRight
             prefs.rightToLeft = true
         }

@@ -46,6 +46,7 @@ struct SeriesDetailView: View {
     @State private var showBookmarks = false
     @State private var showCollections = false
     @State private var showImportOrder = false
+    @State private var manga: Bool?
     @ObservedObject private var favorites = Favorites.shared
     @State private var selected: Set<Int> = []
     @State private var error: String?
@@ -281,10 +282,16 @@ struct SeriesDetailView: View {
     }
 
     private var seriesName: String { series?.name ?? route.name }
+
+    /// "Issues" for comics, "Chapters" for manga, using the per-series guess over Kavita's library type.
+    private func noun(_ d: SeriesDetail) -> String {
+        guard let manga, !d.isBookLibrary else { return d.chapterNoun }
+        return manga ? "Chapters" : "Issues"
+    }
     private var readingOrders: [ReadingOrder] { orderStore.orders(for: seriesName) }
 
     private func tabLabel(_ t: DetailTab, _ d: SeriesDetail) -> String {
-        t == .chapters ? d.chapterNoun : t.rawValue
+        t == .chapters ? noun(d) : t.rawValue
     }
 
     private func tabBar(_ d: SeriesDetail) -> some View {
@@ -377,7 +384,7 @@ struct SeriesDetailView: View {
                     .buttonStyle(PressableStyle())
             } else {
                 NavigationLink(value: VolumeRoute(seriesId: route.id, seriesName: series?.name ?? route.name,
-                                                  volume: volume, isComic: d.chapterNoun == "Issues")) { card }
+                                                  volume: volume, isComic: noun(d) == "Issues")) { card }
                     .buttonStyle(PressableStyle())
             }
         }
@@ -617,6 +624,10 @@ struct SeriesDetailView: View {
                 downloads.replaceIfChanged(client: client, chapterId: c.id, serverPages: c.pages)
             }
             metadata = try? await m
+            if let detail, !detail.isBookLibrary {
+                manga = MangaDetector.remember(route.id, MangaDetector.guess(libraryType: detail.libraryType,
+                                                                             series: series, metadata: metadata))
+            }
             continueChapter = try? await c
             wantToRead = try? await client.isWantToRead(route.id)
             error = nil
