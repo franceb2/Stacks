@@ -9,6 +9,16 @@ final class UpdateChecker: ObservableObject {
     static let repo = "franceb2/Stacks"
     static let downloadURL = URL(string: "https://github.com/\(repo)/releases/latest/download/Stacks.ipa")!
 
+    /// Signulous's upload page. Safari can't be filled in by another app, so the link is copied first:
+    /// tap the URL box there and choose Paste.
+    static let signulousUploadURL = URL(string: "https://www.signulous.com/upload-app")!
+
+    @MainActor
+    static func openSignulous() {
+        UIPasteboard.general.string = downloadURL.absoluteString
+        UIApplication.shared.open(signulousUploadURL)
+    }
+
     struct Release: Equatable {
         let build: Int
         let name: String

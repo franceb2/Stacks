@@ -77,15 +77,18 @@ struct SettingsView: View {
             Section("Updates") {
                 LabeledContent("Installed", value: "\(updates.installedVersion) (build \(updates.installedBuild))")
                 if let release = updates.available {
-                    Menu {
-                        Button("Download IPA", systemImage: "arrow.down.circle") { openURL(UpdateChecker.downloadURL) }
-                        Button("Copy download link", systemImage: "doc.on.doc") {
-                            UIPasteboard.general.string = UpdateChecker.downloadURL.absoluteString
-                            linkCopied = true
-                        }
+                    Button {
+                        UpdateChecker.openSignulous()
+                        linkCopied = true
                     } label: {
-                        Label(linkCopied ? "Link copied" : "Download \(release.name)",
-                              systemImage: linkCopied ? "checkmark.circle.fill" : "arrow.down.circle.fill")
+                        Label("Install \(release.name) with Signulous", systemImage: "arrow.down.circle.fill")
+                    }
+                    Button {
+                        UIPasteboard.general.string = UpdateChecker.downloadURL.absoluteString
+                        linkCopied = true
+                    } label: {
+                        Label(linkCopied ? "Link copied" : "Copy download link",
+                              systemImage: linkCopied ? "checkmark.circle.fill" : "doc.on.doc")
                     }
                     if !release.notes.isEmpty {
                         Text(release.notes).font(.footnote).foregroundStyle(Theme.muted)

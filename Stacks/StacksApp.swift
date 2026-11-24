@@ -125,6 +125,7 @@ struct RootView: View {
     @Environment(\.scenePhase) private var scenePhase
 
     @AppStorage("selectedTab") private var tab: AppTab = .home
+
     @State private var shortcutLaunch: ReaderLaunch?
     @State private var homePath = NavigationPath()
     @State private var libraryPath = NavigationPath()
@@ -173,9 +174,9 @@ struct RootView: View {
         .alert(updates.available.map { "\($0.name) is available" } ?? "Update available",
                isPresented: Binding(get: { updates.shouldAlert },
                                     set: { if !$0 { updates.dismissAlert() } })) {
-            Button("Download IPA") {
-                openURL(UpdateChecker.downloadURL)
+            Button("Open Signulous (link copied)") {
                 updates.dismissAlert()
+                UpdateChecker.openSignulous()
             }
             Button("Copy download link") {
                 UIPasteboard.general.string = UpdateChecker.downloadURL.absoluteString
@@ -184,7 +185,7 @@ struct RootView: View {
             Button("Later", role: .cancel) { updates.dismissAlert() }
         } message: {
             Text("A new version of Stacks is ready." + ((updates.available?.notes).map { $0.isEmpty ? "" : "\n\n\($0)" } ?? "")
-                 + "\n\nDownload the IPA, or copy its link to paste into Signulous.")
+                 + "\n\nOpen Signulous copies the download link and opens the upload page in Safari: tap the URL box and Paste.")
         }
         .onReceive(NotificationCenter.default.publisher(for: .openFromShortcut)) { _ in
             shortcutLaunch = QuickActions.pending
