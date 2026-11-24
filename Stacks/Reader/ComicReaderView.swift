@@ -360,8 +360,6 @@ struct ComicSettingsSheet: View {
                         .disabled(prefs.mode != .leftRight)
                     Toggle("Two pages when sideways", isOn: $prefs.doublePage)
                         .disabled(prefs.mode != .leftRight)
-                    Toggle("Panel by panel", isOn: $prefs.panelView)
-                        .disabled(prefs.mode == .webtoon)
                     Toggle("Tap sides to turn pages", isOn: $prefs.tapToTurn)
                         .disabled(prefs.mode == .webtoon)
                     Picker("Image scaling", selection: $prefs.scaling) {

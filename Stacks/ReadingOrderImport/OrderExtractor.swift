@@ -3,15 +3,19 @@ import Foundation
 /// One issue (or one-shot) found in an imported document, before you choose which colors and sections to keep.
 struct ImportCandidate: Identifiable {
     let id: Int
-    let series: String
+    var series: String
     let number: String?
-    let label: String
+    var label: String
     let year: Int?
     let volume: Int?
     let color: String?
     let section: Int
     /// A title with no issue number. Kept only if a series with that name is in your library.
     let titleOnly: Bool
+    /// A whole collected volume ("Vol. 1: Power and Responsibility"), with the issues it collects ("#1–7").
+    var volumeName: String? = nil
+    var volumeIssues: String? = nil
+    var isVolume: Bool { volumeIssues != nil }
 }
 
 struct ImportSection: Identifiable {
@@ -203,6 +207,20 @@ enum OrderExtractor {
                 continue
             }
 
+            // 1b. A collected volume: "Vol. 1: Power and Responsibility" | "Ultimate Spider-Man #1–7".
+            //     One entry for the whole volume, matched to that volume in your library.
+            if let volCell = cells.first(where: { volumeTitle($0.text) != nil }), let vol = volumeTitle(volCell.text),
+               let issueCell = cells.first(where: { $0.text != volCell.text && firstItem(in: $0.text) != nil }),
+               let item = firstItem(in: issueCell.text) {
+                let before = candidates.count
+                add(series: item.series, number: nil, rest: "", color: issueCell.color ?? volCell.color, volumeHint: vol.number)
+                if candidates.count > before {
+                    candidates[candidates.count - 1].volumeName = vol.name
+                    candidates[candidates.count - 1].volumeIssues = item.issues
+                }
+                continue
+            }
+
             // 2. "Title #N" inside each cell, keeping each cell's color.
             var found = false
             for cell in cells where !cell.text.isEmpty {
@@ -252,6 +270,30 @@ enum OrderExtractor {
         }
         finishSection()
 
+        // Volume rows belong to the main run: "Vol. 9: Ultimate Six | Ultimate Six #1–7" is Ultimate Spider-Man
+        // Vol. 9, which collects Ultimate Six. Use the series most volume rows name.
+        let volumeRows = candidates.indices.filter { candidates[$0].isVolume }
+        if !volumeRows.isEmpty {
+            var counts: [String: Int] = [:]
+            var names: [String: String] = [:]
+            for i in volumeRows {
+                let key = TitleKey.make(candidates[i].series)
+                counts[key, default: 0] += 1
+                if names[key] == nil { names[key] = candidates[i].series }
+            }
+            let mainKey = volumeRows.map { TitleKey.make(candidates[$0].series) }
+                .max { (counts[$0] ?? 0) < (counts[$1] ?? 0) } ?? ""
+            let main = names[mainKey] ?? candidates[volumeRows[0]].series
+            for i in volumeRows {
+                let c = candidates[i]
+                let own = TitleKey.make(c.series) == mainKey
+                let issues = own ? (c.volumeIssues ?? "") : "\(c.series) \(c.volumeIssues ?? "")"
+                let name = (c.volumeName ?? "").isEmpty ? "" : ": \(c.volumeName ?? "")"
+                candidates[i].series = main
+                candidates[i].label = "\(main) Vol. \(c.volume ?? 0)\(name) (\(issues))"
+            }
+        }
+
         // Colors, most common first.
         var counts: [String: Int] = [:]
         var order: [String] = []
@@ -284,6 +326,32 @@ enum OrderExtractor {
 
     private static func stripListMarker(_ s: String) -> String {
         s.replacingOccurrences(of: #"^\s*(?:[-•*▪◦·]|\d{1,4}[.)])\s+"#, with: "", options: .regularExpression)
+    }
+
+    private static let volumeTitleRegex = try! NSRegularExpression(
+        pattern: #"^\s*vol(?:ume)?\.?\s*(\d{1,3})\b\s*(?:[:\-–—.]\s*(.*))?$"#, options: .caseInsensitive)
+
+    /// "Vol. 1: Power and Responsibility" -> (1, "Power and Responsibility")
+    static func volumeTitle(_ text: String) -> (number: Int, name: String)? {
+        let t = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        let ns = t as NSString
+        guard let m = volumeTitleRegex.firstMatch(in: t, range: NSRange(location: 0, length: ns.length)),
+              let n = Int(ns.substring(with: m.range(at: 1))) else { return nil }
+        let name = m.range(at: 2).location != NSNotFound ? ns.substring(with: m.range(at: 2)) : ""
+        return (n, name.trimmingCharacters(in: .whitespaces))
+    }
+
+    /// The first "Series #…" in a cell, and the issue part ("#1–7", "#86–90 + Annual #1").
+    static func firstItem(in text: String) -> (series: String, issues: String)? {
+        let t = normalize(text)
+        let ns = t as NSString
+        guard let m = itemRegex.firstMatch(in: t, range: NSRange(location: 0, length: ns.length)) else { return nil }
+        let series = ns.substring(with: m.range(at: 1)).trimmingCharacters(in: .whitespaces)
+        guard let hash = t.range(of: "#", range: t.range(of: series)?.upperBound.map { $0..<t.endIndex }) else { return nil }
+        let issues = String(t[hash.lowerBound...]).components(separatedBy: "\n")[0]
+            .replacingOccurrences(of: #"\s+"#, with: " ", options: .regularExpression)
+            .trimmingCharacters(in: .whitespaces)
+        return (series, issues)
     }
 
     /// "Daredevil (1964)" -> ("Daredevil", 1964, nil); "Daredevil Vol. 2" -> ("Daredevil", nil, 2)
@@ -376,7 +444,8 @@ enum ReadingOrderBuilder {
             } else if !colors.contains(colorId) {
                 return nil
             }
-            let kind = c.number == nil ? "oneshot" : (TitleKey.make(c.series) == hostKey ? "main" : "spinoff")
+            let kind = c.isVolume ? "volume"
+                : c.number == nil ? "oneshot" : (TitleKey.make(c.series) == hostKey ? "main" : "spinoff")
             return ReadingOrder.Entry(series: c.series, label: c.label, kind: kind, section: names[c.section] ?? "",
                                       number: c.number, year: c.year, volume: c.volume)
         }

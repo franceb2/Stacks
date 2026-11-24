@@ -30,20 +30,6 @@ struct LibrariesView: View {
                         Label(library.name, systemImage: library.systemImage)
                     }
                     .listRowBackground(Theme.card)
-                    .contextMenu {
-                        Button("Scan library", systemImage: "arrow.triangle.2.circlepath") {
-                            scanner.scan(client: client, library: library)
-                        }
-                        Button("Force scan (re-read every folder)", systemImage: "arrow.clockwise.circle") {
-                            scanner.scan(client: client, library: library, force: true)
-                        }
-                    }
-                    .swipeActions(edge: .trailing) {
-                        Button("Scan", systemImage: "arrow.triangle.2.circlepath") {
-                            scanner.scan(client: client, library: library)
-                        }
-                        .tint(Theme.primary)
-                    }
                 }
                 if loaded && libraries.isEmpty {
                     Text(error ?? "No libraries yet. Add one in Kavita on your PC.")
@@ -67,6 +53,11 @@ struct LibrariesView: View {
                         Section("Scan one library") {
                             ForEach(libraries) { library in
                                 Button(library.name) { scanner.scan(client: client, library: library) }
+                            }
+                        }
+                        Section("Force scan one library") {
+                            ForEach(libraries) { library in
+                                Button(library.name) { scanner.scan(client: client, library: library, force: true) }
                             }
                         }
                     }
@@ -136,9 +127,6 @@ struct SeriesGridView: View {
                     .contextMenu {
                         Button("Mark as read", systemImage: "checkmark.circle") { mark(series, read: true) }
                         Button("Mark as unread", systemImage: "circle") { mark(series, read: false) }
-                        Button("Want to Read", systemImage: "heart") {
-                            Task { try? await client.setWantToRead(series.id, true) }
-                        }
                         Button("Add to reading list…", systemImage: "text.badge.plus") {
                             listTarget = ListSheetTarget(target: .series(series.id), title: series.name)
                         }
@@ -166,18 +154,8 @@ struct SeriesGridView: View {
                     Picker("Sort by", selection: $sortRaw) {
                         ForEach(SeriesSort.allCases) { Text($0.label).tag($0.rawValue) }
                     }
-                    Divider()
-                    Button(route.library == nil ? "Scan all libraries" : "Scan this library",
-                           systemImage: "arrow.triangle.2.circlepath") {
-                        scanner.scan(client: client, library: route.library)
-                    }
-                    .disabled(scanner.scanning)
-                    Button("Force scan (re-read every folder)", systemImage: "arrow.clockwise.circle") {
-                        scanner.scan(client: client, library: route.library, force: true)
-                    }
-                    .disabled(scanner.scanning)
                 } label: {
-                    Image(systemName: "ellipsis.circle")
+                    Image(systemName: "arrow.up.arrow.down")
                 }
             }
         }

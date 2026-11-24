@@ -85,6 +85,20 @@ if let x = run("order.txt") {
                      "Invincible: Battle Beast#-", "Invincible#5", "Invincible#6"], "text lines and headings")
 }
 
+if let x = run("volumes.html") {
+    let e = ReadingOrderBuilder.entries(x, colors: ReadingOrderBuilder.defaultColors(x),
+                                        sections: ReadingOrderBuilder.defaultSections(x), libraryKeys: [],
+                                        hostName: "Ultimate Spider-Man")
+    let labels = e.map { "\($0.series)|v\($0.volume.map(String.init) ?? "-")|#\($0.number ?? "-")|\($0.kind)" }
+    print("  kept: \(labels)")
+    print("  labels: \(e.map(\.label))")
+    check(e.count == 5, "one entry per volume row plus the team-up issue (got \(e.count))")
+    check(labels.first == "Ultimate Spider-Man|v1|#-|volume", "Vol. 1 is a single volume entry")
+    check(labels.contains("Ultimate Spider-Man|v9|#-|volume"), "Vol. 9 (Ultimate Six) belongs to the main run")
+    check(e.first?.label == "Ultimate Spider-Man Vol. 1: Power and Responsibility (#1\u{2013}7)", "volume label")
+    check(labels.contains("Ultimate Marvel Team-Up|v-|#1|spinoff"), "single issues still work alongside volumes")
+}
+
 // Links become download links.
 let links = [
     ("https://docs.google.com/document/d/abc_123-X/edit?usp=sharing", "https://docs.google.com/document/d/abc_123-X/export?format=html"),

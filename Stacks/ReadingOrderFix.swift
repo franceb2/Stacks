@@ -305,13 +305,13 @@ struct MissingIssuesSheet: View {
             }
         }
         var out = orderSeen.map { s in (s, Self.ranges(numbers[s] ?? []), numbers[s]?.count ?? 0) }
-        if !oneShots.isEmpty { out.append(("One-shots", oneShots.joined(separator: "\n"), oneShots.count)) }
+        if !oneShots.isEmpty { out.append(("Volumes and one-shots", oneShots.joined(separator: "\n"), oneShots.count)) }
         return out
     }
 
     private var plainText: String {
         "\(order.title) — not in my library\n\n" + groups.map { g in
-            g.series == "One-shots" ? "One-shots:\n\(g.text)" : "\(g.series) \(g.text)"
+            g.series == "Volumes and one-shots" ? "Volumes and one-shots:\n\(g.text)" : "\(g.series) \(g.text)"
         }.joined(separator: "\n")
     }
 

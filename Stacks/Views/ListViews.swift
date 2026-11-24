@@ -1,9 +1,8 @@
 import SwiftUI
 
 struct ReadingListRoute: Hashable { let list: ReadingList }
-struct WantToReadRoute: Hashable {}
 
-/// Lists tab: Want to Read plus your Kavita reading lists.
+/// Lists tab: bookmarks, stats and your Kavita reading lists.
 struct ReadingListsView: View {
     let client: KavitaClient
 
@@ -19,8 +18,6 @@ struct ReadingListsView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 22) {
                 VStack(spacing: 10) {
-                    shortcutRow(WantToReadRoute(), icon: "heart.fill", title: "Want to Read",
-                                subtitle: "Series you've saved for later")
                     shortcutRow(BookmarksRoute(), icon: "bookmark.fill", title: "Bookmarks",
                                 subtitle: "Pages you've saved while reading")
                     shortcutRow(StatsRoute(), icon: "chart.bar.fill", title: "Reading stats",
@@ -327,62 +324,6 @@ struct ReadingListDetailView: View {
             items = try await client.readingListItems(list.id).sorted { $0.order < $1.order }
             error = nil
         } catch let urlError as URLError where urlError.code == .cancelled {
-        } catch {
-            self.error = KavitaClient.isOffline(error) ? "Can't reach your server." : error.localizedDescription
-        }
-        loaded = true
-    }
-}
-
-/// Kavita's Want to Read list.
-struct WantToReadView: View {
-    let client: KavitaClient
-    @State private var series: [Series] = []
-    @State private var loaded = false
-    @State private var error: String?
-
-    var body: some View {
-        ScrollView {
-            CardGrid {
-                ForEach(series) { s in
-                    NavigationLink(value: SeriesRoute(id: s.id, name: s.name)) {
-                        SeriesCard(series: s, client: client)
-                    }
-                    .buttonStyle(PressableStyle())
-                    .zoomSource("series-\(s.id)")
-                    .contextMenu {
-                        Button("Remove from Want to Read", systemImage: "heart.slash") {
-                            Task {
-                                try? await client.setWantToRead(s.id, false)
-                                await load()
-                            }
-                        }
-                    }
-                }
-            }
-            .padding(.vertical, 16)
-
-            if loaded && series.isEmpty {
-                VStack(spacing: 8) {
-                    Text(error ?? "Nothing saved yet").foregroundStyle(Theme.text)
-                    if error == nil {
-                        Text("Tap the heart on any series page to save it here.")
-                            .font(.footnote).foregroundStyle(Theme.muted)
-                    }
-                }
-                .padding(.top, 60)
-            }
-        }
-        .kavitaBackground()
-        .navigationTitle("Want to Read")
-        .refreshable { await load() }
-        .task { await load() }
-    }
-
-    private func load() async {
-        do {
-            series = try await client.wantToRead()
-            error = nil
         } catch {
             self.error = KavitaClient.isOffline(error) ? "Can't reach your server." : error.localizedDescription
         }

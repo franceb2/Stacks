@@ -106,7 +106,6 @@ extension View {
             }
             .navigationDestination(for: VolumeRoute.self) { VolumeView(route: $0, client: client) }
             .navigationDestination(for: ReadingListRoute.self) { ReadingListDetailView(route: $0, client: client) }
-            .navigationDestination(for: WantToReadRoute.self) { _ in WantToReadView(client: client) }
             .navigationDestination(for: CollectionRoute.self) { CollectionView(route: $0, client: client) }
             .navigationDestination(for: PersonRoute.self) { PersonView(route: $0, client: client) }
             .navigationDestination(for: SearchRoute.self) { _ in SearchView(client: client) }

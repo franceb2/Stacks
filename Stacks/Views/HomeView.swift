@@ -8,7 +8,6 @@ struct HomeView: View {
     @EnvironmentObject private var downloads: Downloads
     @State private var onDeck: [Series] = []
     @State private var updated: [GroupedSeries] = []
-    @State private var added: [Series] = []
     @State private var offline = false
     @ObservedObject private var connection = ConnectionStatus.shared
     @State private var error: String?
@@ -31,9 +30,10 @@ struct HomeView: View {
 
                 FavoritesRow(client: client)
 
-                if !onDeck.isEmpty {
+                // The first On Deck series is already the Continue reading card above.
+                if onDeck.count > 1 {
                     carousel("On Deck") {
-                        ForEach(onDeck) { series in
+                        ForEach(onDeck.dropFirst()) { series in
                             NavigationLink(value: SeriesRoute(id: series.id, name: series.name)) {
                                 SeriesCard(series: series, client: client).frame(width: 118)
                             }
@@ -58,19 +58,7 @@ struct HomeView: View {
                     }
                 }
 
-                if !added.isEmpty {
-                    carousel("Newly Added Series") {
-                        ForEach(added) { series in
-                            NavigationLink(value: SeriesRoute(id: series.id, name: series.name)) {
-                                SeriesCard(series: series, client: client).frame(width: 118)
-                            }
-                            .buttonStyle(PressableStyle())
-                            .zoomSource("series-\(series.id)")
-                        }
-                    }
-                }
-
-                if loaded && !offline && onDeck.isEmpty && updated.isEmpty && added.isEmpty {
+                if loaded && !offline && onDeck.isEmpty && updated.isEmpty {
                     VStack(spacing: 8) {
                         Text("Nothing here yet").font(.headline).foregroundStyle(Theme.text)
                         Text(error ?? "Add a library in Kavita on your PC, then pull down to refresh.")
@@ -167,7 +155,6 @@ struct HomeView: View {
     private func load() async {
         async let deck = client.onDeck()
         async let upd = client.recentlyUpdated()
-        async let new = client.recentlyAdded()
         do {
             onDeck = try await deck
             offline = false
@@ -176,7 +163,6 @@ struct HomeView: View {
             if KavitaClient.isOffline(error) { offline = true } else { self.error = error.localizedDescription }
         }
         updated = (try? await upd) ?? updated
-        added = (try? await new) ?? added
         if let hero = onDeck.first {
             heroChapter = try? await client.continuePoint(seriesId: hero.id)
         } else {

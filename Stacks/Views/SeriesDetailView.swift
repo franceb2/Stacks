@@ -37,7 +37,6 @@ struct SeriesDetailView: View {
     @State private var reader: ReaderLaunch?
     @State private var downloadTarget: DownloadTarget?
     @State private var summaryExpanded = false
-    @State private var wantToRead: Bool?
     @State private var listTarget: ListSheetTarget?
     @State private var downloadsQueued = 0
     @State private var selecting = false
@@ -89,6 +88,7 @@ struct SeriesDetailView: View {
         .task { await load() }
         .refreshable {
             await load()
+            NotificationCenter.default.post(name: .readingProgressChanged, object: nil)   // re-matches reading orders
             // Pulling down also re-fetches this series' covers, in case they changed on the PC.
             if let detail {
                 ImageCache.shared.reload([client.seriesCoverURL(route.id)]
@@ -127,7 +127,7 @@ struct SeriesDetailView: View {
         .safeAreaInset(edge: .bottom) {
             if selecting { selectionBar.transition(.move(edge: .bottom).combined(with: .opacity)) }
         }
-        .sensoryFeedback(.selection, trigger: wantToRead)
+        .sensoryFeedback(.selection, trigger: favorites.ids)
         .sensoryFeedback(.success, trigger: downloadsQueued)
     }
 
@@ -187,15 +187,6 @@ struct SeriesDetailView: View {
                 }
                 .buttonStyle(PrimaryButtonStyle())
             }
-            Button {
-                toggleWantToRead()
-            } label: {
-                Image(systemName: wantToRead == true ? "heart.fill" : "heart")
-                    .foregroundStyle(wantToRead == true ? Theme.primary : Theme.text)
-                    .frame(width: 22)
-            }
-            .buttonStyle(SecondaryButtonStyle())
-            .accessibilityLabel(wantToRead == true ? "Remove from Want to Read" : "Add to Want to Read")
             Button {
                 Task {
                     do { try await favorites.toggle(seriesId: route.id, client: client) }
@@ -592,15 +583,6 @@ struct SeriesDetailView: View {
         if ids.isSubset(of: selected) { selected.subtract(ids) } else { selected.formUnion(ids) }
     }
 
-    private func toggleWantToRead() {
-        let newValue = !(wantToRead ?? false)
-        wantToRead = newValue
-        Task {
-            do { try await client.setWantToRead(route.id, newValue) }
-            catch { wantToRead = !newValue }
-        }
-    }
-
     private func download(_ chapter: Chapter, name: String, range: DownloadRange) {
         downloadsQueued += 1
         downloads.start(client: client, chapter: chapter, seriesId: route.id,
@@ -629,7 +611,6 @@ struct SeriesDetailView: View {
                                                                              series: series, metadata: metadata))
             }
             continueChapter = try? await c
-            wantToRead = try? await client.isWantToRead(route.id)
             error = nil
         } catch let urlError as URLError where urlError.code == .cancelled {
         } catch {

@@ -312,6 +312,15 @@ final class ReadingOrderStore: ObservableObject {
             for c in candidates { dated.append((c, await year(of: c))) }
             let byYear = dated.sorted { ($0.1 ?? 0) < ($1.1 ?? 0) }
 
+            // A collected volume ("Vol. 3"): the same-named series that actually has a volume 3.
+            if e.kind == "volume", let v = e.volume {
+                await fetch(candidates.map(\.id))
+                chosen[k] = byYear.first { pair in
+                    details[pair.0.id]?.volumes.contains { $0.number == v || $0.minNumber == Double(v) } ?? false
+                }?.0 ?? byYear.first?.0
+                continue
+            }
+
             if let hint = order.yearHint(e) {
                 chosen[k] = dated.min { abs(($0.1 ?? 0) - hint) < abs(($1.1 ?? 0) - hint) }?.0
             } else if let v = e.volume {
@@ -386,7 +395,8 @@ final class ReadingOrderStore: ObservableObject {
                 used.insert(chapter.id)
             }
         }
-        for (index, e) in order.entries.enumerated() where picked[index] == nil && e.number == nil && fixedSeries[index] == nil {
+        for (index, e) in order.entries.enumerated()
+            where picked[index] == nil && e.number == nil && e.kind != "volume" && fixedSeries[index] == nil {
             guard let s = chosen[groupKey(e)], let d = details[s.id] else { continue }
             let all = d.allChapters
             let free = all.filter { !used.contains($0.id) }
@@ -569,9 +579,6 @@ struct ReadingOrderSection: View {
                     Toggle("Show issues not in my library", isOn: $showMissingRows)
                     if !missing.isEmpty {
                         Button("Missing issues (\(missing.count))", systemImage: "list.bullet.clipboard") { showMissing = true }
-                    }
-                    Button("Refresh", systemImage: "arrow.clockwise") {
-                        Task { await store.resolve(order, client: client, force: true) }
                     }
                     if order.source?.link != nil {
                         Button("Update from link", systemImage: "link") { refreshFromLink() }

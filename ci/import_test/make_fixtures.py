@@ -87,4 +87,20 @@ Notes: read in this order
 ## Phase Two
 Invincible #5, 6
 """)
+# A volumes-based order (trade paperbacks), like the Ultimate Spider-Man doc.
+vol_rows = [
+    ("Vol. 1: Power and Responsibility", "Ultimate Spider-Man #1\u20137", "(Read the whole volume)", "#000000"),
+    ("Vol. 2: Learning Curve", "Ultimate Spider-Man #8\u201313", "", "#000000"),
+    ("Ultimate Marvel Team-Up", "Ultimate Marvel Team-Up #1", "(Optional)", "#cc0000"),
+    ("Vol. 9: Ultimate Six", "Ultimate Six #1\u20137", "(Note: the essential tie-in)", "#000000"),
+    ("Vol. 15: Silver Sable", "Ultimate Spider-Man #86\u201390 + Annual #1", "", "#000000"),
+]
+vcells = "".join(f'<tr><td style="background-color:{bg}"><p><span>{a}</span></p></td>'
+                 f'<td style="background-color:{bg}"><p><span>{b}</span></p></td><td><p><span>{c}</span></p></td></tr>'
+                 for a, b, c, bg in vol_rows)
+open(f"{out}/volumes.html", "w").write(f"""<html><head><title>USM Volumes</title></head><body>
+<p><span>ULTIMATE SPIDER-MAN READING ORDER</span></p>
+<table><tr><td><p><span>TITLE / ARC</span></p></td><td><p><span>ISSUE</span></p></td><td><p><span>NOTES</span></p></td></tr>
+{vcells}</table></body></html>""")
+
 print("fixtures written")

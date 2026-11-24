@@ -22,7 +22,6 @@ struct SettingsView: View {
     @AppStorage("appTheme") private var themeRaw = AppTheme.kavita.rawValue
     @StateObject private var updates = UpdateChecker.shared
     @StateObject private var offlineLibrary = OfflineLibrary.shared
-    @ObservedObject private var scanner = LibraryScanner.shared
     @State private var faceID = AppLock.enabled
     @State private var faceIDProblem = false
     @Environment(\.openURL) private var openURL
@@ -121,25 +120,11 @@ struct SettingsView: View {
 
             Section {
                 LabeledContent("Address", value: session.serverAddress)
-                Button {
-                    scanner.scan(client: client, library: nil)
-                } label: {
-                    HStack {
-                        Text("Scan all libraries")
-                        Spacer()
-                        if scanner.scanning { ProgressView() }
-                    }
-                }
-                .disabled(scanner.scanning)
-                Button("Force scan all (re-read every folder)") {
-                    scanner.scan(client: client, library: nil, force: true)
-                }
-                .disabled(scanner.scanning)
                 Button("Sign out", role: .destructive) { confirmSignOut = true }
             } header: {
                 Text("Server")
             } footer: {
-                Text(scanner.message ?? "Added comics or books on your PC? Scan so Kavita finds them. If something still doesn't show up (like after renaming folders), Force scan re-reads everything. Needs an admin account.")
+                Text("To find comics you just added on your PC, scan from the Library tab (↻).")
             }
             .listRowBackground(Theme.card)
 
@@ -147,8 +132,6 @@ struct SettingsView: View {
                 Picker("Reading mode", selection: $comic.mode) {
                     ForEach(ReadingMode.allCases) { Label($0.label, systemImage: $0.systemImage).tag($0) }
                 }
-                Toggle("Right to left (manga)", isOn: $comic.rightToLeft)
-                    .disabled(comic.mode != .leftRight)
                 Toggle("Two pages when sideways", isOn: $comic.doublePage)
                     .disabled(comic.mode != .leftRight)
                 Toggle("Tap sides to turn pages", isOn: $comic.tapToTurn)
@@ -253,11 +236,6 @@ struct SettingsView: View {
             }
             .listRowBackground(Theme.card)
 
-            Section {
-                LabeledContent("Version", value: Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString")
-                                as? String ?? "1.0")
-            }
-            .listRowBackground(Theme.card)
         }
         .kavitaBackground()
         .navigationTitle("Settings")

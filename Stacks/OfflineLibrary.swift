@@ -2,7 +2,7 @@ import Foundation
 import SwiftUI
 
 /// Saves the whole library for offline browsing: every library list, the home rows, reading lists,
-/// Want to Read, each series page, and the covers. Runs in the background when the server is reachable.
+/// each series page, and the covers. Runs in the background when the server is reachable.
 /// Series pages and covers for everything are only fetched on Wi-Fi; on cellular just the essentials.
 @MainActor
 final class OfflineLibrary: ObservableObject {
@@ -29,11 +29,10 @@ final class OfflineLibrary: ObservableObject {
         guard let libraries = try? await client.libraries(), !ConnectionStatus.shared.offline else { return }
         let wifi = NetworkMonitor.shared.isUnmetered
 
-        // Home rows, lists, Want to Read.
+        // Home rows and lists.
         _ = try? await client.onDeck()
         _ = try? await client.recentlyUpdated()
         _ = try? await client.recentlyAdded()
-        _ = try? await client.wantToRead()
         if let lists = try? await client.readingLists() {
             for list in lists {
                 _ = try? await client.readingListItems(list.id)
@@ -77,7 +76,6 @@ final class OfflineLibrary: ObservableObject {
                         let detail = try? await client.seriesDetail(id: id)
                         _ = try? await client.metadata(seriesId: id)
                         _ = try? await client.continuePoint(seriesId: id)
-                        _ = try? await client.isWantToRead(id)
                         guard wifi else { return }
                         await ImageCache.shared.warm(client.seriesCoverURL(id))
                         // Issue and volume covers, so series pages look complete offline.
