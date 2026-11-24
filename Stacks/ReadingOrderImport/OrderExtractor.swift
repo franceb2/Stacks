@@ -347,7 +347,8 @@ enum OrderExtractor {
         let ns = t as NSString
         guard let m = itemRegex.firstMatch(in: t, range: NSRange(location: 0, length: ns.length)) else { return nil }
         let series = ns.substring(with: m.range(at: 1)).trimmingCharacters(in: .whitespaces)
-        guard let hash = t.range(of: "#", range: t.range(of: series)?.upperBound.map { $0..<t.endIndex }) else { return nil }
+        let from = t.range(of: series)?.upperBound ?? t.startIndex
+        guard let hash = t.range(of: "#", range: from..<t.endIndex) else { return nil }
         let issues = String(t[hash.lowerBound...]).components(separatedBy: "\n")[0]
             .replacingOccurrences(of: #"\s+"#, with: " ", options: .regularExpression)
             .trimmingCharacters(in: .whitespaces)
